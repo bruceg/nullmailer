@@ -1,7 +1,7 @@
 #ifndef NULLMAILER__NETSTRING__H__
 #define NULLMAILER__NETSTRING__H__
 
-#include "mystring.h"
+#include "mystring/mystring.h"
 mystring str2net(const mystring&);
 mystring strnl2net(const mystring&);
 

@@ -1,7 +1,7 @@
 #ifndef NULLMAILER__CONFIGIO__H__
 #define NULLMAILER__CONFIGIO__H__
 
-#include "mystring.h"
+#include "mystring/mystring.h"
 #include "list.h"
 
 bool config_read(const char* filename, mystring& result);

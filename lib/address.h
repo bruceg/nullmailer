@@ -1,7 +1,7 @@
 #ifndef NULLMAILER__ADDRESS__H__
 #define NULLMAILER__ADDRESS__H__
 
-#include "mystring.h"
+#include "mystring/mystring.h"
 
 bool parse_addresses(mystring& line, mystring& list);
 

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "defines.h"
 #include "configio.h"
-#include "fdbuf.h"
+#include "fdbuf/fdbuf.h"
 
 bool config_readint(const char* filename, int& result)
 {

@@ -1,7 +1,7 @@
 #include "config.h"
 #include <ctype.h>
 #include "canonicalize.h"
-#include "mystring.h"
+#include "mystring/mystring.h"
 #include "list.h"
 
 #define LSQBRACKET '['

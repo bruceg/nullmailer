@@ -1,5 +1,5 @@
 #include "config.h"
-#include "mystring.h"
+#include "mystring/mystring.h"
 #include "canonicalize.h"
 
 extern mystring defaultdomain;
@@ -9,7 +9,7 @@ void canonicalize(mystring& domain)
 {
   if(!domain)
     domain = defaulthost;
-  if(domain.find('.') < 0) {
+  if(domain.find_first('.') < 0) {
     if(!!defaultdomain) {
       domain += ".";
       domain += defaultdomain;

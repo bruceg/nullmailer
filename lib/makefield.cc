@@ -3,19 +3,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "itoa.h"
-#include "mystring.h"
-
-#ifdef TM_HAS_GMTOFF
-#define TIMEZONE (l->TM_HAS_GMTOFF)
-#else
-#define TIMEZONE timezone
-#endif
-
-#ifdef TM_HAS_ISDST
-#define DAYLIGHT (l->TM_HAS_ISDST)
-#else
-#define DAYLIGHT daylight
-#endif
+#include "mystring/mystring.h"
 
 mystring make_date()
 {
@@ -23,9 +11,16 @@ mystring make_date()
   time_t t = time(0);
   struct tm* l = localtime(&t);
   strftime(buf, 256, "%a, %d %b %Y %H:%M:%S ", l);
-  long tznum = -TIMEZONE/60;
-  if(DAYLIGHT)
+#ifdef TM_HAS_GMTOFF
+  long tznum = l->TM_HAS_GMTOFF/60;
+#else
+  long tznum = -timezone/60;
+#if TM_HAS_ISDST
+  int daylight = l->TM_HAS_ISDST;
+#endif // TM_HAS_ISDST
+  if(daylight)
     tznum += 60;
+#endif // TM_HAS_GMTOFF
   char tz[6];
   tz[0] = '+';
   if(tznum < 0) {

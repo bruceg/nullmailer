@@ -1,7 +1,7 @@
 #include "config.h"
 #include "defines.h"
 #include "configio.h"
-#include "fdbuf.h"
+#include "fdbuf/fdbuf.h"
 
 bool config_read(const char* filename, mystring& result)
 {

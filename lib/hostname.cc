@@ -1,8 +1,8 @@
 #include "config.h"
-#include "mystring.h"
+#include "mystring/mystring.h"
 #include <unistd.h>
 #include <sys/utsname.h>
-#include "fdbuf.h"
+#include "fdbuf/fdbuf.h"
 
 static mystring* hostname_cache = 0;
 static mystring* domainname_cache = 0;
