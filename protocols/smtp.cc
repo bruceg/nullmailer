@@ -139,9 +139,10 @@ int protocol_prep(fdibuf*)
 
 int protocol_send(fdibuf* in, int fd)
 {
+  read_hostnames();
   smtp conn(fd);
   conn.docmd("", 200);
-  conn.docmd("HELO " + hostname(), 200);
+  conn.docmd("HELO " + me, 200);
   conn.send(in);
   conn.docmd("QUIT", 200, true);
   return 0;

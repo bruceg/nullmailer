@@ -22,9 +22,7 @@
 #include "config.h"
 #include "mystring/mystring.h"
 #include "canonicalize.h"
-
-extern mystring defaultdomain;
-extern mystring defaulthost;
+#include "hostname.h"
 
 void canonicalize(mystring& domain)
 {

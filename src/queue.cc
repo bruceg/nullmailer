@@ -181,15 +181,11 @@ bool deliver()
   return true;
 }
 
-mystring defaulthost;
-mystring defaultdomain;
-
 int main(int, char*[])
 {
   if(config_read("adminaddr", adminaddr) && !!adminaddr) {
     remapadmin = true;
-    defaulthost = hostname();
-    defaultdomain = domainname();
+    read_hostnames();
     canonicalize(localhost);
   }
   

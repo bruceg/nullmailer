@@ -81,8 +81,6 @@ static mystring cur_line;
 ///////////////////////////////////////////////////////////////////////////////
 // Configuration
 ///////////////////////////////////////////////////////////////////////////////
-mystring defaultdomain;
-mystring defaulthost;
 mystring idhost;
 
 extern void canonicalize(mystring& domain);
@@ -90,13 +88,9 @@ extern void canonicalize(mystring& domain);
 void read_config()
 {
   mystring tmp;
-  if(!config_read("defaultdomain", defaultdomain))
-    defaultdomain = hostname();
-  if(!config_read("defaulthost", defaulthost))
-    defaulthost = hostname();
+  read_hostnames();
   if(!config_read("idhost", idhost))
     idhost = defaulthost;
-  canonicalize(defaulthost);
   canonicalize(idhost);
 }
 
