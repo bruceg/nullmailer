@@ -1,6 +1,6 @@
 . functions
 
-injtest() { echo "$@" | not inject >/dev/null }
+injtest() { echo "$@" | not inject >/dev/null; }
 
 echo "Checking that inject rejects leading continuation lines."
 injtest " foo..."

@@ -1,6 +1,6 @@
 . functions
 
-inj() { inject -n -v a </dev/null | head -1 }
+inj() { inject -n -v a </dev/null | head -1; }
 testvar() {
 	set -e
 	echo "Checking that inject obeys $1."
@@ -18,8 +18,8 @@ testhdr() {
 	echo "Checking that inject $1 $2:"
 	echo $2: $3 | inject -n -v a | head -1 | grep -q "$4"
 }
-testign() { testhdr ignores "$@" }
-testset() { testhdr uses "$@" }
+testign() { testhdr ignores "$@"; }
+testset() { testhdr uses "$@"; }
 
 echo "Checking that inject obeys hostname()"
 hostname=`hostname`

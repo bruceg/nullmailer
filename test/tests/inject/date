@@ -1,6 +1,6 @@
 . functions
 
-inj() { injectfield date 'to: nobody' "$@" }
+inj() { injectfield date 'to: nobody' "$@"; }
 
 echo "Checking that inject inserts a date line."
 test -n "`inj`"

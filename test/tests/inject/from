@@ -1,6 +1,6 @@
 . functions
 
-inj() { injectfield from 'to: nobody' "$@" }
+inj() { injectfield from 'to: nobody' "$@"; }
 testvar() {
 	set -e
 	echo "Checking that inject obeys $1."

@@ -1,6 +1,6 @@
 . functions
 
-inj() { injectfield message-id 'to: n' "$@" }
+inj() { injectfield message-id 'to: n' "$@"; }
 
 echo "Checking that inject inserts a message-id."
 test -n "`inj`"

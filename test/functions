@@ -1,10 +1,12 @@
 rm -rf /tmp/nm
 mkdir -p /tmp/nm/var/nullmailer/{queue,tmp}
 mkdir -p /tmp/nm/etc/nullmailer
+/bin/hostname --fqdn >/tmp/nm/etc/nullmailer/me
+/bin/hostname --domain >/tmp/nm/etc/nullmailer/defaultdomain
 
 #not() { if "$@"; then return 1; else return 0; fi }
-not() { ! safe "$@" }
-safe() { set +e; "$@"; result=$?; set -e; return $result }
+not() { ! safe "$@"; }
+safe() { set +e; "$@"; result=$?; set -e; return $result; }
 error() {
   local code=$1
   shift
@@ -22,7 +24,7 @@ error() {
   fi
 }
 
-inject() { ../src/nullmailer-inject "$@" }
+inject() { ../src/nullmailer-inject "$@"; }
 injectlines() {
   for line in "$@"; do
     echo "$line"
@@ -34,7 +36,7 @@ injectfield() {
   shift
   injectlines "$@" | formail -x "$field:"
 }
-protocol() { local p=$1; shift; ../protocols/$p "$@" >/dev/null 2>&1 }
+protocol() { local p=$1; shift; ../protocols/$p "$@" >/dev/null 2>&1; }
 
 export PATH=/bin:/usr/bin:/usr/local/bin
 rm -f $SYSCONFDIR/*
