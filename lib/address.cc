@@ -396,18 +396,19 @@ RULE(domain)
     node = r.next = skipcomment(r.next, comment);
     if(node->type != PERIOD)
       break;
+    r.str += PERIOD;
+    r.addr += PERIOD;
     node = node->next;
     result r1 = match_sub_domain(node);
     if(r1) {
       r.next = r1.next;
-      r.str += PERIOD;
       r.str += r1.str;
       comment += r1.comment;
-      r.addr += PERIOD;
       r.addr += r1.addr;
     }
     else {
       r.next = node;
+      node = r.next = skipcomment(r.next, comment);
     }
   }
   r.comment += comment;

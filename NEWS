@@ -6,6 +6,8 @@ Changes in version 1.00RC8
 
 - Handle the "-bs" flag in the sendmail wrapper by dieing when we see it.
 
+- Fixed the address parser handling domain names with trailing periods.
+
 Note:  If no further bugs are found, this will become the official
 version 1.00 release.
 

@@ -70,8 +70,12 @@ int main()
        "e@x.b.c\n");
   // trailing period
   TEST("e@c.d.",
-       "e@c.d",
-       "e@c.d\n");
+       "e@c.d.",
+       "e@c.d.\n");
+  // trailing period, single domain
+  TEST("e@c.",
+       "e@c.",
+       "e@c.\n");
   // comment <address> style
   TEST("x<y@a.b>",
        "x <y@a.b>",
