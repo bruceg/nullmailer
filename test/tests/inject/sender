@@ -1,6 +1,6 @@
 . functions
 
-inj() { inject -n -v a </dev/null 2>/dev/null | head -1; }
+inj() { inject -n -v a </dev/null 2>/dev/null | head -n 1; }
 testvar() {
 	set -e
 	echo "Checking that inject obeys $1."
@@ -16,7 +16,7 @@ testcanon() {
 testhdr() {
 	set -e
 	echo "Checking that inject $1 $2:"
-	echo $2: $3 | inject -n -v a 2>/dev/null | head -1 | grep -q "$4"
+	echo $2: $3 | inject -n -v a 2>/dev/null | head -n 1 | grep -q "$4"
 }
 testign() { testhdr ignores "$@"; }
 testset() { testhdr uses "$@"; }

@@ -1,6 +1,6 @@
 . functions
 
-inj() { inject -n -v "$@" | tail +2 | sed '/^$/,$d'; }
+inj() { inject -n -v "$@" | tail -n +2 | sed '/^$/,$d'; }
 inj-find() { echo to: a@b.c | inj "$1" d@e.f | grep -q "$2"; }
 inj-notfind() { echo to: a@b.c | inj "$1" d@e.f | not grep -q "$2"; }
 
