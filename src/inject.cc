@@ -6,15 +6,15 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "mystring.h"
+#include "mystring/mystring.h"
 #include "list.h"
 #include "hostname.h"
-#include "fdbuf.h"
+#include "fdbuf/fdbuf.h"
 #include "itoa.h"
 #include "address.h"
 #include "canonicalize.h"
 #include "configio.h"
-#include "cli.h"
+#include "cli/cli.h"
 
 enum {
   use_args, use_both, use_either, use_header
@@ -89,7 +89,7 @@ void parse_recips(const mystring& list)
   if(!!list) {
     int start = 0;
     int end;
-    while((end = list.find('\n', start)) >= 0) {
+    while((end = list.find_first('\n', start)) >= 0) {
       recipients.append(list.sub(start, end-start));
       start = end+1;
     }
@@ -107,8 +107,8 @@ bool parse_recip_arg(mystring str)
 
 bool parse_sender(const mystring& list)
 {
-  int end = list.find('\n');
-  if(end > 0 && list.find('\n', end+1) < 0) {
+  int end = list.find_first('\n');
+  if(end > 0 && list.find_first('\n', end+1) < 0) {
     sender = list.sub(0, end);
     return true;
   }

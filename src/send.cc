@@ -12,7 +12,7 @@
 #include "configio.h"
 #include "defines.h"
 #include "errcodes.h"
-#include "fdbuf.h"
+#include "fdbuf/fdbuf.h"
 #include "itoa.h"
 #include "list.h"
 

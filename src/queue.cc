@@ -7,8 +7,8 @@
 #include <unistd.h>
 #include "itoa.h"
 #include "defines.h"
-#include "mystring.h"
-#include "fdbuf.h"
+#include "mystring/mystring.h"
+#include "fdbuf/fdbuf.h"
 #include "configio.h"
 #include "canonicalize.h"
 #include "hostname.h"
@@ -66,7 +66,7 @@ bool validate_addr(mystring& addr, bool doremap)
     if(hostname == localhost || hostname == "localhost")
       addr = adminaddr;
   }
-  else if(hostname.find('.') < 0)
+  else if(hostname.find_first('.') < 0)
     return false;
   return true;
 }

@@ -3,10 +3,10 @@
 #include <unistd.h>
 #include "connect.h"
 #include "errcodes.h"
-#include "fdbuf.h"
+#include "fdbuf/fdbuf.h"
 #include "hostname.h"
 #include "itoa.h"
-#include "mystring.h"
+#include "mystring/mystring.h"
 #include "protocol.h"
 
 int port = 25;

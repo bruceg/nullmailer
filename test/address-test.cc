@@ -1,10 +1,10 @@
 #include "config.h"
 #include <ctype.h>
 #include "canonicalize.h"
-#include "mystring.h"
+#include "mystring/mystring.h"
 #include "address.h"
 
-#include "fdbuf.h"
+#include "fdbuf/fdbuf.h"
 #include "itoa.h"
 
 static bool test(const mystring& in,

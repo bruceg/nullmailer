@@ -1,6 +1,6 @@
 #include "config.h"
 #include "defines.h"
-#include "fdbuf.h"
+#include "fdbuf/fdbuf.h"
 #include "itoa.h"
 #include <dirent.h>
 #include <stdlib.h>
