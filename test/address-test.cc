@@ -8,8 +8,8 @@
 #include "itoa.h"
 
 static bool test(const mystring& in,
-		const mystring& out,
-		const mystring& list)
+		 const mystring& out,
+		 const mystring& list)
 {
   mystring line = in;
   mystring tmplist;
@@ -35,7 +35,7 @@ static bool test(const mystring& in,
   return status;
 }
 
-#define TEST(X,Y,Z) ++count; if(!test(X,Y,Z)) ++failed
+#define TEST(X,Y,Z) do{ ++count; if(!test(X,Y,Z)) ++failed; }while(0)
 
 mystring defaulthost = "a";
 mystring defaultdomain = "b.c";
@@ -172,6 +172,7 @@ int main()
   //     "who knows",
   //     "e@f.g\n");
   
-  fout << itoa(count) << " tests run, " << itoa(failed) << " failed." << endl;
+  fout << itoa(count) << " tests run, ";
+  fout << itoa(failed) << " failed." << endl;
   return failed;
 }
