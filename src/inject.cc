@@ -91,7 +91,7 @@ void read_config()
 {
   mystring tmp;
   if(!config_read("defaultdomain", defaultdomain))
-    defaultdomain = domainname();
+    defaultdomain = hostname();
   if(!config_read("defaulthost", defaulthost))
     defaulthost = hostname();
   if(!config_read("idhost", idhost))
@@ -161,10 +161,11 @@ struct header_field
 
   bool present;
 
-  bool parse(mystring& line) 
+  bool parse(mystring& line, bool& rm) 
     {
       if(strncasecmp(line.c_str(), name, length))
 	return false;
+      rm = remove;
       if(ignore)
 	return true;
       if(is_resent) {
@@ -175,11 +176,15 @@ struct header_field
 	}
 	header_is_resent = true;
       }
-      mystring tmp = line.right(length);
       if(is_address) {
+	mystring tmp = line.right(length);
 	mystring list;
 	if(!parse_addresses(tmp, list))
 	  bad_hdr(line, "Unable to parse the addresses.");
+	else if(!tmp) {
+	  rm = true;
+	  return true;
+	}
 	else {
 	  line = mystringjoin(name) + " " + tmp;
 	  if(is_recipient) {
@@ -304,10 +309,8 @@ bool parse_line(mystring& line)
   bool remove = false;
   for(unsigned i = 0; i < header_field_count; i++) {
     header_field& h = header_fields[i];
-    if(h.parse(line)) {
-      remove = h.remove;
+    if(h.parse(line, remove))
       break;
-    }
   }
   if(!remove)
     headers.append(line);
