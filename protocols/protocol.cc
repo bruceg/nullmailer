@@ -25,7 +25,7 @@
 #include "connect.h"
 #include "errcodes.h"
 #include "protocol.h"
-#include "cli.h"
+#include "cli++.h"
 
 const char* cli_help_suffix = "";
 const char* cli_args_usage = "remote-address < mail-file";

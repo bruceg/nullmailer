@@ -35,7 +35,7 @@
 #include "address.h"
 #include "canonicalize.h"
 #include "configio.h"
-#include "cli/cli.h"
+#include "cli++/cli++.h"
 
 enum {
   use_args, use_both, use_either, use_header

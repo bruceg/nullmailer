@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include "fdbuf/fdbuf.h"
 #include "defines.h"
-#include "cli/cli.h"
+#include "cli++/cli++.h"
 
 const char* cli_program = "sendmail";
 const char* cli_help_prefix = "Nullmailer sendmail emulator\n";

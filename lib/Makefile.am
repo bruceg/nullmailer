@@ -1,4 +1,4 @@
-SUBDIRS = cli fdbuf mystring
+SUBDIRS = cli++ fdbuf mystring
 noinst_LIBRARIES = libmisc.a libnullmailer.a
 noinst_HEADERS = list.h
 EXTRA_DIST = make_defines.sh listtest.cc mergelib.sh
