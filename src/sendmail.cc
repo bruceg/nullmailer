@@ -37,12 +37,13 @@ const int cli_args_max = -1;
 static int o_dummyi;
 static const char* o_dummys;
 static const char* o_sender = 0;
+static const char* o_mode = 0;
 static char* o_from;
 static int use_header = false;
 
 cli_option cli_options[] = {
   { 'B', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'b', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  { 'b', 0, cli_option::string, 0, &o_mode, "Ignored", 0 },
   { 'C', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
   { 'd', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
   { 'F', 0, cli_option::string, 0, &o_sender,
@@ -108,6 +109,10 @@ int parseargs()
   if(o_from)
     if(!setenvelope(o_from))
       return -1;
+  if (o_mode && !strcmp(o_mode, "s")) {
+    ferr << "sendmail: option -bs is unsupported" << endl;
+    return -1;
+  }
   return 0;
 }
 

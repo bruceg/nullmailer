@@ -4,6 +4,8 @@ Changes in version 1.00RC8
 
 - Made permissions on queued files more strict.
 
+- Handle the "-bs" flag in the sendmail wrapper by dieing when we see it.
+
 Note:  If no further bugs are found, this will become the official
 version 1.00 release.
 
