@@ -233,9 +233,12 @@ bool send_all()
   fout << "Starting delivery, "
        << itoa(files.count()) << " message(s) in queue." << endl;
   for(rlist::iter remote(remotes); remote; remote++) {
-    for(slist::iter file(files); file; files.remove(file)) {
-      if(!send_one(*file, *remote))
-	break;
+    slist::iter file(files);
+    while(file) {
+      if(send_one(*file, *remote))
+	files.remove(file);
+      else
+	file++;
     }
   }
   fout << "Delivery complete, "
