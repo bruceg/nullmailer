@@ -18,9 +18,9 @@ install-data-local:
 install-root:
 	chown nullmail $(DESTDIR)$(localstatedir)/*
 	chown nullmail $(DESTDIR)$(sbindir)/nullmailer-queue
-	chmod o+s $(DESTDIR)$(sbindir)/nullmailer-queue
+	chmod u+s $(DESTDIR)$(sbindir)/nullmailer-queue
 	chown nullmail $(DESTDIR)$(bindir)/mailq
-	chmod o+s $(DESTDIR)$(bindir)/mailq
+	chmod u+s $(DESTDIR)$(bindir)/mailq
 
 dist-hook:
 	sed -e s/@VERSION\@/@VERSION@/ \
