@@ -90,8 +90,9 @@ void read_config()
   mystring tmp;
   read_hostnames();
   if(!config_read("idhost", idhost))
-    idhost = defaulthost;
-  canonicalize(idhost);
+    idhost = me;
+  else
+    canonicalize(idhost);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
