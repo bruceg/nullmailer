@@ -37,16 +37,24 @@ cli_option cli_options[] = {
   {0}
 };
 
+void protocol_fail(int e, const char* msg)
+{
+  ferr << cli_program << ": Failed";
+  if (msg)
+    ferr << ": " << msg;
+  ferr << endl;
+  exit(e);
+}
+
 int cli_main(int, char* argv[])
 {
   const char* remote = argv[0];
   fdibuf in(0, true);
-  int tmp = protocol_prep(&in);
-  if(tmp)
-    return tmp;
+  protocol_prep(&in);
   int fd = tcpconnect(remote, port);
   if(fd < 0)
-    return -fd;
-  return protocol_send(&in, fd);
+    protocol_fail(-fd, "Connect failed");
+  protocol_send(&in, fd);
+  return 0;
 }
 

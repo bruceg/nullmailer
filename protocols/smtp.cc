@@ -69,7 +69,7 @@ int smtp::get(mystring& str)
     code = atoi(tmp.c_str());
     if(!!str)
       str += "/";
-    str += tmp.right(4);
+    str += tmp;
     if(tmp[3] != '-')
       break;
   }
@@ -101,7 +101,7 @@ void smtp::docmd(mystring cmd, int range, bool nofail)
 	e = ERR_MSG_TEMPFAIL;
       else
 	e = ERR_PROTO;
-      exit(e);
+      protocol_fail(e, msg.c_str());
     }
   }
 }
@@ -120,8 +120,9 @@ void smtp::send_data(fdibuf* msg)
   docmd("DATA", 300);
   mystring tmp;
   while(msg->getline(tmp)) {
-    if(tmp[0] == '.' && !(out << ".")) exit(ERR_MSG_WRITE);
-    if(!(out << tmp << "\r\n")) exit(ERR_MSG_WRITE);
+    if((tmp[0] == '.' && !(out << ".")) ||
+       !(out << tmp << "\r\n"))
+      protocol_fail(ERR_MSG_WRITE, "Error sending message to remote");
   }
   docmd(".", 200);
 }
@@ -132,19 +133,17 @@ void smtp::send(fdibuf* msg)
   send_data(msg);
 }
 
-int protocol_prep(fdibuf*)
+void protocol_prep(fdibuf*)
 {
-  return 0;
 }
 
-int protocol_send(fdibuf* in, int fd)
+void protocol_send(fdibuf* in, int fd)
 {
   mystring hh = getenv("HELOHOST");
-  if (!hh) return 1;
+  if (!hh) protocol_fail(1, "$HELOHOST is not set");
   smtp conn(fd);
   conn.docmd("", 200);
   conn.docmd("HELO " + me, 200);
   conn.send(in);
   conn.docmd("QUIT", 200, true);
-  return 0;
 }

@@ -41,7 +41,7 @@ class qmqp
 public:
   qmqp(int fd);
   ~qmqp();
-  int send(fdibuf* msg, unsigned long size, const mystring& env);
+  void send(fdibuf* msg, unsigned long size, const mystring& env);
 };
 
 qmqp::qmqp(int fd)
@@ -64,10 +64,10 @@ bool skip_envelope(fdibuf* msg)
   return msg;
 }
   
-int qmqp::send(fdibuf* msg, unsigned long size, const mystring& env)
+void qmqp::send(fdibuf* msg, unsigned long size, const mystring& env)
 {
   if(!skip_envelope(msg))
-    return -ERR_MSG_READ;
+    protocol_fail(ERR_MSG_READ, "Error re-reading message");
   unsigned long fullsize = strlen(itoa(size)) + 1 + size + 1 + env.length();
   out << itoa(fullsize) << ":"	// Start the "outer" netstring
       << itoa(size) << ":";	// Start the message netstring
@@ -76,15 +76,15 @@ int qmqp::send(fdibuf* msg, unsigned long size, const mystring& env)
       << env			// The envelope is already encoded
       << ",";			// End the "outer" netstring
   if(!out.flush())
-    return -ERR_MSG_WRITE;
+    protocol_fail(ERR_MSG_WRITE, "Error sending message to remote");
   mystring response;
   if(!in.getnetstring(response))
-    return -ERR_PROTO;
+    protocol_fail(ERR_PROTO, "Response from remote was not a netstring");
   switch(response[0]) {
-  case 'K': return 0;
-  case 'Z': return -ERR_MSG_TEMPFAIL;
-  case 'D': return -ERR_MSG_PERMFAIL;
-  default: return -ERR_PROTO;
+  case 'K': return;
+  case 'Z': protocol_fail(ERR_MSG_TEMPFAIL, response.c_str()+1); break;
+  case 'D': protocol_fail(ERR_MSG_PERMFAIL, response.c_str()+1); break;
+  default: protocol_fail(ERR_PROTO, "Invalid status byte in response");
   }
 }
 
@@ -119,16 +119,15 @@ bool preload_data(fdibuf* msg, unsigned long& size, mystring& env)
 static unsigned long msg_size;
 static mystring msg_envelope;
 
-int protocol_prep(fdibuf* in)
+void protocol_prep(fdibuf* in)
 {
   if(!preload_data(in, msg_size, msg_envelope))
-    return ERR_MSG_READ;
-  return 0;
+    protocol_fail(ERR_MSG_READ, "Error reading message");
 }
 
-int protocol_send(fdibuf* in, int fd)
+void protocol_send(fdibuf* in, int fd)
 {
   alarm(60*60);			// Connection must close after an hour
   qmqp conn(fd);
-  return -conn.send(in, msg_size, msg_envelope);
+  conn.send(in, msg_size, msg_envelope);
 }
