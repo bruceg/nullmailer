@@ -34,7 +34,7 @@ const int cli_args_max = 1;
 cli_option cli_options[] = {
   { 'p', "port", cli_option::integer, 0, &port,
     "Set the port number on the remote host to connect to", 0 },
-  {0}
+  {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
 
 void protocol_fail(int e, const char* msg)

@@ -69,7 +69,7 @@ cli_option cli_options[] = {
   { 'V', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
   { 'v', 0, cli_option::flag, 0, &o_dummyi, "Ignored", 0 },
   { 'X', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  {0}
+  {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
 
 #ifdef HAVE_SETENV
