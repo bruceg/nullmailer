@@ -1,0 +1,30 @@
+.TH nullmailer 7
+.SH NAME
+nullmailer \- Overview of nullmailer documentation
+.SH INTRODUCTION
+.B nullmailer
+is a simple and secure relay-only mail transport agent.
+.P
+Documentation on how messages are reformatted and injected into the
+queue can be found in
+.BR nullmailer-inject (1).
+Documentation on how messages are actually inserted into the queue can
+be found in
+.BR nullmailer-queue (8).
+The process of sending queued messages is described in
+.BR nullmailer-send (8).
+.P
+The following table lists all the control files used by
+.BR nullmailer .
+.RS
+.nf
+.ta 5c
+control file	used by
+.I adminaddr	\fBnullmailer-queue
+.I defaultdomain	\fBnullmailer-inject
+.I defaulthost	\fBnullmailer-inject
+.I idhost	\fBnullmailer-inject
+.I pausetime	\fBnullmailer-send
+.I remotes	\fBnullmailer-send
+.fi
+.RE
