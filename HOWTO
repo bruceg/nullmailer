@@ -44,5 +44,4 @@ Footnotes:
 during compilation.  It defaults to /usr/local/etc
 2. QMQP is a high-speed mail queueing protocol, used with qmail.  See
 http://cr.yp.to/proto/qmqp.html
-3. See http://cr.yp.to/daemontools.html.  I have RPMS available at
-http://em.ca/~bruceg/rpms/daemontools/
+3. See http://cr.yp.to/daemontools.html.
