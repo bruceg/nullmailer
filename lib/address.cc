@@ -97,36 +97,43 @@ anode::anode(node_type t, mystring s)
 struct result
 {
   anode* next;
+  bool good;
   mystring str;
   mystring comment;
   mystring addr;
 
+  result();
   result(const result&);
-  result(anode* = 0);
+  result(anode*);
   result(anode*, const mystring&, const mystring&, const mystring&);
   bool operator!() const
     {
-      return !next;
+      return !good;
     }
   operator bool() const
     {
-      return next;
+      return good;
     }
 };
 
+result::result()
+  : next(0), good(0)
+{
+}
+
 result::result(anode* n)
-  : next(n)
+  : next(n), good(1)
 {
 }
 
 result::result(anode* n, const mystring& s,
 	       const mystring& c, const mystring& l)
-  : next(n), str(s), comment(c), addr(l)
+  : next(n), good(1), str(s), comment(c), addr(l)
 {
 }
 
 result::result(const result& r)
-  : next(r.next), str(r.str), comment(r.comment), addr(r.addr)
+  : next(r.next), good(r.good), str(r.str), comment(r.comment), addr(r.addr)
 {
 }
 
@@ -595,6 +602,7 @@ RULE(address)
 RULE(addresses)
 {
   ENTER("address *(*(COMMA) address) EOF");
+  if(node->type == EOT) RETURN(0, "", "", "");
   MATCHRULE(r1, address);
   r1.str += r1.comment;
   r1.comment = "";
