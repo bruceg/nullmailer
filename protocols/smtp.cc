@@ -1,5 +1,5 @@
 // nullmailer -- a simple relay-only MTA
-// Copyright (C) 1999-2003  Bruce Guenter <bruceg@em.ca>
+// Copyright (C) 2005  Bruce Guenter <bruceg@em.ca>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -109,9 +109,9 @@ void smtp::send_envelope(fdibuf* msg)
 {
   mystring tmp;
   msg->getline(tmp);
-  docmd("MAIL FROM: <" + tmp + ">", 200);
+  docmd("MAIL FROM:<" + tmp + ">", 200);
   while(msg->getline(tmp) && !!tmp)
-    docmd("RCPT TO: <" + tmp + ">", 200);
+    docmd("RCPT TO:<" + tmp + ">", 200);
 }
 
 void smtp::send_data(fdibuf* msg)

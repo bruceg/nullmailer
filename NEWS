@@ -2,6 +2,8 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.00RC8
 
+- Fixed extraneous spaces in SMTP sender.
+
 - Made permissions on queued files more strict.
 
 - Handle the "-bs" flag in the sendmail wrapper by dieing when we see it.
