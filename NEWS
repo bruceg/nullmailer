@@ -2,6 +2,8 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.00RC6
 
+- Protocol modules now report all failure and success messages.
+
 - Removed the whole gethostname/getdomainname mess and replaced it with
   code to read the hostname from the "me" control file, and the default
   domain name from the "defaultdomain" control file.
@@ -14,8 +16,14 @@ Changes in version 1.00RC6
 
 - Fixed a bug in the setenv function in sendmail.cc.
 
+NOTE!  Make sure to set up the new "me" control file before using this
+version.  The RPM install does this automatically.
+
 Note:  If no further bugs are found, this will become the official
 version 1.00 release.
+
+Development of this version has been sponsored by FutureQuest, Inc.
+ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
 Changes in version 1.00RC5
 
