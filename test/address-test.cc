@@ -60,6 +60,10 @@ int main()
   TEST("e@x",
        "e@x.b.c",
        "e@x.b.c\n");
+  // trailing period
+  TEST("e@c.d.",
+       "e@c.d",
+       "e@c.d\n");
   // comment <address> style
   TEST("x<y@a.b>",
        "x <y@a.b>",
