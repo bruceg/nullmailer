@@ -16,6 +16,8 @@ Changes in version 1.00RC8
 - Fixed bug in header parsing that would cause the last header line to
   be repeated if there was no body.
 
+- Fixed bug in handling headers containing CR+LF line endings.
+
 Note:  If no further bugs are found, this will become the official
 version 1.00 release.
 

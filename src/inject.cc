@@ -333,7 +333,7 @@ bool read_header()
 {
   mystring whole;
   while(fin.getline(cur_line)) {
-    if(!cur_line)
+    if(!cur_line || cur_line == "\r")
       break;
     if(!!whole && is_continuation(cur_line)) {
       //if(!whole)

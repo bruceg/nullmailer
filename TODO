@@ -1,6 +1,3 @@
-- Fix header parsing continuing past headers when the headers contain
-  \r\n?
-
 - Document proto/smtp use $HELOHOST for the HELO string.
 
 - Check documentation regarding init.d scripts.
