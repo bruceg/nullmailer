@@ -28,8 +28,8 @@ static bool test(const mystring& in,
   if(!!out && line != out) {
     fout << "Parsing of '" << in << "' failed: bad result string, was:\n"
 	 << line
-	 << "should be:\n"
-	 << out;
+	 << "\nshould be:\n"
+	 << out << "\n";
     status = false;
   }
   return status;
