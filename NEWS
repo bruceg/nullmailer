@@ -1,5 +1,11 @@
 This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
+Changes in version 0.41
+
+- Imported latest fdbuf, mystring, and cli libraries.
+
+- Fixed a bug in the timezone handling on systems with tm_gmtoff.
+-------------------------------------------------------------------------------
 Changes in version 0.40
 
 - Fixed some compile problems to allow nullmailer to compile on FreeBSD.

@@ -21,6 +21,8 @@ EXTRAS="ChangeLog HOWTO NEWS README TODO YEAR2000"
 # the version-numbered directory in the destination site.
 EXTRAS_VER="ANNOUNCEMENT"
 
+VERSION_BASE=archive
+
 # Set HOSTNAME to the name of the host to which to connect via ssh
 HOSTNAME=em.ca
 
