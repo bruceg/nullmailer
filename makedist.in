@@ -1,8 +1,8 @@
 # Template makedist.in file
 
 # Set PKGURL to the full base URL for the package web site.
-PKGURL=http://em.ca/~bruceg/nullmailer/
-LISTURL='http://lists.em.ca/ezmlm.cgi?2'
+PKGURL=http://untroubled.org/nullmailer/
+LISTURL='http://lists.em.ca/?list=nullmailer'
 
 # If LISTSUB is set, makedist will add a note regarding mailing list
 # subscription.
@@ -27,7 +27,7 @@ EXTRAS_DIST=
 
 VERSION_BASE=archive
 
-WEBSITE=em.ca
+WEBSITE=untroubled.org
 WEBDIR=www/nullmailer
 
 # Set RPMUPLOAD to a list of additional "hostname/path" destinations to
