@@ -69,3 +69,30 @@ AC_DEFUN(TEST_STRUCT_TM,
 	then AC_DEFINE(TM_HAS_GMTOFF,__tm_gmtoff)
 	fi
 )
+
+dnl TRY_STRUCT_UTSNAME_MEMBER(MEMBER,FLAGNAME)
+AC_DEFUN(TRY_STRUCT_UTSNAME_MEMBER,
+[ AC_CACHE_CHECK(whether struct utsname contains [$1],
+	[$2],
+	cat >conftest.c <<EOF
+#include <sys/utsname.h>
+int main() { struct utsname* foo; foo->[$1]; }
+EOF
+	if ${CC} ${CFLAGS} -c conftest.c >/dev/null 2>&1; then
+		[$2]=yes
+	else
+		[$2]=no
+	fi
+	rm -f conftest*)
+])
+
+AC_DEFUN(TEST_STRUCT_UTSNAME,
+  TRY_STRUCT_UTSNAME_MEMBER(domainname, local_cv_flag_UTSNAME_HAS_DOMAINNAME)
+  TRY_STRUCT_UTSNAME_MEMBER(__domainname,
+                            local_cv_flag_UTSNAME_HAS___DOMAINNAME)
+  if test "$local_cv_flag_UTSNAME_HAS_DOMAINNAME" = yes
+  then AC_DEFINE(UTSNAME_HAS_DOMAINNAME,domainname)
+  elif test "$local_cv_flag_UTSNAME_HAS___DOMAINNAME" = yes
+  then AC_DEFINE(UTSNAME_HAS_DOMAINNAME,__domainname)
+  fi
+)

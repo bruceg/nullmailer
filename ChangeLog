@@ -1,3 +1,13 @@
+2000-06-28  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* lib/hostname.cc (getnames): Changed the logic here to append the
+	domain name to the node name to produce the fully qualified host
+	name if the node name does not already contain the domain name.
+
+	* protocols/smtp.cc: Changed all the calls to smtp::docmd to use
+	the start of the range instead of the expected response.  This may
+	have been causing some SMTP sessions to fail.
+
 2000-06-19  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
 
 	* lib/tcpconnect.cc (tcpconnect): Removed an extraneous const from

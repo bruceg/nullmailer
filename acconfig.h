@@ -15,3 +15,5 @@
 #undef TM_HAS_GMTOFF
 
 #undef TM_HAS_ISDST
+
+#undef UTSNAME_HAS_DOMAINNAME
