@@ -158,8 +158,7 @@ bool load_files()
 
 void exec_protocol(int fd, remote& remote)
 {
-  if(close(0) == -1 || dup2(fd, 0) == -1 || close(fd) == -1 ||
-     close(1) == -1 || close(2) == -1)
+  if(close(0) == -1 || dup2(fd, 0) == -1 || close(fd) == -1)
     return;
   mystring program = PROTOCOL_DIR + remote.proto;
   const char* args[3+remote.options.count()];
