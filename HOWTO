@@ -1,0 +1,45 @@
+Configuration of this program in the typical case is quite simple.
+
+1. Compile and install the program.  If you are using the RPM, skip this
+step.  See the INSTALL file for more details.  Note that this package is
+designed to execute as a non-priveleged user named "nullmail".  When you
+do the final install, add the "nullmail" user (typically with either a
+non-priveleged group or a new "nullmail" group) and run "make
+install-root" to set up the files with the proper permissions.
+
+2. Determine who your relay host is.  This is the computer or computers
+to which you will send all your mail.
+
+3. Into the file SYSCONFDIR/nullmailer/remotes, put one line for each of
+your relay hosts:
+	HOSTNAME PROTOCOL
+You will have specified the SYSCONFDIR during configuration of the
+install step.  On most systems, it will be /usr/local/etc.  The RPMs use
+/etc.  HOSTNAME is the fully-qualified host name of the relay host, or
+its numerical IP address.  PROTOCOL will typically be "smtp" (without
+the quotes), but QMQP[1] is also supported with the "qmqp" module.
+
+4. Start nullmailer-send.  If you are using the RPM, ignore the rest of
+the instructions and type:
+	/etc/rc.d/init.d/nullmailer start
+The daemontools[2] package includes a log recording facility (accustamp
+and cyclog) as well as supervisor agents (supervise, svc, and svstat).
+To run the program using these tools:
+- create a directory into which the logs should be put
+- create a directory for the supervisory data
+- make both of these owned by nullmail
+- if you are using the standard daemontools, run (all one line):
+	env - PATH="$PATH" setuser nullmail supervise SUPERVISOR-DIR sh -c 'nullmailer-send | accustamp | cyclog LOG-DIR' &
+- if you are using daemontools patched with my supervise-pipe patch, run:
+	env - PATH="$PATH" setuser nullmail supervise SUPERVISOR-DIR nullmailer-send \| accustamp \| cyclog LOG-DIR &
+
+5. You're done!  The included sendmail emulator front-end should allow
+most (if not all) sendmail-compatible programs to run without any
+changes.  See the man page for nullmailer-inject for details on outgoing
+email message header formatting options.
+
+Footnotes:
+1. QMQP is a high-speed mail queueing protocol, used with qmail.  See
+http://pobox.com/~djb/proto/qmqp.html
+2. See http://pobox.com/~djb/daemontools.html.  I have RPMS available at
+http://www.qcc.sk.ca/~bguenter/distrib/daemontools/

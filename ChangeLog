@@ -1,0 +1,435 @@
+2000-01-11  Bruce Guenter  <bguenter@bguenter.pointsnorth.com>
+
+	* Released version 0.40
+
+	* lib/makefield.cc: Fixed up to autodetect (with the help of
+	configure) the tm_isdst and tm_gmtoff flags in struct tm.
+
+2000-01-11  Bruce Guenter  <bruceg@daedalus.bfsmedia.com>
+
+	* lib/tcpconnect.cc: Reordered the include files here to avoid
+	problems with FreeBSD headers.
+
+2000-01-10  Bruce Guenter  <bruceg@daedalus.bfsmedia.com>
+
+	* lib/address.cc: Renamed isspecial to issymbol to avoid problems
+	on FreeBSD caused by an existing "isspecial" macro.
+
+	* src/sendmail.cc (cli_main): Fixed typo that caused parseargs to
+	not be called.
+
+1999-10-22  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* protocols/protocol.cc (cli_main): Use the already opened FD to
+	load the message from instead of opening it.
+
+	* src/send.cc (send_one): Open the named file for writing before
+	attempting to send message, and pass it to exec_protocol.
+	(exec_protocol): Dup the open message to FD 0 before executing
+	program.
+
+1999-10-21  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.39
+
+	* lib/list.h: Added a const_list_iterator, as well as a copy
+	constructor for list<T>.
+
+1999-10-20  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* src/inject.cc (parse_line): Added test for non-RFC header lines
+	(ie lines starting with anything except a sequence of
+	non-whitespace characters follows by a colon).
+	(read_header): Test if the first header line is a continuation
+	line and fail if so.
+
+	* src/send.cc (load_remotes): Fixed parsing of "remotes" control
+	file to allow any whitespace between, before, and after elements,
+	as well as to handle lines starting with a '#' as comments.
+
+1999-10-04  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.38
+
+	* src/send.cc (load_config): Don't fail reading the configuration
+	if pausetime can't be read.
+
+1999-09-23  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.37
+	
+	* lib/address.cc (RULE(route_spec)): Made the "phrase" optional to
+	allow addresses like "<foo@bar>" (note, no comment) to be parsed.
+
+1999-09-16  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* src/send.cc (send_all): Load the config each time the queue is
+	run.
+	(do_select): Removed the logic here to handle reloading the config
+	on HUP, since it's reloaded all the time.
+	(load_files): Removed the 'stat' on the queue directory as an
+	indicator of if it needs to be rescanned, and made the contents
+	reloaded always.
+	(do_select): Force a reload of the queue if the select times out.
+
+1999-09-11  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.36
+
+	* src/sendmail.cc: Rewrote to use the CLI library.
+
+	* src/inject.cc: Rewrote to use the CLI library.
+
+	* protocols/protocol.cc: Rewrote to use the CLI library.
+
+1999-09-02  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.35
+
+1999-08-26  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* src/send.cc (remote): Parse options from the string.
+	(load_remotes): Handle options after the protocol name.
+	(exec_protocol): Build an argument list including options.
+
+	* protocols/protocol.cc (parse_args): Added support for a port
+	number.
+
+	* protocols/qmqp.cc: Adapted to use generic interface.
+
+	* protocols/smtp.cc: Adapted to use generic interface.
+
+	* protocols/protocol.cc (main): Started writing a generic protocol
+	library, which will open the message file and determine a port
+	number.
+
+	* src/send.cc (load_files): Stat the queue before opening it to
+	see if the contents have changed.
+
+1999-07-22  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* lib/hostname.cc (getnames): Switched the implementation of
+	domainname and hostname to use uname(2).  This fixes a problem
+	observed with empty domain names.
+
+1999-07-16  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* lib/address.cc: Rewrote this parsing framework to do a top-level
+	tokenization before parsing, and then parse based on those
+	tokens.
+
+1999-07-15  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Imported latest mystring and fdbuf libraries, and adapted the
+	rest of the code to call the new routines.
+
+1999-03-30  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Integrated new modularized mystring library from vmailmgr.
+
+1999-03-27  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.33
+
+	* src/queue.cc (copyenv): Only do the envelope remapping on
+	recipient addresses.
+
+	* lib/listtest.cc: Wrote test code for the list class (not
+	compiled, but included in the distribution).
+
+	* lib/list.h (remove): Fixed (hopefully) the code to advance the
+	prev/curr pointers after removing a node.
+
+	* src/send.cc (catchsender): Removed an extraneous return line.
+
+	* doc/nullmailer-queue.8: Updated to describe the admin address
+	facility.
+
+	* src/queue.cc (main): Load in the "admin" address and localhost
+	to determine how to remap addresses.
+	If the hostname is localhost, remap this address to the admin
+	address.
+
+1999-03-04  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.32
+
+	* lib/address.cc (unquote): Wrote this routine to remove quoting
+	and escaped characters from a string.
+	(quote): Wrote this routine to add necessary quoting and escaping
+	to addresses.
+	(RULE(quoted_string)): Unquote strings before returning them.
+	Modified many other routines to handle unquoting.
+
+1999-02-25  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.31
+
+	* Makefile.am (install-root): Neede to make nullmailer-queue
+	setuid nullmail here.
+
+	* HOWTO: Added a quick guide to getting nullmailer running.
+
+1999-02-23  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.30
+
+	* src/inject.cc (struct header_field): Do not empty the recipient
+	list when a resent field is seen if header recipients are being
+	ignored.
+
+	* doc/nullmailer-inject.1: Adjusted the section on setting the
+	host name to account for the below change.
+
+	* src/inject.cc (setup_from): Set the host name to defaulthost
+	instead of hostname(), and canonicalize host and shost before
+	using them.
+
+	* lib/fdbuf_copy.cc (fdbuf_copy): Added an initial EOF test and
+	moved the loop's EOF test to the end of the loop.
+
+1999-02-22  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* src/inject.cc (send_body): Removed the test to see if fin is at
+	EOF before calling fdbuf_copy.
+
+	* lib/fdbuf_copy.cc (fdbuf_copy): Revised loop termination
+	condition from in.last_count() == 0 (which could happen at EOF) to
+	!in.eof() (since EOF is not an error condition).
+
+	* Released version 0.29
+
+	* src/inject.cc: Fixed a number of offsets in the header_has_* and
+	header_field_* declarations.
+
+	* doc/nullmailer-inject.1: Modified the documentation to describe
+	the "-n" (do not queue) and "-v" (show envelope) flags.
+
+	* src/inject.cc: Added handling for flags to print out the message
+	and optionally the envelope instead of queueing the message.
+
+	* src/sendmail.cc (parseargs): Added a whole long list of sendmail
+	flags to ignore.
+
+	* lib/address.cc (RULE(route)): fixed missing pointer advance
+
+1999-02-21  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* test/address-test.cc: Moved this testing code out of the main
+	address.cc source code module.
+
+1999-02-20  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* lib/address.cc (RULE(address)): Reversed order of group and
+	mailbox.
+	(RULE(phrase)): Fixed the extra trailing space added by this rule
+	along with cleaning up how this rule works.
+	(RULE(mailboxes)): Added this rule, a parallel of addresses, for
+	use in group.
+	(RULE(group)): Fixed several bugs in this rule.
+
+1999-02-19  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* lib/address.cc (RULE(quoted_string)): Fixed inclusion of quotes
+	in quoted addresses.
+	(TEST_ADDRESS): Added in a self-test framework
+	(RULE(comment)): fixed missing comment carry-through
+	(RULE(group)): fixed missing comment insertion
+	(RULE(addresses)): fixed missing comment insertion
+	(RULE(local_part)): forgot to advance pointer if a comment was
+	matched.
+	(RULE(domain)): forgot to advance pointer after SKIPDELIM
+	(RULE(addr_spec)): forgot to advance pointer after SKIPDELIM
+
+1999-02-18  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.28
+
+	* src/sendmail.cc (main): Pass "-e" to inject (use either) instead
+	of "-a" (use args only) if sendmail was not passed a "-t",
+	otherwise pass "-b" (use both) instead of "-h" (use header only).
+
+	* spec: Fixed the useradd part of this script to add the
+	"nullmail" user instead of "$1".
+
+	* init: Reworked large parts of this script to make it work on my
+	systems.
+
+	* src/send.cc (read_trigger): Modified behavior of this routine to
+	read a chunk of data from the trigger before closing it.  This
+	prevents the trigger from being "pulled" after it's been reopened.
+
+	* src/sendmail.cc: Prefixed all error messages with "sendmail:".
+
+	* src/inject.cc (setup_from): Added code to handle the "c" flag --
+	use "address (comment)" style in the generated from line instead
+	of "comment <address>".
+	(exec_queue): Fixed error message to print out the actual value of
+	SBIN_DIR, plus prefixing the message with "nullmailer-inject".
+
+	* Released version 0.27
+
+	* src/inject.cc (main): Whoops -- write should have been writeln.
+
+	* protocols/qmqp.cc: Completed (with minimal testing) the QMQP
+	module.
+
+	* lib/fdbuf_copy.cc (fdbuf_copy): Added a "noflush" option to make
+	calling flush on the output fdbuf optional.
+
+	* lib/makefield.cc (make_date): Fixed bug: neglected to
+	NUL-terminate the timezone string.
+
+	* lib/canonicalize.cc (canonicalize): Moved this function out of
+	address.cc
+
+	* lib/errcodes.cc (errorstr): Added some new error codes
+
+	* lib/fdibuf.cc (getchar): Wrote this routine to read in a single
+	character.
+	(getnetstring): Wrote this routine to read in a netstring
+
+	* lib/netstring.cc (strnl2net): Wrote this routine that converts a
+	string plus a newline character into a netstring.  This avoids an
+	extra memory allocation and copy to do the concatenation before
+	making the netstring.
+
+	* protocols/qmqp.cc: Started a QMQP protocol module.
+
+	* lib/netstring.cc (str2net): Wrote this routine to convert
+	strings into netstrings (for details, see
+	ftp://koobera.math.uic.edu/www/proto/netstrings.txt).
+
+	* protocols/smtp.cc (main): Moved the message file open above the
+	connection to avoid making a connection if the file is unreadable.
+
+	* lib/fdibuf.cc (rewind): Wrote this routine to rewind an open
+	fdibuf.
+
+	* src/inject.cc (make_recipient_list): Completed code to handle
+	the "t" flag.
+
+	* doc/nullmailer-inject.1: Added section describing the parsing of
+	the NULLMAILER_FLAGS environment variable.
+
+	* src/inject.cc (struct header_field): Added code to handle fields
+	that are ignored.
+	(fix_header): Added preliminary code to add in a missing to field.
+	(parse_flags): Wrote this routine to handle the NULLMAILER_FLAGS
+	environment variable.
+	(parse_args): Added a call to parse_flags.
+
+1999-02-17  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.26
+
+	* Moved address.cc, address.h, makefield.cc into lib.
+
+1999-02-16  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* src/queue.cc (deliver): Fixed unique filename generator to call
+	itoa only once per constructor, and to avoid calling time() and
+	getpid() more than necessary.
+
+	* src/send.cc (exec_protocol): Stripped out the error messages
+	printed in this routine, since they go nowhere anyways.
+	(send_one): Added tracing information about program execution.
+
+	* src/makefield.cc (make_messageid): Can't have two calls to itoa
+	as arguments to the same function call (mystring constructor in
+	this case) because itoa uses a static buffer.
+
+	* src/inject.cc (exec_queue): Execute nullmailer-queue from
+	SBIN_DIR.
+
+	* lib/defines.h: Added a definition for SBIN_DIR.
+
+1999-02-15  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.25
+
+	* doc/nullmailer-send.8: Updated the documentation to reflect the
+	new parsing code for "remotes".
+
+	* src/makefield.cc (make_messageid): Changed the format of the
+	message-id string to make it easier to generate and more unique.
+	(make_date): Fixed timezone number generator code.
+
+	* lib/itoa.cc (itoa): Fixed bug in padding code that caused the
+	string to be padded with unending NUL bytes instead of zeros.
+
+	* lib/config_readlist.cc (config_readlist): Modified to strip all
+	the lines that are read in, to ignore lines that start with a
+	pound ('#') or are empty, and to return false if no lines were
+	read.
+
+	* lib/config_read.cc (config_read): Modified to strip the
+	resulting string.
+
+	* lib/mystring.cc: Revised lstrip, rstrip, and strip to return
+	*this if no modifications to the string were necessary.
+
+	* src/send.cc (load_config): Rewrote the logic of this routine to
+	always load all the config files, and moved the loading of the
+	remotes into a separate section.
+	(load_remotes): Added support for loading "hostname protocol"
+	pairs from the remotes file.
+
+	* protocols/smtp.cc (main): Filename is argv[2], not argv[1].
+
+	* src/address.cc (RULE(local_part)): Fixed another pointer
+	increment bug.
+
+	* src/inject.cc (main): Moved check for no recipients into here.
+
+1999-02-14  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* lib/hostname.cc: Fixed a problem that could cause
+	nullmailer-inject (and possibly others) to core dump on exit.
+
+	* src/inject.cc (send_body): Fixed bug that caused transmission of
+	an empty body (legal) to nullmailer-queue to fail.
+	(read_header): Added a check to ensure that at least one recipient
+	was given.
+
+1999-02-13  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* src/send.cc: Rewrote the portion of this code that executes the
+	protocol program to not do a connect, and to expect a numerical
+	error code from the exit status of the program.  Also implemented
+	a configurable pause between queue runs.
+
+	* protocols/smtp.cc: Rewrote this module extensively.  It now
+	expects the hostname as the first command-line parameter and the
+	filename as the second, and returns a single error code (no
+	text error messages and no pipes).
+
+1999-02-12  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* src/address.cc (RULE(domain)): Fixed pointer increment bug in
+	this rule.
+
+	* doc/nullmailer-inject.1: Updated to reflect status of
+	configuration variable reading.
+
+	* src/makefield.cc (make_messageid): Use idhost instead of
+	hostname().
+
+	* src/inject.cc (read_config): Read the defaultdomain,
+	defaulthost, and idhost config files.
+
+	* src/address.cc (canonicalize): Use the defaulthost and
+	defaultdomain strings, declared in src/inject.cc, instead of
+	hostname() and domainname().
+
+	* src/inject.cc: Added code to parse the command line options as
+	documented in the man page.
+
+1999-02-11  Bruce Guenter  <bguenter@mikhail.qcc.sk.ca>
+
+	* Released version 0.22
+
+	* src/sendmail.cc: Completed the basics of this program.
+
+	* doc/nullmailer-inject.1: Filled in the DESCRIPTION a little bit.
+

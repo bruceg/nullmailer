@@ -1,0 +1,9 @@
+. functions
+
+inj() { injectfield return-path 'to: n' "$@" }
+
+echo "Checking that inject does not inserts a return-path."
+test -z "`inj`"
+
+echo "Checking that inject strips return-paths."
+test -z "`inj return-path: blah`"

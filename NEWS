@@ -1,0 +1,143 @@
+This file lists all the major user-visible changes to nullmailer.
+-------------------------------------------------------------------------------
+Changes in version 0.40
+
+- Fixed some compile problems to allow nullmailer to compile on FreeBSD.
+
+- Fixed a bug in the sendmail emulator to allow it to set the sender
+  name and address from the command line properly.
+
+- Modified the CLI library to behave more like the standard getopt
+  library.
+
+- Made a change to protocol between nullmailer-send and protocol
+  modules.  nullmailer-send now opens up the message files and passes
+  them to the protocol module as FD 0 instead of passing a filename.
+
+- Added some notes to the nullmailer-send manual page explaining how
+  messages are delivered.
+-------------------------------------------------------------------------------
+Changes in version 0.39
+
+- Fixed problems in nullmailer-send in parsing the "remotes" file.  It
+  previously did not handle comment lines or tabs or multiple white
+  space.
+
+- Made nullmailer-inject stricter about header lines to ensure that they
+  comply with RFC822.
+
+- Several minor updates to the libraries to bring them up to date.
+-------------------------------------------------------------------------------
+Changes in version 0.38
+
+- Fixed bug in nullmailer-send that caused it to refuse to send mail
+  when the optional "pausetime" configuration file did not exist.
+-------------------------------------------------------------------------------
+Changes in version 0.37
+
+- Fixed bug in address parser that caused strings like "<a@b.c>"
+  (without a leading comment) to fail.
+
+- Make nullmailer-send rescan the mail queue each time it wakes up,
+  rather than only if the timestamp changes to avoids race conditions.
+
+- Make nullmailer-send reload its config files ("remotes" and
+  "pausetime" each time it scans the queue).
+
+- Fixed top-level install-root target to run chmod/chown on the right
+  path to nullmailer-queue.
+
+- Added a configure test for libinet, libsocket, and libxnet libraries
+  for systems that have their networking code seperate from the main C
+  library (such as Solaris).
+-------------------------------------------------------------------------------
+Changes in version 0.36
+
+- Imported generic CLI library, to avoid the use of getopt on systems
+  that don't have one.
+-------------------------------------------------------------------------------
+Changes in version 0.35
+
+- Protocols now take a "-p #" to specify the port number to connect to.
+
+- This option can be specified in the "remotes" file immediately after
+  the protocol name.
+
+- nullmailer-send will now only rescan the mail queue if its timestamp
+  has changed since the last scan.
+
+- Fixed an observed problem with empty domain names by using uname(2)
+  instead of domainname and hostname.
+
+- The header address parsing code is rewritten to do a lexical
+  tokenization before parsing.
+
+- Imported new fdbuf and mystring libraries
+
+- Updated init scripts and RPM spec to work with new daemontools 0.61
+  and supervise-scripts packages.
+-------------------------------------------------------------------------------
+Changes in version 0.33
+- fixed a bug in the "list" template class that caused nullmailer-send
+  to only send out one message before sleeping
+- added a trivial address remapping facility to nullmailer-queue to
+  allow local addresses to be redirected to a remote administrator
+  address.
+-------------------------------------------------------------------------------
+Changes in version 0.32
+- the address parser now deals properly with quoted addresses
+-------------------------------------------------------------------------------
+Changes in version 0.31
+- added a HOWTO document
+- "make install-root" will now properly make nullmailer-queue setuid
+  nullmail
+-------------------------------------------------------------------------------
+Changes in version 0.30
+- fixed bug in the I/O library that caused nullmailer-inject to return
+  an error on messages with a single blank line following the header,
+  even though the message was successfully sent to nullmailer-queue
+- in nullmailer-inject, the hostname of the sender is set from the
+  defaulthost config file instead of hostname() (note that default is
+  set from hostname() if the file does not exist)
+- fixed a bug in nullmailer-inject that would cause it to incorrectly
+  clear its recipient list when using command-line recipients with a
+  "resent" message
+-------------------------------------------------------------------------------
+Changes in version 0.29
+- included the testing framework (mostly empty) into the package
+- fixed some bugs in nullmailer-inject caused by incorrect offsets into
+  the array of header fields
+- many bug fixes to the address parsing framework
+- nullmailer-inject now has an option to only print out the message
+  instead of passing it on to nullmailer-queue
+- many sendmail flags are now ignored instead of causing errors in the
+  sendmail front end to nullmailer-inject
+-------------------------------------------------------------------------------
+Changes in version 0.28
+- fixed the bugs in the spec and init script
+- nullmailer-inject now handles the "c" flag like qmail-inject
+- changed some error messages
+- the sendmail front end should have its header vs command-line
+  recipients logic fixed now
+-------------------------------------------------------------------------------
+Changes in version 0.27
+- added a QMQP protocol module
+- fixed a missing NUL-termination when creating the Date header line
+- nullmailer-inject now parses the NULLMAILER_FLAGS -- see the man page
+-------------------------------------------------------------------------------
+Changes in version 0.26
+- nullmailer-queue and nullmailer-send now go into sbin instead of bin
+- bugfixes to the unique number generation routines
+- moved some files around internally
+-------------------------------------------------------------------------------
+Changes in version 0.25
+- nullmailer-send now reads a protocol name along with the remote host
+- nullmailer-inject now handles its command-line options properly, as
+  well as reading and using defaulthost, defaultdomain, and idhost
+- fixed several bugs in the address parsing and date-generation code
+- revised the interface between nullmailer-send and the protocol modules
+  to simplify the interface and nullmailer-send
+-------------------------------------------------------------------------------
+Changes in version 0.22
+- added simple sendmail front end
+-------------------------------------------------------------------------------

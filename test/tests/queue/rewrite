@@ -1,0 +1,45 @@
+. functions
+
+que() {
+	set -e
+	../src/nullmailer-queue && \
+	cat /tmp/nm/var/nullmailer/queue/* && \
+	rm -f /tmp/nm/var/nullmailer/queue/*
+}
+que-recip() {
+	set -e
+	que | sed -e '2,2!d' | grep -q "$@"
+}
+
+echo admin@remote >/tmp/nm/etc/nullmailer/adminaddr
+
+echo "Checking that queue rewrites user@localhost to adminaddr."
+que-recip -q '^admin@remote$' <<EOF
+bruceg@qcc.sk.ca
+user@localhost
+
+header
+
+data
+EOF
+
+echo "Checking that queue rewrites user@hostname to adminaddr."
+hostname=`hostname -f`
+que-recip -q '^admin@remote$' <<EOF
+bruceg@qcc.sk.ca
+user@$hostname
+
+header
+
+data
+EOF
+
+echo "Checking that queue does not rewrite non-local users."
+que-recip -q '^user@nowhere.org$' <<EOF
+bruceg@qcc.sk.ca
+user@nowhere.org
+
+header
+
+data
+EOF

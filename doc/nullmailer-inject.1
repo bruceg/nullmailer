@@ -1,0 +1,240 @@
+.TH nullmailer-inject 1
+.SH NAME
+nullmailer-inject \- Reformat and inject a message into the queue.
+.SH SYNOPSIS
+.B nullmailer-inject
+[\-a]
+[\-b]
+[\-e]
+[\-f sender]
+[\-h]
+.I [recipient [recipient ...]]
+.SH DESCRIPTION
+This program reads a email message from standard input, reformats its
+header to comply with RFC822, and sends the resulting message to the
+queue.
+.SS HEADER FIELDS
+The following lines are parsed for recipient addresses:
+.IR To ,
+.IR Cc ,
+.IR Bcc ,
+.IR Apparently-To ,
+.IR Resent-To ,
+.IR Resent-Cc ,
+and
+.IR Resent-Bcc .
+
+The following sender address lines are parsed and rewritten:
+.IR Sender ,
+.IR From ,
+.IR Reply-To ,
+.IR Return-Path ,
+.IR Return-Receipt-To ,
+.IR Errors-To ,
+.IR Resent-Sender ,
+.IR Resent-From ,
+and
+.IR Resent-Reply-To .
+If the
+.I Return-Path
+header field is present and contains a single address, its contents
+will be used to set the envelope sender address.
+
+If the message contains any of the following fields, it is treated as
+a resent message:
+.IR Resent-Sender ,
+.IR Resent-From ,
+.IR Resent-Reply-To ,
+.IR Resent-To ,
+.IR Resent-Cc ,
+.IR Resent-Bcc ,
+.IR Resent-Date ,
+.IR Resent-Message-ID .
+If the message is resent, only the recipient fields prefixed with
+.I Resent-
+are examined for addresses.
+
+Any occurrences of
+.IR Bcc ,
+.IR Resent-Bcc ,
+.IR Return-Path ,
+or
+.I Content-Length
+are discarded after they are parsed (if necessary).
+
+If the header lacks a
+.I Message-Id
+field, a unique string is generated and added to the message.
+If the header lacks a
+.I Date
+field, the current local date and time in RFC822 format is appended to
+the message.
+If the message has no
+.I To
+or
+.I Cc
+fields, the following line is appended to the message:
+
+.EX
+	Cc: recipient list not shown: ;
+.EE
+.SS ADDRESS LISTS
+Address lists are expected to follow the syntax set out in RFC822.
+The following is a simplified explanation of the syntax.
+
+An address list is list of addresses seperated by commas.
+An individual address may have one of the following three forms:
+.IR user@fqdn ,
+.IR comment <user@fqdn> ,
+or
+.IR phrase: address-list; .
+Any of the first two forms may be used within the address list of the
+third form.
+Any word containing special characters must be placed in double quotes
+and the special characters must be preceded with a backslash.
+Comments may be placed between addresses in parenthesis.
+All comments are ignored.
+
+Addresses lists are reformatted as they are parsed for ease of later
+re-parsing when the message reaches the destination(s).
+If an address is missing a fqdn,
+.B nullmailer-inject
+adds one.
+.SH OPTIONS
+.TP
+.I -a
+Use only the command line arguments as recipient addresses.
+Ignore the header recipient lines.
+.TP
+.I -b
+Use both the command line arguments and data from the message header
+as recipient addresses.
+.TP
+.I -e
+Use either the command line arguments (if there are any) or data from
+the message header (if there are no arguments) as the recipient
+addresses.
+.TP
+.I -f sender
+Set the envelope sender address to
+.I sender .
+.TP
+.I -h
+Use only data from the message header as the recipient addresses.
+.TP
+.I -n
+Do not queue the message, but print the reformatted contents to
+standard output.
+.TP
+.I -v
+Print out the envelope (sender and recipient addresses) preceding the
+message when printing the message to standard output.
+.SH RETURN VALUE
+Exits 0 if it was successful, otherwise it prints a diagnostic message
+to standard output and exits 1.
+.SH ENVIRONMENT
+The environment variable
+.BR NULLMAILER_FLAGS
+is parsed and the behavior of
+.B nullmailer-inject
+is modified if any of the following letters are present:
+.TP
+.B c
+Use "address (comment)" style in the generated
+.B From
+field instead of the default "comment <address>" style.
+.TP
+.B f
+Ignore and remove any
+.B From
+header lines and always insert a generated one.
+.TP
+.B i
+Ignore and remove any
+.B Message-Id
+header lines.
+.TP
+.B s
+Ignore and remove any
+.B Return-Path
+header lines.
+.TP
+.B t
+Insert a
+.BR To
+line containing a list of the recipients if the header does not
+contain either a
+.B To
+or a
+.B Cc
+field.
+If the message is determined to be a resent message (see above), a
+.B Resent-To
+field is added if the header does not contain either a
+.BR Resent-To
+or a
+.BR Resent-Cc
+field.
+.PP
+The user name is set by
+.BR NULLMAILER_USER ,
+.BR MAILUSER ,
+.BR USER ,
+or
+.BR LOGNAME ,
+whichever comes first or
+.I unknown
+if none of the above are set.
+
+The host name is set by the canonicalized value of
+.BR NULLMAILER_HOST ,
+.BR MAILHOST ,
+or
+.BR HOSTNAME ,
+whichever comes first, or the
+.I defaulthost
+config file if none of the above are set (see below).
+
+The full name of the user is set by
+.BR NULLMAILER_NAME ,
+.BR MAILNAME ,
+or
+.BR NAME ,
+whichever comes first.
+
+The user and host name of the envelope sender default to the user and
+host name set above, but may be overridden by
+.BR NULLMAILER_SUSER
+and
+.BR NULLMAILER_SHOST .
+.SH CONTROL FILES
+When reading the following files, a single line is read and stripped
+of all leading and trailing whitespace characters.
+.TP
+.B defaultdomain
+The content of this file is appended to any host name that does not
+contain a period, including
+.BR defaulthost
+and
+.BR idhost .
+Defaults to the value of the
+.I domainname
+system call.
+.TP
+.B defaulthost
+The content of this file is appended to any address that is missing a
+host name.
+Defaults to the value of the
+.I hostname
+system call.
+.TP
+.B idhost
+The content of this file is used when building the message-id string
+for the message.
+Defaults to the canonicalized value of
+.BR defaulthost .
+.SH SEE ALSO
+nullmailer-queue(8)
+.SH NOTES
+This document glosses over very many details of how address parsing
+and rewriting actually works (among other things).

@@ -1,0 +1,76 @@
+. functions
+
+inj() { inject -n -v a </dev/null | head -1 }
+testvar() {
+	set -e
+	echo "Checking that inject obeys $1."
+	export $1="$2"
+	inj | grep -q "$3"
+}
+testcanon() {
+	set -e
+	echo "Checking that inject canonicalizes $1."
+	export $1="$2"
+	inj | grep -q "$3"
+}
+testhdr() {
+	set -e
+	echo "Checking that inject $1 $2:"
+	echo $2: $3 | inject -n -v a | head -1 | grep -q "$4"
+}
+testign() { testhdr ignores "$@" }
+testset() { testhdr uses "$@" }
+
+echo "Checking that inject obeys hostname()"
+hostname=`hostname`
+domainname=`hostname -d`
+inj | grep -q "@$hostname$"
+
+echo "Checking that inject obeys config/defaulthost"
+echo test.org >$SYSCONFDIR/defaulthost
+inj | grep -q '@test.org$'
+
+echo "Checking that inject obeys domainname()"
+echo test >$SYSCONFDIR/defaulthost
+rm -f $SYSCONFDIR/defaultdomain
+inj | grep -q "@test.$domainname$"
+
+echo "Checking that inject obeys config/defaultdomain"
+echo test >$SYSCONFDIR/defaulthost
+echo domain.org >$SYSCONFDIR/defaultdomain
+inj | grep -q '@test.domain.org$'
+
+testvar HOSTNAME test1.org '@test1.org$'
+
+testcanon HOSTNAME test1 '@test1.domain.org$'
+
+testvar MAILHOST test2.org '@test2.org$'
+
+testcanon MAILHOST test2 '@test2.domain.org$'
+
+testvar NULLMAILER_HOST test3.org '@test3.org$'
+
+testcanon NULLMAILER_HOST test3 '@test3.domain.org$'
+
+echo "Checking that inject uses 'unknown'"
+inj | grep -q '^unknown@'
+
+testvar LOGNAME name1 '^name1@'
+
+testvar USER name2 '^name2@'
+
+testvar MAILUSER name3 '^name3@'
+
+testvar NULLMAILER_USER name4 '^name4@'
+
+testign Errors-To a@b.c '^name4@test3'
+testign From a@b.c '^name4@test3'
+testign Reply-To a@b.c '^name4@test3'
+testign Resent-From a@b.c '^name4@test3'
+testign Resent-Reply-To a@b.c '^name4@test3'
+testign Resent-Sender a@b.c '^name4@test3'
+testign Return-Receipt-To a@b.c '^name4@test3'
+testign Sender a@b.c '^name4@test3'
+testset Return-Path name0@host0.org '^name0@host0.org$'
+export NULLMAILER_FLAGS=s
+testign Return-Path name0@host0.org '^name4@test3'

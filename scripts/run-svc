@@ -1,0 +1,2 @@
+#! /bin/sh
+exec setuidgid nullmail /usr/sbin/nullmailer-send

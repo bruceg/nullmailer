@@ -1,0 +1,66 @@
+. functions
+
+inj() { injectfield from 'to: nobody' "$@" }
+testvar() {
+	set -e
+	echo "Checking that inject obeys $1."
+	export $1="$2"
+	inj | grep -q "$3"
+}
+
+echo "Checking that inject inserts a from line."
+test -n "`inj`"
+
+echo "Checking that inject preserves an existing from line."
+inj "from: a@b.c" | grep -q '^ a@b\.c$'
+
+echo "Checking that inject does not add more from lines."
+test 1 -eq `inj "from: a@b.c" | wc -l`
+
+echo "Checking that inject will strip from lines."
+export NULLMAILER_FLAGS=f
+inj "from: a@b.c" | not grep -q '^ a@b\.c$'
+unset NULLMAILER_FLAGS
+
+echo "Checking that inject obeys hostname()"
+hostname=`hostname`
+inj | grep -q "@$hostname>$"
+
+echo "Checking that inject obeys config/defaulthost"
+echo test.org >$SYSCONFDIR/defaulthost
+inj | grep -q '@test.org>$'
+
+echo "Checking that inject obeys config/defaultdomain"
+echo test >$SYSCONFDIR/defaulthost
+echo domain.org >$SYSCONFDIR/defaultdomain
+inj | grep -q '@test.domain.org>$'
+
+testvar HOSTNAME test1.org '@test1.org>$'
+
+testvar MAILHOST test2.org '@test2.org>$'
+
+testvar NULLMAILER_HOST test3.org '@test3.org>$'
+
+echo "Checking that inject uses 'unknown'"
+inj | grep -q ' <unknown@'
+
+testvar LOGNAME name1 ' <name1@'
+
+testvar USER name2 ' <name2@'
+
+testvar MAILUSER name3 ' <name3@'
+
+testvar NULLMAILER_USER name4 ' <name4@'
+
+echo "Checking that inject uses a blank name."
+inj | grep -q '^ <'
+
+testvar NAME full1 '^ full1 <'
+
+testvar MAILNAME full2 '^ full2 <'
+
+testvar NULLMAILER_NAME full3 '^ full3 <'
+
+echo "Checking that inject will use address-comment form."
+export NULLMAILER_FLAGS=c
+inj | grep -q '^ name4@test3.org (full3)$'

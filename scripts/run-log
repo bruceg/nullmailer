@@ -1,0 +1,2 @@
+#! /bin/sh
+exec setuidgid nullmail multilog t /var/log/nullmailer

@@ -1,0 +1,51 @@
+.TH nullmailer-queue 8
+.SH NAME
+nullmailer-queue \- insert mail messages into the queue
+.SH SYNOPSIS
+.B nullmailer-queue
+.SH DESCRIPTION
+This program reads a formatted mail message from standard input and
+safely injects it into the outgoing mail queue.
+.PP
+The data sent into standard input is expected to have the following
+format: one line containing the envelope sender, one or more lines
+containing the recipients, a single blank line, and then the contents
+of the message exactly as it is to be transmitted to the destination.
+All lines are terminated with a single line-feed character.
+All addresses must contain a fully-qualified domain name.
+.PP
+.SH RETURN VALUE
+Exits 0 if it successfully queues the message.
+If it failed to queue the message, it exits 1 and prints an error
+message to stdandard output.
+.SH CONTROL FILES
+.TP
+.B adminaddr
+If this file is not empty, all recipients to users at either
+"localhost" (the literal string) or the canonical host name (based on
+the values returned by the
+.I hostname
+and the
+.I domainname
+system calls) are remapped to this address.
+This is provided to allow local daemons to be able to send email to
+"somebody@localhost" and have it go somewhere sensible instead of
+being bounced by your relay host.
+.SH OTHER FILES
+.TP
+.B /var/nullmailer/queue
+The directory into which the completed messages are moved.
+.TP
+.B /var/nullmailer/tmp
+The directory in which messages are formed temporarily.
+.TP
+.B /var/nullmailer/trigger
+A pipe used to trigger
+.BR nullmailer-send
+to immediately start sending the message from the queue.
+.SH SEE ALSO
+nullmailer-inject(1),
+nullmailer-send(8)
+.SH LIMITATIONS
+This program should enforce system-wide configurable message length
+limits.

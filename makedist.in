@@ -1,0 +1,42 @@
+# Template makedist.in file
+
+# Set PKGURL to the full base URL for the package web site.
+PKGURL=http://em.ca/~bruceg/nullmailer/
+
+# If LISTSUB is set, makedist will add a note regarding mailing list
+# subscription.
+LISTSUB=nullmailer-subscribe@lists.em.ca
+
+# Set MAKERPM to non-empty if the tarball is to be built into a RPM.
+MAKERPM=true
+
+# Set DOCS to the list of files that should go into the "docs" directory
+# in the destination site.
+
+# Set EXTRAS to a list of any other extra files that should go into the
+# base directory in the destination site.
+EXTRAS="ChangeLog HOWTO NEWS README TODO YEAR2000"
+
+# Set EXTRAS_VER to a list of any other extra files that should go into
+# the version-numbered directory in the destination site.
+EXTRAS_VER="ANNOUNCEMENT"
+
+# Set HOSTNAME to the name of the host to which to connect via ssh
+HOSTNAME=em.ca
+
+# Set USERNAME to the name to log in as
+USERNAME=bruceg
+
+# Set PKGDIR to the directory to change into before delivering the files
+PKGDIR=www/nullmailer
+
+# Set RPMUPLOAD to a list of additional "hostname/path" destinations to
+# which to upload the source and binary RPMs.
+RPMUPLOAD="incoming.redhat.com/libc6"
+
+# Set LIST to the mailing list(s) to send the announcement to
+LIST=nullmailer@lists.em.ca
+
+# Run any extra commands to prepare the source tree (such as making
+# documentation) here.
+make -C doc

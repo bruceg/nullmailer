@@ -1,0 +1,12 @@
+. functions
+
+inj() { injectfield date 'to: nobody' "$@" }
+
+echo "Checking that inject inserts a date line."
+test -n "`inj`"
+
+echo "Checking that inject preserves an existing date line."
+inj "date: foo" | grep '^ foo$' >/dev/null
+
+echo "Checking that inject does not add more date lines."
+test 1 -eq `inj "date: foo" | wc -l`

@@ -1,0 +1,50 @@
+AC_INIT(lib/defines.h)
+AM_INIT_AUTOMAKE(nullmailer, 0.40)
+AM_CONFIG_HEADER(config.h)
+AC_PROG_MAKE_SET
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_CXX
+CXX_NO_RTTI
+CXX_NO_EXCEPTIONS
+
+CFLAGS="$CFLAGS -W -Wall"
+CXXFLAGS="$CXXFLAGS -W -Wall"
+
+AC_PROG_INSTALL
+AC_PROG_RANLIB
+AC_PATH_PROG(STRIP, strip)
+AC_PATH_PROG(RM, rm)
+AC_PATH_PROG(MKDIR, mkdir)
+
+dnl Checks for libraries.
+AC_CHECK_LIB(xnet, socket)
+AC_CHECK_LIB(inet, socket)
+AC_CHECK_LIB(socket, socket)
+
+dnl Checks for header files.
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_HEADER_TIME
+dnl AC_CHECK_HEADERS(fcntl.h sys/time.h shadow.h crypt.h)
+AC_CHECK_HEADERS(unistd.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+dnl AC_TYPE_UID_T
+dnl AC_TYPE_SIGNAL
+dnl AC_C_INLINE
+dnl AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+
+TEST_STRUCT_TM
+
+dnl Checks for library functions.
+AC_CHECK_FUNCS(gethostname getdomainname setenv)
+dnl AC_CHECK_FUNCS(gettimeofday mkdir putenv rmdir socket)
+AC_CHECK_FUNCS(srandom)
+
+AC_DEFINE(BUFSIZE, 4096)
+
+AC_OUTPUT(Makefile doc/Makefile lib/Makefile lib/cli/Makefile lib/fdbuf/Makefile lib/mystring/Makefile protocols/Makefile src/Makefile test/Makefile)

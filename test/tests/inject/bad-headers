@@ -1,0 +1,15 @@
+. functions
+
+injtest() { echo "$@" | not inject >/dev/null }
+
+echo "Checking that inject rejects leading continuation lines."
+injtest " foo..."
+
+echo "Checking that inject rejects malformed RFC headers."
+injtest "foo : bar"
+injtest ":foo bar"
+injtest "foo"
+
+echo "Checking that inject rejects bad addresses."
+injtest "from: foo<bar"
+

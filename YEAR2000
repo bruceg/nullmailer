@@ -1,0 +1,10 @@
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+This program does not read in any dates from the user in any format.
+Any date manipulation is done in terms of seconds since the UNIX epoch.
+Any conversion from seconds into a readable form includes a full four
+digit year.  As far as I am aware, no parts of this package will have
+any problems on the year 2000 or well beyond.

@@ -1,0 +1,41 @@
+rm -rf /tmp/nm
+mkdir -p /tmp/nm/var/nullmailer/{queue,tmp}
+mkdir -p /tmp/nm/etc/nullmailer
+
+#not() { if "$@"; then return 1; else return 0; fi }
+not() { ! safe "$@" }
+safe() { set +e; "$@"; result=$?; set -e; return $result }
+error() {
+  local code=$1
+  shift
+  if "$@"; then
+    echo "Result was 0, should be $code."
+    return 1
+  else
+    result=$?
+    if test $result -eq $code; then
+      return 0
+    else
+      echo "Result was $result, should be $code."
+      return 1
+    fi
+  fi
+}
+
+inject() { ../src/nullmailer-inject "$@" }
+injectlines() {
+  for line in "$@"; do
+    echo "$line"
+  done | inject -n
+  return $?
+}
+injectfield() {
+  local field=$1
+  shift
+  injectlines "$@" | formail -x "$field:"
+}
+protocol() { local p=$1; shift; ../protocols/$p "$@" >/dev/null 2>&1 }
+
+export PATH=/bin:/usr/bin:/usr/local/bin
+rm -f $SYSCONFDIR/*
+set -e

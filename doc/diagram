@@ -1,0 +1,21 @@
+qmail-inject  sendmail
+      \          /
+       \        /
+        \      /
+    nullmailer-inject
+            |
+            |
+            |
+    nullmailer-queue
+            |
+            |
+            |
+        QUEUE/tmp -> QUEUE/queue
+                         |
+                         |
+                         |
+                  nullmailer-send
+                         |
+                         |
+                         |
+                    BIN/PROTOCOL

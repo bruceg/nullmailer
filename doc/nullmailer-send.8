@@ -1,0 +1,72 @@
+.TH nullmailer-send 8
+.SH NAME
+nullmailer-send \- Send queued messages
+.SH SYNOPSIS
+.B nullmailer-send
+.SH DESCRIPTION
+This program is responsible for coordinating the transmission of
+messages that have been queued by
+.BR nullmailer-queue .
+It uses a variety of protocol modules to deliver the messages from the
+queue to remote "smart" servers.
+.P
+When the program starts, the queue is scanned to build a list of
+messages to send.
+The queue is rescanned when either the trigger is pulled, or after
+.B pausetime
+seconds have elapsed after the last failed delivery.
+When there are no messages in the queue, nullmailer does no rescanning
+until the trigger is pulled.
+Pulling the trigger consists of opening up the trigger named pipe and
+writing a single byte to it, which causes this program to be awakened
+(if it's not already processing the queue).
+This procedure is done by
+.B nullmailer-queue
+to ensure that messages are delivered immediately.
+.P
+Delivery of messages consists of reading the list of remote servers and
+then trying to deliver the messages to these servers as follows.
+For each remote in the list, the named protocol handler is executed once
+for each message remaining in the queue.
+If the protocol handler succeeds, the message is removed from the queue
+and processing continues with the next message.
+If it fails, the remote is skipped and processing of the remaing
+messages continues with the next remote.
+When all the remotes have been tried,
+.B nullmailer-send
+sleeps for a number of seconds specified by
+.B pausetime
+before retrying sending the contents of the queue.
+.SH CONTROL FILES
+All the control files are reread each time the queue is run.
+.TP
+.B pausetime
+The number of seconds to pause between successive queue runs when
+there are messages in the queue (defaults to
+.IR 60 ).
+.TP
+.B remotes
+This file contains a list of remote servers to which to send each
+message.
+Each line of this file contains a remote host name or address and an
+optional protocol string, separated by white space.
+The protocol name defaults to
+.IR smtp .
+Blank lines and lines starting with a pound are ignored.
+.SH FILES
+.TP
+.B /var/nullmailer/queue
+The message queue.
+.TP
+.B /var/nullmailer/trigger
+A trigger file to cause immediate delivery.
+.TP
+.B /usr/local/etc/nullmailer
+The configuration directory.
+.TP
+.B /usr/local/libexec/nullmailer
+The protocol program directory.
+.SH SEE ALSO
+nullmailer-queue(8),
+nullmailer-inject(1),
+mailq(1)

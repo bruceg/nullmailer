@@ -1,0 +1,9 @@
+This is nullmailer, a sendmail/qmail/etc replacement MTA for hosts which
+relay to a fixed set of smart relays.  It is designed to be simple to
+configure, secure, and easily extendable.
+
+Please send any comments to bruceg@em.ca.
+
+A mailing list has been set up to discuss this package.  To subscribe,
+send an email to:
+	nullmailer-subscribe@ezmlm.vsource.com

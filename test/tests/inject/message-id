@@ -1,0 +1,24 @@
+. functions
+
+inj() { injectfield message-id 'to: n' "$@" }
+
+echo "Checking that inject inserts a message-id."
+test -n "`inj`"
+
+echo "Checking that inject preserves an existing message-id."
+inj "Message-Id: <mid@mid>" | grep -q '^ <mid@mid>$'
+
+echo "Checking that inject does not add more message-ids."
+test 1 -eq `inj "Message-Id: <mid@mid>" | wc -l`
+
+echo "Checking that inject will ignore an existing message-id."
+export NULLMAILER_FLAGS=i
+inj "Message-Id: <mid@mid>" | not grep -q '^ <mid@mid>$'
+
+echo "Checking that inject obeys hostname()"
+hostname=`hostname`
+inj | grep -q "@$hostname>$"
+
+echo "Checking that inject obeys config/idhost"
+echo test1.org >$SYSCONFDIR/idhost
+inj | grep -q '@test1.org>$'

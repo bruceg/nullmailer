@@ -1,0 +1,44 @@
+. functions
+
+rm -f testmail
+cat >testmail <<EOF
+bruceg@em.ca
+bruceg@em.ca
+
+From: <bruceg@em.ca>
+To: <bruceg@em.ca>
+Subject: Nullmailer automated test message
+
+Just testing, please ignore
+EOF
+
+for p in smtp qmqp
+do
+	echo "Testing host not found error with $p."
+	error 2 protocol $p this.host.can.not.exist <testmail
+
+	echo "Testing connection refused error with $p."
+	error 7 protocol $p -p 24680 localhost <testmail
+	
+	echo "Testing usage error with $p (zero args)."
+	error 1 protocol $p <testmail
+	
+	echo "Testing usage error with $p (two args)."
+	error 1 protocol $p localhost foobar <testmail
+	
+	echo "Testing usage error with $p (unknown option)."
+	error 1 protocol $p -x localhost <testmail
+	
+	echo "Testing usage error with $p (invalid integer)."
+	error 1 protocol $p -p foo localhost <testmail
+
+	tcpserver 0 24680 date & job=$!
+	sleep 1
+	trap "kill $job" EXIT
+	echo "Testing protocol failure with $p."
+	error 11 protocol $p -p 24680 localhost <testmail
+	kill $job
+	trap - EXIT
+done
+
+rm -f testmail

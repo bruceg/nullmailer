@@ -1,0 +1,50 @@
+. functions
+
+inj() { inject -n -v "$@" | tail +2 | sed '/^$/,$d' }
+inj-find() { echo to: a@b.c | inj "$1" d@e.f | grep -q "$2" }
+inj-notfind() { echo to: a@b.c | inj "$1" d@e.f | not grep -q "$2" }
+
+hdrline='^a@b.c$'
+cmdline='^d@e.f$'
+
+echo "Checking that inject uses command line with -a."
+inj-find -a $cmdline
+
+echo "Checking that inject ignores header lines with -a."
+inj-notfind -a $hdrline
+
+echo "Checking that inject uses command line with -b."
+inj-find -b $cmdline
+
+echo "Checking that inject uses header lines with -b."
+inj-find -b $hdrline
+
+echo "Checking that inject ignores command line with -h."
+inj-notfind -h $cmdline
+
+echo "Checking that inject uses header lines with -h."
+inj-find -h $hdrline
+
+echo "Checking that inject uses command line with -e and no header."
+echo | inj -e d@e.f | grep -q $cmdline
+
+echo "Checking that inject uses command line with -e and header."
+inj-find -e $cmdline
+
+echo "Checking that inject uses header with -e and no command line."
+echo to: a@b.c | inj -e | grep -q $hdrline
+
+echo "Checking that inject ignores header with -e and command line."
+inj-notfind -e $hdrline
+
+echo "Checking that inject uses command line with no header by default."
+echo | inj -e d@e.f | grep -q $cmdline
+
+echo "Checking that inject uses command line with header by default."
+inj-find -e $cmdline
+
+echo "Checking that inject uses header with no command line by default."
+echo to: a@b.c | inj -e | grep -q $hdrline
+
+echo "Checking that inject ignores header with command line by default."
+inj-notfind -e $hdrline
