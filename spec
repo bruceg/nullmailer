@@ -30,7 +30,8 @@ make
 
 %install
 rm -fr $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/{usr/lib,etc/rc.d/init.d}
+mkdir -p $RPM_BUILD_ROOT/etc
+mkdir -p $RPM_BUILD_ROOT/usr/lib
 mkdir -p $RPM_BUILD_ROOT/var/nullmailer/service/log
 mkdir -p $RPM_BUILD_ROOT/var/log/nullmailer
 
@@ -77,6 +78,7 @@ fi
 %dir /usr/libexec/nullmailer
 /usr/libexec/nullmailer/*
 /usr/man/man1/*
+/usr/man/man7/*
 /usr/man/man8/*
 %attr(04711,nullmail,nullmail) /usr/sbin/nullmailer-queue
 /usr/sbin/nullmailer-send
