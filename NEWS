@@ -12,6 +12,8 @@ Changes in version 1.00RC6
 - Added some missing includes to fix compilation failures in various
   sources.
 
+- Fixed a bug in the setenv function in sendmail.cc.
+
 Note:  If no further bugs are found, this will become the official
 version 1.00 release.
 -------------------------------------------------------------------------------
