@@ -139,7 +139,8 @@ int protocol_prep(fdibuf*)
 
 int protocol_send(fdibuf* in, int fd)
 {
-  read_hostnames();
+  mystring hh = getenv("HELOHOST");
+  if (!hh) return 1;
   smtp conn(fd);
   conn.docmd("", 200);
   conn.docmd("HELO " + me, 200);

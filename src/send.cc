@@ -35,6 +35,7 @@
 #include "defines.h"
 #include "errcodes.h"
 #include "fdbuf/fdbuf.h"
+#include "hostname.h"
 #include "itoa.h"
 #include "list.h"
 
@@ -301,6 +302,12 @@ bool do_select()
 
 int main(int, char*[])
 {
+  mystring hh;
+
+  read_hostnames();
+  if (!config_read("helohost", hh)) hh = me;
+  setenv("HELOHOST", hh.c_str(), 1);
+  
   if(!open_trigger())
     return 1;
   if(chdir(QUEUE_MSG_DIR) == -1) {
