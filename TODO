@@ -1,5 +1,9 @@
 - Document proto/smtp use $HELOHOST for the HELO string.
 
+- Convert all proto modules to use timedout reads.
+
+- Add support for authentication to protocols.
+
 *** Add a delayed delivery notification system somehow ***
 
 - Remove "adminaddr" facility from -queue, and add a more general
