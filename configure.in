@@ -43,9 +43,8 @@ TEST_STRUCT_UTSNAME
 CHECK_NAMED_PIPE_BUG
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(gethostname getdomainname setenv)
 dnl AC_CHECK_FUNCS(gettimeofday mkdir putenv rmdir socket)
-AC_CHECK_FUNCS(srandom)
+AC_CHECK_FUNCS(setenv srandom)
 
 AC_DEFINE(BUFSIZE, 4096)
 AM_CONDITIONAL(FDBUF_NO_MYSTRING, false)
