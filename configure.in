@@ -1,5 +1,5 @@
 AC_INIT(lib/defines.h)
-AM_INIT_AUTOMAKE(nullmailer, 1.00RC4)
+AM_INIT_AUTOMAKE(nullmailer, 1.00RC5)
 AM_CONFIG_HEADER(config.h)
 AC_PROG_MAKE_SET
 
