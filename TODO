@@ -1,18 +1,35 @@
-- Add a "me" config file from which the hostname is derived.
+- Document new "defaultdomain", "helohost", and "me" configuration
+  files.
+
+- Make proto/smtp use $HELOHOST for the HELO string, and document it.
+
+- Add a "failed" queue directory for permanently failed messages.
+
+- Check documentation regarding init.d scripts.
 
 - Add note to HOWTO about setting hostnames.
 
 - Modify nullmailer-send to always run through its entire queue before
   stopping.
 
+- Figure out how to make nullmailer-inject automatically insert a blank
+  line (if it's missing) after the last header.
+
 *** Add a delayed delivery notification system somehow ***
+
+- Remove "adminaddr" facility from -queue, and add a more general
+  destination address rewriting facility to -inject:
+  - Read a list containing "PATTERN:ADDRESS" lines.
+  - PATTERN can be a literal "user@FQDN" or just "user", in which case
+    it must be matched exactly (before qualification).
+  - PATTERN can be "@FQDN" which matches any user.
 
 - For version 1.1: improved protocol module API
   - Need to communicate better error messages to nullmailer-send.
 
 - For version 2: three-state queueing
   - Queue message partially (tmp -> holding)
-  - Send to recipient immediately
+  - Send to smarthost immediately
   - Remove from holding if sending succeeds
   - Complete queueing (holding -> queue) if sending is deferred
   - Return with an error if sending fails (permanently)

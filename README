@@ -11,6 +11,12 @@ configure, secure, and easily extendable.
 A mailing list has been set up to discuss this package.  To subscribe,
 send an email to:
 	nullmailer-subscribe@lists.em.ca
+A mailing list archive is available at:
+	http://lists.em.ca/?list=nullmailer
+
+Development versions of nullmailer are available via anonymous CVS.
+Set your CVSROOT to ":pserver:cvs@bruce-guenter.dyndns.org:/CVS",
+login with an empty password, and check out the "nullmailer" module.
 
 This program is Copyright(C) 2000 Bruce Guenter, and may be copied
 according to the GNU GENERAL PUBLIC LICENSE (GPL) Version 2 or a later
