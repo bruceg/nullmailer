@@ -21,7 +21,7 @@ the quotes), but QMQP[1] is also supported with the "qmqp" module.
 
 4. Start nullmailer-send.  If you are using the RPM, ignore the rest of
 the instructions and type:
-	/etc/rc.d/init.d/nullmailer start
+	svc-start nullmailer
 Otherwise, you will need to set up the appropriate scripts to run
 nullmailer-send in the background, with its output going to a logging
 program.  The following is an appropriate run script for use with
