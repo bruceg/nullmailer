@@ -1,3 +1,8 @@
+2001-02-01  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* src/send.cc (send_all): If sending the file fails, skip to the
+	next file instead of aborting sending completely.
+
 2000-12-29  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
 
 	* Released version 1.00RC5
