@@ -113,7 +113,7 @@ int main(int argc, char** argv)
   FD_ZERO(&rfds);
   FD_SET(fd,&rfds);
   tv.tv_sec = tv.tv_usec = 0;
-  return select(fd+1, &rfds, 0, 0,&tv) > 0;
+  return (select(fd+1, &rfds, 0, 0,&tv) > 0) ? 0 : 1;
 }
 EOF
 	if ! ${CC} ${CFLAGS} conftest.c -o conftest
@@ -121,6 +121,7 @@ EOF
 		echo Compile failed
 		exit 1
 	fi
+	mkfifo conftest.pipe
 	if ./conftest conftest.pipe
 	then
 		AC_DEFINE(NAMEDPIPEBUG, 1)

@@ -1,7 +1,13 @@
 This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
+Changes in version 1.00RC4
+
+- Fixed the reversed logic in the named pipe bug check.
+-------------------------------------------------------------------------------
 Changes in version 1.00RC3
 
+- Treat the first non-header line in a message as the first line of the
+  body, even if it isn't preceded by a blank line.
 - Fixed another host name bug causing compilation failures on systems
   without "domainname" in struct utsname.
 - Fixed some typos that would prevent proper TCP connections on many
