@@ -2,9 +2,6 @@
 
 - Check documentation regarding init.d scripts.
 
-- Figure out how to make nullmailer-inject automatically insert a blank
-  line (if it's missing) after the last header.
-
 *** Add a delayed delivery notification system somehow ***
 
 - Remove "adminaddr" facility from -queue, and add a more general
