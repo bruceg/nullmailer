@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "mystring/mystring.h"
+#include <string.h>
 #include <unistd.h>
 #include <sys/utsname.h>
 
