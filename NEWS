@@ -3,6 +3,7 @@ This file lists all the major user-visible changes to nullmailer.
 Changes in version 1.00RC4
 
 - Fixed the reversed logic in the named pipe bug check.
+- Updated the HOWTO notes.
 -------------------------------------------------------------------------------
 Changes in version 1.00RC3
 

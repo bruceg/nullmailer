@@ -1,7 +1,3 @@
-- Note requirement to run 'make install-root'
-
-- Fix Solaris missing domainname declaration problem
-
 - For version 2: three-state queueing
   - Queue message partially (tmp -> holding)
   - Send to recipient immediately

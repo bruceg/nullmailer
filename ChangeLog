@@ -1,3 +1,8 @@
+2000-08-15  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* lib/hostname.cc (getnames): Added an extern declaration of
+	getdomainname for systems that don't declare it.
+
 2000-08-10  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
 
 	* Released version 1.00RC3
