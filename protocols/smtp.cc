@@ -25,7 +25,6 @@
 #include "connect.h"
 #include "errcodes.h"
 #include "fdbuf/fdbuf.h"
-#include "hostname.h"
 #include "itoa.h"
 #include "mystring/mystring.h"
 #include "protocol.h"
@@ -143,6 +142,6 @@ void protocol_send(fdibuf* in, int fd)
   if (!hh) protocol_fail(1, "$HELOHOST is not set");
   smtp conn(fd);
   conn.docmd("", 200);
-  conn.docmd("HELO " + me, 200);
+  conn.docmd("HELO " + hh, 200);
   conn.send(in);
 }

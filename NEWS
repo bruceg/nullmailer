@@ -2,6 +2,8 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.00RC7
 
+- Fixed typo in smtp protocol module that caused HELO to be sent without
+  a hostname.
 
 Note:  If no further bugs are found, this will become the official
 version 1.00 release.
