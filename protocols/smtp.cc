@@ -100,21 +100,21 @@ void smtp::send_envelope(fdibuf* msg)
 {
   mystring tmp;
   msg->getline(tmp);
-  docmd("MAIL FROM: <" + tmp + ">", 250);
+  docmd("MAIL FROM: <" + tmp + ">", 200);
   while(msg->getline(tmp) && !!tmp)
-    docmd("RCPT TO: <" + tmp + ">", 250);
+    docmd("RCPT TO: <" + tmp + ">", 200);
 }
 
 void smtp::send_data(fdibuf* msg)
 {
-  docmd("DATA", 354);
+  docmd("DATA", 300);
   mystring tmp;
   while(msg->getline(tmp)) {
     if((tmp[0] == '.' && tmp[1] == 0 && !(out << ".")) ||
        !(out << tmp << "\r\n"))
       exit(ERR_MSG_WRITE);
   }
-  docmd(".", 250);
+  docmd(".", 200);
 }
 
 void smtp::send(fdibuf* msg)
@@ -131,9 +131,9 @@ int protocol_prep(fdibuf*)
 int protocol_send(fdibuf* in, int fd)
 {
   smtp conn(fd);
-  conn.docmd("", 220);
-  conn.docmd("HELO " + hostname(), 250);
+  conn.docmd("", 200);
+  conn.docmd("HELO " + hostname(), 200);
   conn.send(in);
-  conn.docmd("QUIT", 221, true);
+  conn.docmd("QUIT", 200, true);
   return 0;
 }
