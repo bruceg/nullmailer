@@ -51,8 +51,9 @@ int tcpconnect(const mystring& hostname, int port)
   memset(&sa, 0, sizeof(sa));
   int e = sethostbyname(hostname, sa);
   if(e) return e;
+  sa.sin_family = AF_INET;
   sa.sin_port = htons(port);
-  int s = socket(AF_INET, SOCK_STREAM, 0);
+  int s = socket(PF_INET, SOCK_STREAM, 0);
   if(s == -1)
     return -ERR_SOCKET;
   if(connect(s, (sockaddr*)&sa, sizeof(sa)) != 0) {
