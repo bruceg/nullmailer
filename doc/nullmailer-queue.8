@@ -22,12 +22,9 @@ message to stdandard output.
 .TP
 .B adminaddr
 If this file is not empty, all recipients to users at either
-"localhost" (the literal string) or the canonical host name (based on
-the values returned by the
-.I hostname
-and the
-.I domainname
-system calls) are remapped to this address.
+"localhost" (the literal string) or the canonical host name (from the
+.I me
+control file) are remapped to this address.
 This is provided to allow local daemons to be able to send email to
 "somebody@localhost" and have it go somewhere sensible instead of
 being bounced by your relay host.
