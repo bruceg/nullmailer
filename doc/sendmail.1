@@ -1,0 +1,75 @@
+.TH sendmail 1
+.SH NAME
+sendmail \- sendmail emulator interface for nullmailer
+.SH SYNOPSIS
+.B sendmail
+[
+.B flags
+] [
+.I recipients
+] <
+.I message
+.SH DESCRIPTION
+This program is a front end program for
+.BR nullmailer-inject .
+It is used by programs that expect a
+.I sendmail
+interface for sending email.
+After parsing the command-line arguments, this program executes
+.B nullmailer-inject
+directly.
+See the documentation for
+.B nullmailer-inject
+for details on how messages are reformatted and queued.
+.SH OPTIONS
+.TP
+.B \-B TYPE
+.TP
+.B \-b MODE
+.TP
+.B \-C FILE
+.TP
+.B \-d DEBUG
+.TP
+.B \-h COUNT
+.TP
+.B \-i
+.TP
+.B \-L TAG
+.TP
+.B \-N DSN
+.TP
+.B \-n
+.TP
+.B \-O OPTION
+.TP
+.B \-o OPTION
+.TP
+.B \-p PROTOCOL
+.TP
+.B \-q TIME
+.TP
+.B \-R RETURN
+.TP
+.B \-U
+.TP
+.B \-V ENVID
+.TP
+.B \-v
+.TP
+.B \-X LOGFILE
+Ignored
+.TP
+.B \-F ADDRESS
+Sets the full name of the sender.
+.TP
+.B \-f ADDRESS
+Sets the envelope sender address.
+.TP
+.B \-r ADDRESS
+An alternate and obsolete form of the -f flag.
+.TP
+.B \-t
+Read message for recipients and ignore the command-line arguments.
+.SH SEE ALSO
+nullmailer-inject(1)
