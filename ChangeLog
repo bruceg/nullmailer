@@ -1,3 +1,7 @@
+2000-12-29  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* Released version 1.00RC5
+
 2000-10-05  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
 
 	* lib/hostname.cc: Fixed the prototype for getdomainname.

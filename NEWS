@@ -1,13 +1,18 @@
 This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
+Changes in version 1.00RC6
+
+- Added some missing includes to fix compilation failures in
+  lib/hostname.cc and src/send.cc
+
+Note:  If no further bugs are found, this will become the official
+version 1.00 release.
+-------------------------------------------------------------------------------
 Changes in version 1.00RC5
 
 - Fixed getdomainname prototype in lib/hostname.cc.
 - Return proper error codes for permanent and temporary SMTP failures.
 - Adapted to use supervise-scripts 3.
-
-Note:  If no further bugs are found, this will become the official
-version 1.00 release.
 -------------------------------------------------------------------------------
 Changes in version 1.00RC4
 

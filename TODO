@@ -1,3 +1,8 @@
+- Modify nullmailer-send to always run through its entire queue before
+  stopping.
+
+*** Add a delayed delivery notification system somehow ***
+
 - For version 2: three-state queueing
   - Queue message partially (tmp -> holding)
   - Send to recipient immediately
