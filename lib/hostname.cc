@@ -38,9 +38,9 @@ static void getnames()
 #ifdef UTSNAME_HAS_DOMAINNAME
   domainname_cache = new mystring(buf.UTSNAME_HAS_DOMAINNAME);
 #elif HAVE_GETDOMAINNAME
-  char buf[256];
-  getdomainname(buf, 255);
-  domainname_cache = new mystring(buf);
+  char hbuf[256];
+  getdomainname(hbuf, 255);
+  domainname_cache = new mystring(hbuf);
 #else
   domainname_cache = new mystring;
 #endif

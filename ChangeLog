@@ -1,3 +1,8 @@
+2000-07-03  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* lib/hostname.cc (getnames): Fixed typo that caused systems
+	without "domainname" in struct utsname to fail to compile.
+
 2000-06-28  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
 
 	* lib/hostname.cc (getnames): Changed the logic here to append the
