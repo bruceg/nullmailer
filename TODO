@@ -1,10 +1,19 @@
+- Add a "me" config file from which the hostname is derived.
+
+- Add note to HOWTO about setting hostnames.
+
 - Modify nullmailer-send to always run through its entire queue before
   stopping.
 
 *** Add a delayed delivery notification system somehow ***
 
+- For version 1.1: improved protocol module API
+  - Need to communicate better error messages to nullmailer-send.
+
 - For version 2: three-state queueing
   - Queue message partially (tmp -> holding)
   - Send to recipient immediately
   - Remove from holding if sending succeeds
-  - Complete queueing (holding -> queue) if sending fails
+  - Complete queueing (holding -> queue) if sending is deferred
+  - Return with an error if sending fails (permanently)
+  - Move all from holding -> queue on startup of nullmailer-send
