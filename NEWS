@@ -13,6 +13,9 @@ Changes in version 1.00RC8
 
 - Fixed the address parser handling domain names with trailing periods.
 
+- Fixed bug in header parsing that would cause the last header line to
+  be repeated if there was no body.
+
 Note:  If no further bugs are found, this will become the official
 version 1.00 release.
 

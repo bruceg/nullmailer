@@ -349,6 +349,7 @@ bool read_header()
       if(!!whole)
 	parse_line(whole);
       whole = cur_line;
+      cur_line = "";
     }
   }
   if(!!whole)
