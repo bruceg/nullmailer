@@ -52,6 +52,7 @@ cli_option cli_options[] = {
   { 'h', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
   { 'i', 0, cli_option::flag, 0, &o_dummyi, "Ignored", 0 },
   { 'L', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  { 'm', 0, cli_option::flag,   0, &o_dummyi, "Ignored", 0 },
   { 'N', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
   { 'n', 0, cli_option::flag, 0, &o_dummyi, "Ignored", 0 },
   { 'O', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
