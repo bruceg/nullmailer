@@ -145,5 +145,4 @@ void protocol_send(fdibuf* in, int fd)
   conn.docmd("", 200);
   conn.docmd("HELO " + me, 200);
   conn.send(in);
-  conn.docmd("QUIT", 200, true);
 }
