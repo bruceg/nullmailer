@@ -1,3 +1,8 @@
+2000-06-19  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* lib/tcpconnect.cc (tcpconnect): Removed an extraneous const from
+	the call to connect.
+
 2000-06-15  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
 
 	* Released version 1.00RC1

@@ -55,7 +55,7 @@ int tcpconnect(const mystring& hostname, int port)
   int s = socket(AF_INET, SOCK_STREAM, 0);
   if(s == -1)
     return -ERR_SOCKET;
-  if(connect(s, (const sockaddr*)&sa, sizeof(sa)) != 0) {
+  if(connect(s, (sockaddr*)&sa, sizeof(sa)) != 0) {
     switch(errno) {
     case ECONNREFUSED: return -ERR_CONN_REFUSED;
     case ETIMEDOUT: return -ERR_CONN_TIMEDOUT;
