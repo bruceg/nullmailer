@@ -30,7 +30,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "ac/time.h"
+#include "ac/systime.h"
 #include "configio.h"
 #include "defines.h"
 #include "errcodes.h"

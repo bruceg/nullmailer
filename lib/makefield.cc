@@ -22,7 +22,7 @@
 #include "config.h"
 #include "defines.h"
 #include <unistd.h>
-#include "ac/time.h"
+#include "ac/systime.h"
 #include "itoa.h"
 #include "mystring/mystring.h"
 
