@@ -30,7 +30,7 @@ static mystring* domainname_cache = 0;
 #ifdef HAVE_GETDOMAINNAME
 // Re-declare the prototype here, as some systems don't declare it
 // in a predictable header file.
-extern "C" getdomainname(char*, size_t);
+extern "C" int getdomainname();
 #endif
 
 static void getnames()
