@@ -22,16 +22,12 @@ the quotes), but QMQP[1] is also supported with the "qmqp" module.
 4. Start nullmailer-send.  If you are using the RPM, ignore the rest of
 the instructions and type:
 	/etc/rc.d/init.d/nullmailer start
-The daemontools[2] package includes a log recording facility (accustamp
-and cyclog) as well as supervisor agents (supervise, svc, and svstat).
-To run the program using these tools:
-- create a directory into which the logs should be put
-- create a directory for the supervisory data
-- make both of these owned by nullmail
-- if you are using the standard daemontools, run (all one line):
-	env - PATH="$PATH" setuser nullmail supervise SUPERVISOR-DIR sh -c 'nullmailer-send | accustamp | cyclog LOG-DIR' &
-- if you are using daemontools patched with my supervise-pipe patch, run:
-	env - PATH="$PATH" setuser nullmail supervise SUPERVISOR-DIR nullmailer-send \| accustamp \| cyclog LOG-DIR &
+Otherwise, you will need to set up the appropriate scripts to run
+nullmailer-send in the background, with its output going to a logging
+program.  The following is an appropriate run script for use with
+daemontools[2]:
+	#!/bin/sh
+	exec setuser nullmail nullmailer-send 2>&1
 
 5. You're done!  The included sendmail emulator front-end should allow
 most (if not all) sendmail-compatible programs to run without any
@@ -40,6 +36,6 @@ email message header formatting options.
 
 Footnotes:
 1. QMQP is a high-speed mail queueing protocol, used with qmail.  See
-http://pobox.com/~djb/proto/qmqp.html
-2. See http://pobox.com/~djb/daemontools.html.  I have RPMS available at
-http://www.qcc.sk.ca/~bguenter/distrib/daemontools/
+http://cr.yp.to/proto/qmqp.html
+2. See http://cr.yp.to/daemontools.html.  I have RPMS available at
+http://em.ca/~bruceg/rpms/daemontools/
