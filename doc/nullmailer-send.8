@@ -44,6 +44,10 @@ All the control files are reread each time the queue is run.
 The number of seconds to pause between successive queue runs when
 there are messages in the queue (defaults to
 .IR 60 ).
+If this is set to
+.IR 0 ,
+nullmailer-send will exit immediately after going through the queue once
+(one-shot mode).
 .TP
 .B remotes
 This file contains a list of remote servers to which to send each

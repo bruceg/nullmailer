@@ -5,6 +5,9 @@ Changes in version 1.00RC7
 - Fixed typo in smtp protocol module that caused HELO to be sent without
   a hostname.
 
+- Added a one-shot mode to nullmailer-send, triggered by setting the
+  pausetime to zero.
+
 Note:  If no further bugs are found, this will become the official
 version 1.00 release.
 

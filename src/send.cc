@@ -321,6 +321,7 @@ int main(int, char*[])
   load_files();
   for(;;) {
     send_all();
+    if (pausetime == 0) break;
     do_select();
   }
   return 0;
