@@ -136,7 +136,7 @@ result::result(const result& r)
 #define RETURNR(R) return R
 #define RETURN(N,S,C,L) return result(N,S,C,L)
 #else
-#include "fdbuf.h"
+#include "fdbuf/fdbuf.h"
 static const char indentstr[] = "                       ";
 static const char* indent = indentstr + sizeof indentstr - 1;
 #define ENTER(R) do{ fout << indent-- << __FUNCTION__ << ": " << node->str << ": " << R << endl; }while(0)
@@ -381,7 +381,7 @@ RULE(sub_domain)
 
 RULE(domain)
 {
-  ENTER("sub-domain *(PERIOD sub-domain)");
+  ENTER("sub-domain *(PERIOD sub-domain) [PERIOD]");
   MATCHRULE(r, sub_domain);
   if(!r) FAIL("did not match sub-domain");
   mystring comment;
@@ -391,13 +391,17 @@ RULE(domain)
       break;
     node = node->next;
     result r1 = match_sub_domain(node);
-    if(!r1) break;
-    r.next = r1.next;
-    r.str += PERIOD;
-    r.str += r1.str;
-    comment += r1.comment;
-    r.addr += PERIOD;
-    r.addr += r1.addr;
+    if(r1) {
+      r.next = r1.next;
+      r.str += PERIOD;
+      r.str += r1.str;
+      comment += r1.comment;
+      r.addr += PERIOD;
+      r.addr += r1.addr;
+    }
+    else {
+      r.next = node;
+    }
   }
   r.comment += comment;
   RETURNR(r);
