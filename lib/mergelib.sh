@@ -6,7 +6,7 @@ mkdir "$tmpdir"
 cd "$tmpdir"
 trap 'cd ..; rm -rf "$tmpdir"' EXIT
 for input in "$@"; do
-	dir="${input##*/}"
+	dir="`basename "$input"`"
 	mkdir "$dir"
 	cd "$dir"
 	ar x ../../"$input"

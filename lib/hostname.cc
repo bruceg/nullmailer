@@ -23,7 +23,6 @@
 #include "mystring/mystring.h"
 #include <unistd.h>
 #include <sys/utsname.h>
-#include "fdbuf/fdbuf.h"
 
 static mystring* hostname_cache = 0;
 static mystring* domainname_cache = 0;
@@ -35,11 +34,34 @@ static void getnames()
   struct utsname buf;
   uname(&buf);
   hostname_cache = new mystring(buf.nodename);
-  int i = hostname_cache->find_first('.');
-  if(i != -1)
-    domainname_cache = new mystring(hostname_cache->right(i+1));
-  else
-    domainname_cache = new mystring;
+
+#ifdef UTSNAME_HAS_DOMAINNAME
+  domainname_cache = new mystring(buf.UTSNAME_HAS_DOMAINNAME);
+#elif HAVE_GETDOMAINNAME
+  char buf[256];
+  getdomainname(buf, 255);
+  domainname_cache = new mystring(buf);
+#else
+  domainname_cache = new mystring;
+#endif
+
+  // Tricky logic: if the node name does not contains the domain name
+  // as a proper suffix, paste them together.
+  char* nodename_end = buf.nodename + hostname_cache->length() -
+    domainname_cache->length() - 1;
+  if(domainname_cache->length() > 0) {
+    if(nodename_end <= buf.nodename ||
+       strcmp(nodename_end + 1, domainname_cache->c_str()) ||
+       *nodename_end != '.')
+      *hostname_cache = *hostname_cache + "." + *domainname_cache;
+  }
+  // Otherwise, the domain name is empty, try to determine it from
+  // the host name.
+  else {
+    int i = hostname_cache->find_first('.');
+    if(i != -1)
+      *domainname_cache = hostname_cache->right(i+1);
+  }
 }
 
 mystring hostname()
