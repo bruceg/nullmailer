@@ -218,15 +218,17 @@ contain a period, including
 and
 .BR idhost .
 Defaults to the value of the
-.I domainname
-system call.
+.I me
+control file, if it exists, otherwise the literal name
+.IR defauldomain .
 .TP
 .B defaulthost
 The content of this file is appended to any address that is missing a
 host name.
 Defaults to the value of the
-.I hostname
-system call.
+.I me
+control file, if it exists, otherwise the literal name
+.IR defaulthost .
 .TP
 .B idhost
 The content of this file is used when building the message-id string
@@ -236,6 +238,8 @@ Defaults to the canonicalized value of
 .TP
 .B me
 The fully-qualifiled host name of the computer running nullmailer.
+Defaults to the literal name
+.IR me .
 .SH SEE ALSO
 nullmailer-queue(8)
 .SH NOTES

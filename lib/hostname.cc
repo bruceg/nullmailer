@@ -31,8 +31,15 @@ mystring defaultdomain;
 
 void read_hostnames()
 {
-  if (!config_read("me", me)) me = "me";
-  if (!config_read("defaultdomain", defaultdomain)) defaultdomain = "";
-  if (!config_read("defaulthost", defaulthost)) defaulthost = me;
-  canonicalize(defaultdomain);
+  int nome;
+  nome = 0;
+  if (!config_read("me", me)) {
+    nome = 1;
+    me = "me";
+  }
+  if (!config_read("defaultdomain", defaultdomain))
+    defaultdomain = nome ? "defaultdomain" : me.c_str();
+  if (!config_read("defaulthost", defaulthost))
+    defaulthost = nome ? "defaulthost" : me.c_str();
+  canonicalize(defaulthost);
 }
