@@ -1,5 +1,7 @@
 2000-08-10  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
 
+	* Released version 1.00RC3
+
 	* src/inject.cc (read_header): Fixed header parsing logic.
 
 2000-08-07  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
