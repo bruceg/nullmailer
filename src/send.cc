@@ -243,10 +243,16 @@ bool send_all()
 }
 
 static int trigger;
+#ifdef NAMEDPIPEBUG
+static int trigger2;
+#endif
 
 bool open_trigger()
 {
   trigger = open(QUEUE_TRIGGER, O_RDONLY|O_NONBLOCK);
+#ifdef NAMEDPIPEBUG
+  trigger2 = open(QUEUE_TRIGGER, O_WRONLY|O_NONBLOCK);
+#endif
   if(trigger == -1)
     fail("Could not open trigger file.");
   return true;
@@ -257,6 +263,9 @@ bool read_trigger()
   if(trigger != -1) {
     char buf[1024];
     read(trigger, buf, sizeof buf);
+#ifdef NAMEDPIPEBUG
+    close(trigger2);
+#endif
     close(trigger);
   }
   return open_trigger();
