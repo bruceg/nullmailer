@@ -1,5 +1,13 @@
 This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
+Changes in version 1.00RC8
+
+Note:  If no further bugs are found, this will become the official
+version 1.00 release.
+
+Development of this version has been sponsored by FutureQuest, Inc.
+ossi@FutureQuest.net  http://www.FutureQuest.net/
+-------------------------------------------------------------------------------
 Changes in version 1.00RC7
 
 - Fixed typo in smtp protocol module that caused HELO to be sent without
@@ -7,9 +15,6 @@ Changes in version 1.00RC7
 
 - Added a one-shot mode to nullmailer-send, triggered by setting the
   pausetime to zero.
-
-Note:  If no further bugs are found, this will become the official
-version 1.00 release.
 
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
