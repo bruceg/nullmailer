@@ -55,6 +55,12 @@ fi
 if ! [ -L /service/nullmailer ]; then
 	svc-add /var/nullmailer/service nullmailer
 fi
+if ! [ -s /etc/nullmailer/me ]; then
+	/bin/hostname --fqdn >/etc/nullmailer/me
+fi
+if ! [ -s /etc/nullmailer/defaultdomain ]; then
+	/bin/hostname --domain >/etc/nullmailer/defaultdomain
+fi
 
 %preun
 if [ "$1" = 0 ]; then
