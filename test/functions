@@ -32,7 +32,7 @@ injectlines() {
 injectfield() {
   local field=$1
   shift
-  injectlines "$@" | formail -x "$field:"
+  injectlines "$@" | grep -i "^$field:" | cut -d: -f2-
 }
 protocol() { local p=$1; shift; ../protocols/$p "$@" >/dev/null 2>&1; }
 
