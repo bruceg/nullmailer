@@ -1,3 +1,10 @@
+2000-08-28  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* Released version 1.00RC4
+
+	* lib/address.cc (RULE(domain)): Modified to handle (and strip) a
+	trailing period in the domain name.
+
 2000-08-15  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
 
 	* lib/hostname.cc (getnames): Added an extern declaration of
