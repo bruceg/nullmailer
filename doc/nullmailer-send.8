@@ -48,10 +48,17 @@ there are messages in the queue (defaults to
 .B remotes
 This file contains a list of remote servers to which to send each
 message.
-Each line of this file contains a remote host name or address and an
-optional protocol string, separated by white space.
+Each line of this file contains a remote host name or address followed
+by an optional protocol string, separated by white space.
 The protocol name defaults to
-.IR smtp .
+.IR smtp ,
+and may be followed by command-line arguments for that module.
+For example, to connect to port 2525 on your SMTP smart host, use:
+
+.EX
+    smarthost.dom smtp --port=2525
+.EE
+
 Blank lines and lines starting with a pound are ignored.
 .SH FILES
 .TP
