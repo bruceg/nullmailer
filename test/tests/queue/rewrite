@@ -24,10 +24,9 @@ data
 EOF
 
 echo "Checking that queue rewrites user@hostname to adminaddr."
-hostname=`hostname -f`
 que-recip -q '^admin@remote$' <<EOF
 bruceg@qcc.sk.ca
-user@$hostname
+user@f.q.d.n
 
 header
 

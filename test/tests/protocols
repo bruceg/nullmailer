@@ -1,4 +1,5 @@
 . functions
+export HELOHOST=f.q.d.n
 
 rm -f testmail
 cat >testmail <<EOF

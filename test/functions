@@ -1,8 +1,6 @@
 rm -rf /tmp/nm
 mkdir -p /tmp/nm/var/nullmailer/{queue,tmp}
 mkdir -p /tmp/nm/etc/nullmailer
-/bin/hostname --fqdn >/tmp/nm/etc/nullmailer/me
-/bin/hostname --domain >/tmp/nm/etc/nullmailer/defaultdomain
 
 #not() { if "$@"; then return 1; else return 0; fi }
 not() { ! safe "$@"; }
@@ -40,4 +38,6 @@ protocol() { local p=$1; shift; ../protocols/$p "$@" >/dev/null 2>&1; }
 
 export PATH=/bin:/usr/bin:/usr/local/bin
 rm -f $SYSCONFDIR/*
+echo f.q.d.n >/tmp/nm/etc/nullmailer/me
+echo q.d.n >/tmp/nm/etc/nullmailer/defaultdomain
 set -e

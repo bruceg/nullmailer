@@ -1,6 +1,6 @@
 . functions
 
-inj() { inject -n -v a </dev/null | head -1; }
+inj() { inject -n -v a </dev/null 2>/dev/null | head -1; }
 testvar() {
 	set -e
 	echo "Checking that inject obeys $1."
@@ -16,24 +16,17 @@ testcanon() {
 testhdr() {
 	set -e
 	echo "Checking that inject $1 $2:"
-	echo $2: $3 | inject -n -v a | head -1 | grep -q "$4"
+	echo $2: $3 | inject -n -v a 2>/dev/null | head -1 | grep -q "$4"
 }
 testign() { testhdr ignores "$@"; }
 testset() { testhdr uses "$@"; }
 
-echo "Checking that inject obeys hostname()"
-hostname=`hostname`
-domainname=`hostname -d`
-inj | grep -q "@$hostname$"
+echo "Checking that inject obeys me"
+inj | grep -q "@f.q.d.n$"
 
 echo "Checking that inject obeys config/defaulthost"
 echo test.org >$SYSCONFDIR/defaulthost
 inj | grep -q '@test.org$'
-
-echo "Checking that inject obeys domainname()"
-echo test >$SYSCONFDIR/defaulthost
-rm -f $SYSCONFDIR/defaultdomain
-inj | grep -q "@test.$domainname$"
 
 echo "Checking that inject obeys config/defaultdomain"
 echo test >$SYSCONFDIR/defaulthost

@@ -15,9 +15,8 @@ echo "Checking that inject will ignore an existing message-id."
 export NULLMAILER_FLAGS=i
 inj "Message-Id: <mid@mid>" | not grep -q '^ <mid@mid>$'
 
-echo "Checking that inject obeys hostname()"
-hostname=`hostname`
-inj | grep -q "@$hostname>$"
+echo "Checking that inject obeys me"
+inj | grep -q "@f.q.d.n>$"
 
 echo "Checking that inject obeys config/idhost"
 echo test1.org >$SYSCONFDIR/idhost

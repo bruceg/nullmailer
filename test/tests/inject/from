@@ -22,9 +22,8 @@ export NULLMAILER_FLAGS=f
 inj "from: a@b.c" | not grep -q '^ a@b\.c$'
 unset NULLMAILER_FLAGS
 
-echo "Checking that inject obeys hostname()"
-hostname=`hostname`
-inj | grep -q "@$hostname>$"
+echo "Checking that inject obeys me"
+inj | grep -q "@f.q.d.n>$"
 
 echo "Checking that inject obeys config/defaulthost"
 echo test.org >$SYSCONFDIR/defaulthost
