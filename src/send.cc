@@ -140,6 +140,7 @@ void catch_alrm(int)
 
 bool load_files()
 {
+  reload_files = false;
   fout << "Rescanning queue." << endl;
   DIR* dir = opendir(".");
   if(!dir)
@@ -288,7 +289,7 @@ bool do_select()
   if(s == 1) {
     fout << "Trigger pulled." << endl;
     read_trigger();
-    reload_files = 1;
+    reload_files = true;
   }
   else if(s == -1 && errno != EINTR)
     fail("Internal error in select.");
