@@ -36,4 +36,5 @@ defines.cc: Makefile.am make_defines.sh
 
 dist-hook:
 	$(RM) -f $(distdir)/defines.cc
-	cp -dP `find ac -name CVS -prune -o -type f -print` $(distdir)
+	mkdir $(distdir)/ac
+	cp -dP `find ac -name CVS -prune -o -type f -print` $(distdir)/ac/
