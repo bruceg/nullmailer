@@ -1,5 +1,10 @@
 This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
+Changes in version 1.00RC3
+
+- Fixed another host name bug causing compilation failures on systems
+  without "domainname" in struct utsname.
+-------------------------------------------------------------------------------
 Changes in version 1.00RC2
 
 - Fixed a bug in the way host names are determined.  This should fix
