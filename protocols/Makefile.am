@@ -1,7 +1,6 @@
 libexecdir = @libexecdir@/nullmailer
 
 libexec_PROGRAMS = smtp qmqp
-CXXLINK = $(CC) $(CXXFLAGS) $(LDFLAGS) -o $@
 INCLUDES = -I../lib -I../lib/cli
 
 smtp_SOURCES = smtp.cc protocol.cc protocol.h

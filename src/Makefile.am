@@ -8,7 +8,6 @@ sbin_PROGRAMS = \
 
 #noinst_PROGRAMS = address
 
-CXXLINK = $(CC) $(CXXFLAGS) $(LDFLAGS) -o $@
 INCLUDES = -I../lib -I../lib/cli
 
 mailq_SOURCES = mailq.cc

@@ -1,7 +1,6 @@
 noinst_PROGRAMS = address-test
 EXTRA_DIST = address-trace.cc
 
-CXXLINK = $(CC) $(CXXFLAGS) $(LDFLAGS) -o $@
 INCLUDES = -I../lib
 
 address_test_SOURCES = address-test.cc # address-trace.cc
