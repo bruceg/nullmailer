@@ -22,6 +22,7 @@ testign() { testhdr ignores "$@"; }
 testset() { testhdr uses "$@"; }
 
 echo "Checking that inject obeys me"
+rm -f $SYSCONFDIR/default*
 inj | grep -q "@f.q.d.n$"
 
 echo "Checking that inject obeys config/defaulthost"
