@@ -43,7 +43,7 @@ public:
   ~smtp();
   int get(mystring& str);
   int put(mystring cmd, mystring& result);
-  void docmd(mystring cmd, int range, bool nofail=false);
+  void docmd(mystring cmd, int range, bool show_succ=false);
   void send_data(fdibuf* msg);
   void send_envelope(fdibuf* msg);
   void send(fdibuf* msg);
@@ -84,7 +84,7 @@ int smtp::put(mystring cmd, mystring& result)
   return get(result);
 }
 
-void smtp::docmd(mystring cmd, int range, bool nofail)
+void smtp::docmd(mystring cmd, int range, bool show_succ)
 {
   mystring msg;
   int code;
@@ -92,18 +92,18 @@ void smtp::docmd(mystring cmd, int range, bool nofail)
     code = get(msg);
   else
     code = put(cmd, msg);
-  if(!nofail) {
-    if(code < range || code >= (range+100)) {
-      int e;
-      if(code >= 500)
-	e = ERR_MSG_PERMFAIL;
-      else if(code >= 400)
-	e = ERR_MSG_TEMPFAIL;
-      else
-	e = ERR_PROTO;
-      protocol_fail(e, msg.c_str());
-    }
+  if(code < range || code >= (range+100)) {
+    int e;
+    if(code >= 500)
+      e = ERR_MSG_PERMFAIL;
+    else if(code >= 400)
+      e = ERR_MSG_TEMPFAIL;
+    else
+      e = ERR_PROTO;
+    protocol_fail(e, msg.c_str());
   }
+  else if(show_succ)
+    protocol_succ(msg.c_str());
 }
 
 void smtp::send_envelope(fdibuf* msg)
@@ -124,7 +124,7 @@ void smtp::send_data(fdibuf* msg)
        !(out << tmp << "\r\n"))
       protocol_fail(ERR_MSG_WRITE, "Error sending message to remote");
   }
-  docmd(".", 200);
+  docmd(".", 200, true);
 }
 
 void smtp::send(fdibuf* msg)

@@ -81,7 +81,7 @@ void qmqp::send(fdibuf* msg, unsigned long size, const mystring& env)
   if(!in.getnetstring(response))
     protocol_fail(ERR_PROTO, "Response from remote was not a netstring");
   switch(response[0]) {
-  case 'K': return;
+  case 'K': protocol_succ(response.c_str()+1); break;
   case 'Z': protocol_fail(ERR_MSG_TEMPFAIL, response.c_str()+1); break;
   case 'D': protocol_fail(ERR_MSG_PERMFAIL, response.c_str()+1); break;
   default: protocol_fail(ERR_PROTO, "Invalid status byte in response");
