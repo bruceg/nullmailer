@@ -2,7 +2,7 @@
 
 # Set PKGURL to the full base URL for the package web site.
 PKGURL=http://untroubled.org/nullmailer/
-LISTURL='http://lists.em.ca/?list=nullmailer'
+LISTURL='http://lists.untroubled.org/?list=nullmailer'
 
 # If LISTSUB is set, makedist will add a note regarding mailing list
 # subscription.
@@ -32,10 +32,10 @@ WEBDIR=www/nullmailer
 
 # Set RPMUPLOAD to a list of additional "hostname/path" destinations to
 # which to upload the source and binary RPMs.
-RPMUPLOAD="incoming.redhat.com/libc6"
+#RPMUPLOAD="incoming.redhat.com/libc6"
 
 # Set LIST to the mailing list(s) to send the announcement to
-LIST=nullmailer@lists.em.ca
+LIST=nullmailer@lists.untroubled.org
 
 # Run any extra commands to prepare the source tree (such as making
 # documentation) here.
