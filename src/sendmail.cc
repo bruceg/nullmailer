@@ -1,5 +1,5 @@
 // nullmailer -- a simple relay-only MTA
-// Copyright (C) 1999  Bruce Guenter <bruceg@em.ca>
+// Copyright (C) 1999,2000  Bruce Guenter <bruceg@em.ca>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 //
 // You can contact me at <bruceg@em.ca>.  There is also a mailing list
 // available to discuss this package.  To subscribe, send an email to
-// <nullmailer-subscribe@ezmlm.vsource.com>.
+// <nullmailer-subscribe@lists.em.ca>.
 
 #include <config.h>
 #include <stdlib.h>
