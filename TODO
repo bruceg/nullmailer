@@ -1,23 +1,9 @@
-- Test smtp use of $HELOHOST
-
 - Fix header parsing continuing past headers when the headers contain
   \r\n?
 
-- Document new "defaultdomain", "helohost", and "me" configuration
-  files.
-
-- Test new "defaultdomain", "defaulthost", "helohost", and "me"
-
-- Make proto/smtp use $HELOHOST for the HELO string, and document it.
-
-- Add a "failed" queue directory for permanently failed messages.
+- Document proto/smtp use $HELOHOST for the HELO string.
 
 - Check documentation regarding init.d scripts.
-
-- Add note to HOWTO about setting hostnames.
-
-- Modify nullmailer-send to always run through its entire queue before
-  stopping.
 
 - Figure out how to make nullmailer-inject automatically insert a blank
   line (if it's missing) after the last header.
@@ -31,8 +17,8 @@
     it must be matched exactly (before qualification).
   - PATTERN can be "@FQDN" which matches any user.
 
-- For version 1.1: improved protocol module API
-  - Need to communicate better error messages to nullmailer-send.
+- For version 1.1:
+  - Add a "failed" queue directory for permanently failed messages.
 
 - For version 2: three-state queueing
   - Queue message partially (tmp -> holding)
