@@ -44,6 +44,14 @@ int main()
 {
   int count = 0;
   int failed = 0;
+  // empty list
+  TEST("",
+       "",
+       "");
+  // empty list with comment
+  TEST("(no addresses)",
+       "(no addresses)",
+       "");
   // periods in local
   TEST("a.b@c.d",
        "a.b@c.d",
