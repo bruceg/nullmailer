@@ -38,6 +38,7 @@ static void getnames()
 #ifdef UTSNAME_HAS_DOMAINNAME
   domainname_cache = new mystring(buf.UTSNAME_HAS_DOMAINNAME);
 #elif HAVE_GETDOMAINNAME
+  extern "C" getdomainname(char*, size_t);
   char hbuf[256];
   getdomainname(hbuf, 255);
   domainname_cache = new mystring(hbuf);
