@@ -49,4 +49,4 @@ AC_CHECK_FUNCS(setenv srandom)
 AC_DEFINE(BUFSIZE, 4096)
 AM_CONDITIONAL(FDBUF_NO_MYSTRING, false)
 
-AC_OUTPUT(Makefile doc/Makefile lib/Makefile lib/cli/Makefile lib/fdbuf/Makefile lib/mystring/Makefile protocols/Makefile src/Makefile test/Makefile)
+AC_OUTPUT(Makefile doc/Makefile lib/Makefile lib/cli++/Makefile lib/fdbuf/Makefile lib/mystring/Makefile protocols/Makefile src/Makefile test/Makefile)
