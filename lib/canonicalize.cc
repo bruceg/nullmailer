@@ -30,7 +30,7 @@ void canonicalize(mystring& domain)
     domain = defaulthost;
   if(domain.find_first('.') < 0) {
     if(!!defaultdomain) {
-      domain += ".";
+      if (!!domain) domain += ".";
       domain += defaultdomain;
     }
   }
