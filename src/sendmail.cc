@@ -80,7 +80,8 @@ int setenv(const char* var, const char* val, int overwrite)
 {
   size_t varlen = strlen(var);
   size_t vallen = strlen(val);
-  char str[varlen+vallen+2];
+  char* str = malloc(varlen+vallen+2);
+  if (str == 0) return -1;
   memcpy(str, var, varlen);
   str[varlen] = '=';
   memcpy(str+varlen+1, val, vallen);
