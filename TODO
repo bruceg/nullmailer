@@ -1,5 +1,12 @@
+- Test smtp use of $HELOHOST
+
+- Fix header parsing continuing past headers when the headers contain
+  \r\n?
+
 - Document new "defaultdomain", "helohost", and "me" configuration
   files.
+
+- Test new "defaultdomain", "defaulthost", "helohost", and "me"
 
 - Make proto/smtp use $HELOHOST for the HELO string, and document it.
 
