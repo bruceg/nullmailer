@@ -35,9 +35,9 @@ mkdir -p $RPM_BUILD_ROOT/var/log/nullmailer
 
 make DESTDIR=$RPM_BUILD_ROOT install-strip
 ln -s ../sbin/sendmail $RPM_BUILD_ROOT/usr/lib/sendmail
-install scripts/init $RPM_BUILD_ROOT/etc/rc.d/init.d/nullmailer
-install scripts/run-svc $RPM_BUILD_ROOT/var/lock/svc/nullmailer/run
-install scripts/run-log $RPM_BUILD_ROOT/var/lock/svc/nullmailer/log/run
+install scripts/nullmailer.init $RPM_BUILD_ROOT/etc/rc.d/init.d/nullmailer
+install scripts/nullmailer.run $RPM_BUILD_ROOT/var/lock/svc/nullmailer/run
+install scripts/nullmailer-log.run $RPM_BUILD_ROOT/var/lock/svc/nullmailer/log/run
 
 %clean
 rm -rf $RPM_BUILD_ROOT
