@@ -76,6 +76,8 @@ cli_option cli_options[] = {
 typedef list<mystring> slist;
 // static bool do_debug = false;
 
+static mystring cur_line;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Configuration
 ///////////////////////////////////////////////////////////////////////////////
@@ -284,7 +286,7 @@ void setup_from()
     sender = suser + "@" + shost;
 }
 
-void parse_line(mystring& line)
+bool parse_line(mystring& line)
 {
   bool valid = false;
   for(unsigned i = 0; i < line.length(); i++) {
@@ -297,38 +299,58 @@ void parse_line(mystring& line)
     }
   }
   if(!valid)
-    bad_hdr(line, "Missing field name.");
-  else {
-    bool remove = false;
-    for(unsigned i = 0; i < header_field_count; i++) {
-      header_field& h = header_fields[i];
-      if(h.parse(line)) {
-	remove = h.remove;
-	break;
-      }
+    //bad_hdr(line, "Missing field name.");
+    return false;
+  bool remove = false;
+  for(unsigned i = 0; i < header_field_count; i++) {
+    header_field& h = header_fields[i];
+    if(h.parse(line)) {
+      remove = h.remove;
+      break;
     }
-    if(!remove)
-      headers.append(line);
   }
+  if(!remove)
+    headers.append(line);
+  return true;
+}
+
+bool is_header(const mystring& line)
+{
+  for(unsigned i = 0; i < line.length(); i++) {
+    char ch = line[i];
+    if(isspace(ch))
+      return false;
+    if(ch == ':')
+      return true;
+  }
+  return false;
+}
+
+bool is_continuation(const mystring& line)
+{
+  return isspace(line[0]);
 }
 
 bool read_header()
 {
-  mystring line;
   mystring whole;
-  while(fin.getline(line)) {
-    if(!line)
+  while(fin.getline(cur_line)) {
+    if(!cur_line)
       break;
-    if(isspace(line[0])) {
-      if(!whole)
-	bad_hdr(line, "First line cannot be a continuation line.");
-      else
-	whole += "\n" + line;
+    if(!!whole && is_continuation(cur_line)) {
+      //if(!whole)
+      //bad_hdr(cur_line, "First line cannot be a continuation line.");
+      //else
+      whole += "\n" + cur_line;
+    }
+    else if(!is_header(cur_line)) {
+      cur_line += '\n';
+      break;
     }
     else {
       if(!!whole)
 	parse_line(whole);
-      whole = line;
+      whole = cur_line;
     }
   }
   if(!!whole)
@@ -385,11 +407,6 @@ bool fix_header()
   if(!header_has_to && !header_has_cc)
     headers.append("Cc: recipient list not shown: ;");
   return true;
-}
-
-bool process_header()
-{
-  return read_header() && fix_header();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -458,7 +475,8 @@ bool send_header()
 
 bool send_body()
 {
-  if(!fdbuf_copy(fin, *nqpipe))
+  if(!(*nqpipe << cur_line) ||
+     !fdbuf_copy(fin, *nqpipe))
     fail("Error sending message body to nullmailer-queue.");
   return true;
 }
@@ -481,7 +499,7 @@ bool wait_queue()
     fail("nullmailer-queue crashed or was killed.");
 }
 
-bool send_message() 
+bool send_message()
 {
   if(show_message) {
     nqpipe = &fout;
@@ -549,9 +567,9 @@ bool parse_args(int argc, char* argv[])
 int cli_main(int argc, char* argv[])
 {
   read_config();
-  if(!parse_args(argc, argv))
-    return 1;
-  if(!process_header())
+  if(!parse_args(argc, argv) ||
+     !read_header() ||
+     !fix_header())
     return 1;
   if(recipients.count() == 0) {
     fout << "No recipients were listed." << endl;
