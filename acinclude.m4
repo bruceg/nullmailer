@@ -116,7 +116,7 @@ int main(int argc, char** argv)
   return (select(fd+1, &rfds, 0, 0,&tv) > 0) ? 0 : 1;
 }
 EOF
-	if ! ${CC} ${CFLAGS} conftest.c -o conftest
+	if ! ${CC} ${CFLAGS} conftest.c -o conftest 2>/dev/null
 	then
 		echo Compile failed
 		exit 1
