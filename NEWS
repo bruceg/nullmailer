@@ -1,6 +1,6 @@
 This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
-Changes in version 1.00RC8
+Changes in version 1.00
 
 - Fixed problem with multiple arguments to protocol modules.
   Thanks Sascha Silbe.
@@ -17,9 +17,6 @@ Changes in version 1.00RC8
   be repeated if there was no body.
 
 - Fixed bug in handling headers containing CR+LF line endings.
-
-Note:  If no further bugs are found, this will become the official
-version 1.00 release.
 
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
