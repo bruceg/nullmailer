@@ -96,3 +96,37 @@ AC_DEFUN(TEST_STRUCT_UTSNAME,
   then AC_DEFINE(UTSNAME_HAS_DOMAINNAME,__domainname)
   fi
 )
+
+AC_DEFUN(CHECK_NAMED_PIPE_BUG,
+[ AC_CACHE_CHECK(whether named pipes are buggy,
+	  local_cv_flag_NAMEDPIPEBUG,
+	  cat >conftest.c <<EOF
+#include <fcntl.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+int main(int argc, char** argv)
+{
+  struct timeval tv;
+  fd_set rfds;
+  int fd = open(*(argv+1), O_RDONLY | O_NONBLOCK);
+  FD_ZERO(&rfds);
+  FD_SET(fd,&rfds);
+  tv.tv_sec = tv.tv_usec = 0;
+  return select(fd+1, &rfds, 0, 0,&tv) > 0;
+}
+EOF
+	if ! ${CC} ${CFLAGS} conftest.c -o conftest
+	then
+		echo Compile failed
+		exit 1
+	fi
+	if ./conftest conftest.pipe
+	then
+		AC_DEFINE(NAMEDPIPEBUG, 1)
+		local_cv_flag_NAMEDPIPEBUG=yes
+	else
+		local_cv_flag_NAMEDPIPEBUG=no
+	fi
+	rm -f conftest*)
+])

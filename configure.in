@@ -1,5 +1,5 @@
 AC_INIT(lib/defines.h)
-AM_INIT_AUTOMAKE(nullmailer, 1.00RC2)
+AM_INIT_AUTOMAKE(nullmailer, 1.00RC3)
 AM_CONFIG_HEADER(config.h)
 AC_PROG_MAKE_SET
 
@@ -40,6 +40,7 @@ AC_TYPE_SIZE_T
 
 TEST_STRUCT_TM
 TEST_STRUCT_UTSNAME
+CHECK_NAMED_PIPE_BUG
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(gethostname getdomainname setenv)
@@ -47,5 +48,6 @@ dnl AC_CHECK_FUNCS(gettimeofday mkdir putenv rmdir socket)
 AC_CHECK_FUNCS(srandom)
 
 AC_DEFINE(BUFSIZE, 4096)
+AM_CONDITIONAL(FDBUF_NO_MYSTRING, false)
 
 AC_OUTPUT(Makefile doc/Makefile lib/Makefile lib/cli/Makefile lib/fdbuf/Makefile lib/mystring/Makefile protocols/Makefile src/Makefile test/Makefile)

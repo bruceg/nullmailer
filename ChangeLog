@@ -1,3 +1,24 @@
+2000-08-10  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* src/inject.cc (read_header): Fixed header parsing logic.
+
+2000-08-07  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* src/inject.cc: Treat the first non-header line as the first line
+	of the body.
+
+	* src/sendmail.cc: Ignore the -L option (set the identifier for
+	syslog messages).
+
+2000-07-12  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* src/send.cc: Added code to handle buggy named pipes that require
+	both a reader and a writer to be opened simultaneously.
+
+	* lib/tcpconnect.cc (tcpconnect): AF_INET should have been PF_INET
+	in call to socket.  Also, the sin_family needed to be set to
+	AF_INET.
+
 2000-07-03  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
 
 	* lib/hostname.cc (getnames): Fixed typo that caused systems

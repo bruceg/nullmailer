@@ -4,6 +4,11 @@ Changes in version 1.00RC3
 
 - Fixed another host name bug causing compilation failures on systems
   without "domainname" in struct utsname.
+- Fixed some typos that would prevent proper TCP connections on many
+  systems.
+- Handle systems that require both a reader and a writer on a named pipe
+  to do a proper select.
+- Added a man page for the sendmail emulator, and an overall man page.
 -------------------------------------------------------------------------------
 Changes in version 1.00RC2
 
