@@ -1,3 +1,10 @@
+2000-06-15  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* Fixed up copyright notices in all the sources.
+
+	* lib/makefield.cc (make_date): Totally reworked the logic here if
+	tm_gmtoff is detected to fix timezone and DST detection bugs.
+
 2000-01-11  Bruce Guenter  <bguenter@bguenter.pointsnorth.com>
 
 	* Released version 0.40
