@@ -92,8 +92,18 @@ void smtp::docmd(mystring cmd, int range, bool nofail)
     code = get(msg);
   else
     code = put(cmd, msg);
-  if(!nofail && (code < range || code >= (range+100)))
-    exit(ERR_PROTO);
+  if(!nofail) {
+    if(code < range || code >= (range+100)) {
+      int e;
+      if(code >= 500)
+	e = ERR_MSG_PERMFAIL;
+      else if(code >= 400)
+	e = ERR_MSG_TEMPFAIL;
+      else
+	e = ERR_PROTO;
+      exit(e);
+    }
+  }
 }
 
 void smtp::send_envelope(fdibuf* msg)
