@@ -27,6 +27,12 @@
 static mystring* hostname_cache = 0;
 static mystring* domainname_cache = 0;
 
+#ifdef HAVE_GETDOMAINNAME
+// Re-declare the prototype here, as some systems don't declare it
+// in a predictable header file.
+extern "C" getdomainname(char*, size_t);
+#endif
+
 static void getnames()
 {
   if(hostname_cache)
@@ -37,14 +43,15 @@ static void getnames()
 
 #ifdef UTSNAME_HAS_DOMAINNAME
   domainname_cache = new mystring(buf.UTSNAME_HAS_DOMAINNAME);
-#elif HAVE_GETDOMAINNAME
-  extern "C" getdomainname(char*, size_t);
+#else
+#ifdef HAVE_GETDOMAINNAME
   char hbuf[256];
   getdomainname(hbuf, 255);
   domainname_cache = new mystring(hbuf);
 #else
   domainname_cache = new mystring;
-#endif
+#endif // HAVE_GETDOMAINNAME
+#endif // UTSNAME_HAS_DOMAINNAME
 
   // Tricky logic: if the node name does not contains the domain name
   // as a proper suffix, paste them together.
