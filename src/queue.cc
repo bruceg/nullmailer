@@ -164,7 +164,7 @@ bool deliver()
   const mystring tmpfile = QUEUE_TMP_DIR + pidstr;
   const mystring newfile = QUEUE_MSG_DIR + timestr + "." + pidstr;
 
-  int out = open(tmpfile.c_str(), O_CREAT|O_WRONLY|O_TRUNC, 0666);
+  int out = open(tmpfile.c_str(), O_CREAT|O_WRONLY|O_TRUNC, 0600);
   if(out < 0)
     fail("Could not open temporary file for writing");
   if(!dump(out)) {
