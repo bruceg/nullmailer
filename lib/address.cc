@@ -601,8 +601,13 @@ RULE(address)
 
 RULE(addresses)
 {
-  ENTER("address *(*(COMMA) address) EOF");
+  ENTER("[address *(*(COMMA) address)] EOF");
+
+  // Special-case handling for empty address lists
   if(node->type == EOT) RETURN(0, "", "", "");
+  if(node->type == COMMENT && node->next->type == EOT)
+    RETURN(0, node->str, "", "");
+
   MATCHRULE(r1, address);
   r1.str += r1.comment;
   r1.comment = "";
