@@ -10,7 +10,8 @@ URL: http://em.ca/~bruceg/nullmailer/
 Packager: Bruce Guenter <bruceg@em.ca>
 Provides: smtpdaemon
 Conflicts: sendmail
-Requires: supervise-scripts >= 2.2
+Conflicts: qmail
+Requires: supervise-scripts >= 3.2
 PreReq: shadow-utils
 
 %description
@@ -35,42 +36,40 @@ mkdir -p $RPM_BUILD_ROOT/var/log/nullmailer
 
 make DESTDIR=$RPM_BUILD_ROOT install-strip
 ln -s ../sbin/sendmail $RPM_BUILD_ROOT/usr/lib/sendmail
-install scripts/nullmailer.init $RPM_BUILD_ROOT/etc/rc.d/init.d/nullmailer
-install scripts/nullmailer.run $RPM_BUILD_ROOT/var/lock/svc/nullmailer/run
-install scripts/nullmailer-log.run $RPM_BUILD_ROOT/var/lock/svc/nullmailer/log/run
+install scripts/nullmailer.run $RPM_BUILD_ROOT/var/nullmailer/service/run
+install scripts/nullmailer-log.run $RPM_BUILD_ROOT/var/nullmailer/service/log/run
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %pre
 PATH="/sbin:/usr/sbin:$PATH" export PATH
-case "$1" in
-1)
+if [ "$1" = 1 ]; then
 	# pre-install instructions
 	grep ^nullmail: /etc/group >/dev/null || groupadd -r nullmail
 	grep ^nullmail: /etc/passwd >/dev/null || useradd -d /var/lock/svc/nullmailer -g nullmail -M -r -s /bin/true nullmail
-	;;
-esac
+fi
 
 %post
-/sbin/chkconfig --add nullmailer
+if ! [ -L /service/nullmailer ]; then
+	svc-add /var/nullmailer/service nullmailer
+fi
 
 %preun
-/sbin/chkconfig --del nullmailer
+if [ "$1" = 0 ]; then
+	svc-remove nullmailer
+fi
 
 %postun
-case "$1" in
-0)
+if [ "$1" = 0 ]; then
 	# post-erase instructions
 	/usr/sbin/userdel nullmail
 	/usr/sbin/groupdel nullmail
-	;;
-esac
+fi
 
 %files
 %defattr(-,nullmail,nullmail)
 %doc AUTHORS BUGS ChangeLog COPYING INSTALL NEWS README TODO YEAR2000
-/etc/rc.d/init.d/nullmailer
 %dir /etc/nullmailer
 %attr(04711,nullmail,nullmail) /usr/bin/mailq
 /usr/bin/nullmailer-inject
@@ -82,12 +81,5 @@ esac
 %attr(04711,nullmail,nullmail) /usr/sbin/nullmailer-queue
 /usr/sbin/nullmailer-send
 /usr/sbin/sendmail
-%dir /var/lock/svc/nullmailer
-/var/lock/svc/nullmailer/run
-%dir /var/lock/svc/nullmailer/log
-/var/lock/svc/nullmailer/log/run
 %dir /var/log/nullmailer
-%dir /var/nullmailer
-%dir /var/nullmailer/queue
-%dir /var/nullmailer/tmp
-/var/nullmailer/trigger
+/var/nullmailer
