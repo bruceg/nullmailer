@@ -1,5 +1,5 @@
 // nullmailer -- a simple relay-only MTA
-// Copyright (C) 1999-2003  Bruce Guenter <bruceg@em.ca>
+// Copyright (C) 2005  Bruce Guenter <bruceg@em.ca>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -166,7 +166,7 @@ void exec_protocol(int fd, remote& remote)
   unsigned i = 0;
   args[i++] = program.c_str();
   for(slist::const_iter opt(remote.options); opt; opt++)
-    args[i++] = (*opt).c_str();
+    args[i++] = strdup((*opt).c_str());
   args[i++] = remote.host.c_str();
   args[i++] = 0;
   execv(args[0], (char**)args);

@@ -2,6 +2,9 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.00RC8
 
+- Fixed problem with multiple arguments to protocol modules.
+  Thanks Sascha Silbe.
+
 - Fixed extraneous spaces in SMTP sender.
 
 - Made permissions on queued files more strict.
