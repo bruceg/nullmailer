@@ -2,6 +2,7 @@
 
 # Set PKGURL to the full base URL for the package web site.
 PKGURL=http://em.ca/~bruceg/nullmailer/
+LISTURL='http://lists.em.ca/ezmlm.cgi?2'
 
 # If LISTSUB is set, makedist will add a note regarding mailing list
 # subscription.
@@ -9,7 +10,7 @@ LISTSUB=nullmailer-subscribe@lists.em.ca
 
 # Set MAKERPM to non-empty if the tarball is to be built into a RPM.
 MAKERPM=true
-NOARCH=
+NOARCH=false
 
 # Set DOCS to the list of files that should go into the "docs" directory
 # in the destination site.

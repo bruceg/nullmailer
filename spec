@@ -31,7 +31,7 @@ make
 %install
 rm -fr $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/{usr/lib,etc/rc.d/init.d}
-mkdir -p $RPM_BUILD_ROOT/var/nullmailer/service
+mkdir -p $RPM_BUILD_ROOT/var/nullmailer/service/log
 mkdir -p $RPM_BUILD_ROOT/var/log/nullmailer
 
 make DESTDIR=$RPM_BUILD_ROOT install-strip
