@@ -27,7 +27,7 @@ nullmailer-send in the background, with its output going to a logging
 program.  The following is an appropriate run script for use with
 daemontools[2]:
 	#!/bin/sh
-	exec setuser nullmail nullmailer-send 2>&1
+	exec setuidgid nullmail nullmailer-send 2>&1
 
 5. You're done!  The included sendmail emulator front-end should allow
 most (if not all) sendmail-compatible programs to run without any

@@ -1,3 +1,12 @@
+2000-10-05  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* lib/hostname.cc: Fixed the prototype for getdomainname.
+
+2000-10-02  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
+
+	* protocols/smtp.cc (docmd): Return proper error codes for
+	permanent and temporary SMTP failures.
+
 2000-08-28  Bruce Guenter  <bruce@bruce-guenter.dyndns.org>
 
 	* Released version 1.00RC4
