@@ -4,6 +4,11 @@ Changes in version 1.00RC4
 
 - Fixed the reversed logic in the named pipe bug check.
 - Updated the HOWTO notes.
+- Fixed a compile problem on Solaris (and possibly other systems).
+- Fixed address parsing to strip a trailing period in the domain name.
+
+Note:  If no further bugs are found, this will become the official
+version 1.00 release.
 -------------------------------------------------------------------------------
 Changes in version 1.00RC3
 
@@ -32,9 +37,6 @@ Changes in version 1.00RC1
 - Imported latest fdbuf, mystring, and cli libraries.
 
 - Fixed a bug in the timezone handling on systems with tm_gmtoff.
-
-Note:  If no further bugs are found, this will be come the official
-version 1.00 release.
 -------------------------------------------------------------------------------
 Changes in version 0.40
 
