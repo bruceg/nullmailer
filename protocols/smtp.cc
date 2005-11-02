@@ -22,6 +22,7 @@
 #include "config.h"
 #include <stdlib.h>
 #include <unistd.h>
+#include "base64.h"
 #include "connect.h"
 #include "errcodes.h"
 #include "fdbuf/fdbuf.h"
@@ -137,11 +138,6 @@ void protocol_prep(fdibuf*)
 {
 }
 
-void to64(char* infile, char* outfile);
-void to64(const mystring& infile, mystring& outfile);
-void output64chunk(int c1, int c2, int c3, int pads, char** outfile);
-void output64chunk(int c1, int c2, int c3, int pads, mystring& outfile);
-
 void protocol_send(fdibuf* in, int fd)
 {
   mystring hh = getenv("HELOHOST");
@@ -150,67 +146,16 @@ void protocol_send(fdibuf* in, int fd)
   conn.docmd("", 200);
   conn.docmd("HELO " + hh, 200);
 
-  if ( strlen(auth) > 0 )
+  if (strlen(auth) > 0)
   {
     mystring authstr = auth;
     mystring uname = authstr.left(authstr.find_first(','));
-    mystring pass = authstr.sub(authstr.find_first(',')+1,authstr.length());
-    mystring plain = uname + "\1" + uname + "\1" + pass;
+    mystring pass = authstr.sub(authstr.find_first(',') + 1, authstr.length());
+    mystring plain = uname + '\0' + uname + '\0' + pass;
     mystring encoded = "AUTH PLAIN ";
-    to64(plain,encoded);
-    conn.docmd(encoded,200);
+    base64_encode(plain, encoded);
+    conn.docmd(encoded, 200);
   }
 
   conn.send(in);
 }
-
-static char basis_64[] =
-   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-void to64(const mystring& infile, mystring& outfile)
-{
-    int c1, c2, c3;
-    size_t inpos = 0;
-    while ((c1 = infile[inpos++])) {
-	c2 = infile[inpos++];
-	if (!c2) {
-	    output64chunk(c1, 0, 0, 2, outfile);
-	} else {
-	    c3 = infile[inpos++];
-	    if (!c3) {
-		output64chunk(c1, c2, 0, 1, outfile);
-	    } else {
-		output64chunk(c1, c2, c3, 0, outfile);
-	    }
-	}
-    }
-}
-
-void output64chunk(int c1, int c2, int c3, int pads, mystring& outfile)
-{
-  if (c1==1) c1 = 0;
-  if (c2==1) c2 = 0;
-  if (c3==1) c3 = 0;
-
-  char out[5];
-  out[0] = basis_64[c1>>2];
-  out[1] = basis_64[((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4)];
-  switch (pads)
-  {
-  case 0:
-    out[2] = basis_64[((c2 & 0xF) << 2) | ((c3 & 0xC0) >>6)];
-    out[3] = basis_64[c3 & 0x3F];
-    break;
-  case 1:
-    out[2] = basis_64[((c2 & 0xF) << 2) | ((c3 & 0xC0) >>6)];
-    out[3] = '=';
-    break;
-  case 2:
-    out[2] = '=';
-    out[3] = '=';
-    break;
-  }; 
-  out[4] = 0;
-  outfile += out;
-}
-
