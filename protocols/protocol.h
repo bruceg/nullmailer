@@ -8,6 +8,7 @@ extern void protocol_succ(const char* msg);
 
 // This must be provided by the protocol, but will be set by the lib.
 extern int port;
+extern char* auth;
 
 extern void protocol_prep(fdibuf* in);
 extern void protocol_send(fdibuf* in, int fd);
