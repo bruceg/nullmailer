@@ -148,8 +148,9 @@ void protocol_send(fdibuf* in, int fd)
   if (auth != 0)
   {
     mystring authstr = auth;
-    mystring uname = authstr.left(authstr.find_first(','));
-    mystring pass = authstr.sub(authstr.find_first(',') + 1, authstr.length());
+    int comma = authstr.find_first(',');
+    mystring uname = authstr.left(comma);
+    mystring pass = authstr.right(comma + 1);
     mystring plain = uname + '\0' + uname + '\0' + pass;
     mystring encoded = "AUTH PLAIN ";
     base64_encode(plain, encoded);
