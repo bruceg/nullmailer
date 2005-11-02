@@ -31,7 +31,6 @@
 #include "protocol.h"
 
 int port = 25;
-char* auth = "";
 const char* cli_program = "smtp";
 const char* cli_help_prefix = "Send an email message via SMTP\n";
 
@@ -146,7 +145,7 @@ void protocol_send(fdibuf* in, int fd)
   conn.docmd("", 200);
   conn.docmd("HELO " + hh, 200);
 
-  if (strlen(auth) > 0)
+  if (auth != 0)
   {
     mystring authstr = auth;
     mystring uname = authstr.left(authstr.find_first(','));

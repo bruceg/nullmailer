@@ -27,6 +27,7 @@
 #include "protocol.h"
 #include "cli++.h"
 
+const char* auth = 0;
 const char* cli_help_suffix = "";
 const char* cli_args_usage = "remote-address < mail-file";
 const int cli_args_min = 1;

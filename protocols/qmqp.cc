@@ -31,7 +31,6 @@
 #include "protocol.h"
 
 int port = 628;
-char* auth = "";
 const char* cli_program = "qmqp";
 const char* cli_help_prefix = "Send an emal message via QMQP\n";
 
