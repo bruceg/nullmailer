@@ -1,5 +1,11 @@
 This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
+Changes in version 1.01
+
+
+Development of this version has been sponsored by FutureQuest, Inc.
+ossi@FutureQuest.net  http://www.FutureQuest.net/
+-------------------------------------------------------------------------------
 Changes in version 1.00
 
 - Fixed problem with multiple arguments to protocol modules.
