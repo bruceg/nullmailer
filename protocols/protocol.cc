@@ -27,7 +27,8 @@
 #include "protocol.h"
 #include "cli++.h"
 
-const char* auth = 0;
+const char* user = 0;
+const char* pass = 0;
 const char* cli_help_suffix = "";
 const char* cli_args_usage = "remote-address < mail-file";
 const int cli_args_min = 1;
@@ -35,8 +36,10 @@ const int cli_args_max = 2;
 cli_option cli_options[] = {
   { 'p', "port", cli_option::integer, 0, &port,
     "Set the port number on the remote host to connect to", 0 },
-  { 'a', "auth", cli_option::string, 0, &auth,
-    "Set the user and password for authentication (user,pass)", 0 },
+  { 0, "user", cli_option::string, 0, &user,
+    "Set the user name for authentication", 0 },
+  { 0, "pass", cli_option::string, 0, &pass,
+    "Set the password for authentication", 0 },
   {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
 

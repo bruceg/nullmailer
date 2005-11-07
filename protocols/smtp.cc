@@ -145,13 +145,9 @@ void protocol_send(fdibuf* in, int fd)
   conn.docmd("", 200);
   conn.docmd("HELO " + hh, 200);
 
-  if (auth != 0)
+  if (user != 0 && pass != 0)
   {
-    mystring authstr = auth;
-    int comma = authstr.find_first(',');
-    mystring uname = authstr.left(comma);
-    mystring pass = authstr.right(comma + 1);
-    mystring plain = uname + '\0' + uname + '\0' + pass;
+    mystring plain = mystring(user) + '\0' + user + '\0' + pass;
     mystring encoded = "AUTH PLAIN ";
     base64_encode(plain, encoded);
     conn.docmd(encoded, 200);
