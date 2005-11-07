@@ -32,7 +32,7 @@ const char* pass = 0;
 const char* cli_help_suffix = "";
 const char* cli_args_usage = "remote-address < mail-file";
 const int cli_args_min = 1;
-const int cli_args_max = 2;
+const int cli_args_max = 1;
 cli_option cli_options[] = {
   { 'p', "port", cli_option::integer, 0, &port,
     "Set the port number on the remote host to connect to", 0 },
