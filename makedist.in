@@ -6,7 +6,7 @@ LISTURL='http://lists.untroubled.org/?list=nullmailer'
 
 # If LISTSUB is set, makedist will add a note regarding mailing list
 # subscription.
-LISTSUB=nullmailer-subscribe@lists.em.ca
+LISTSUB=nullmailer-subscribe@lists.untroubled.org
 
 # Set MAKERPM to non-empty if the tarball is to be built into a RPM.
 MAKERPM=true

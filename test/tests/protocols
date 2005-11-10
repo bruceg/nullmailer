@@ -3,11 +3,11 @@ export HELOHOST=f.q.d.n
 
 rm -f testmail
 cat >testmail <<EOF
-bruceg@em.ca
-bruceg@em.ca
+bruce@untroubled.org
+bruce@untroubled.org
 
-From: <bruceg@em.ca>
-To: <bruceg@em.ca>
+From: <bruce@untroubled.org>
+To: <bruce@untroubled.org>
 Subject: Nullmailer automated test message
 
 Just testing, please ignore
