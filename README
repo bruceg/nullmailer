@@ -2,7 +2,7 @@ nullmailer
 Simple relay-only mail transport agent
 Bruce Guenter <bruceg@em.ca>
 Version 1.01
-2005-02-28
+2005-11-10
 
 This is nullmailer, a sendmail/qmail/etc replacement MTA for hosts which
 relay to a fixed set of smart relays.  It is designed to be simple to
