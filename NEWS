@@ -2,7 +2,8 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.01
 
-- Added support for SMTP AUTH PLAIN.  Thanks Ace Jones.
+- Added support for SMTP AUTH PLAIN.
+  Thanks to Ace Jones for the initial implementation.
 
 - Fixed compile error in lib/list.h
 
