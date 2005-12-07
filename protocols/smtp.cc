@@ -147,7 +147,11 @@ void protocol_send(fdibuf* in, int fd)
 
   if (user != 0 && pass != 0)
   {
-    mystring plain = mystring(user) + '\0' + user + '\0' + pass;
+    mystring plain(user);
+    plain += '\0';
+    plain += user;
+    plain += '\0';
+    plain += pass;
     mystring encoded = "AUTH PLAIN ";
     base64_encode(plain, encoded);
     conn.docmd(encoded, 200);
