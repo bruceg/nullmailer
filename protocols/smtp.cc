@@ -100,6 +100,8 @@ void smtp::docmd(mystring cmd, int range, bool show_succ)
       e = ERR_MSG_TEMPFAIL;
     else
       e = ERR_PROTO;
+    out << "QUIT\r\n";
+    out.flush();
     protocol_fail(e, msg.c_str());
   }
   else if(show_succ)
