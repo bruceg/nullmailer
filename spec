@@ -2,7 +2,7 @@ Name: nullmailer
 Summary: Simple relay-only mail transport agent
 Version: @VERSION@
 Release: 1
-Copyright: GPL
+License: GPL
 Group: Networking/Daemons
 Source: http://untroubled.org/nullmailer/archive/%{version}/nullmailer-%{version}.tar.gz
 BuildRoot: /tmp/nullmailer-root
