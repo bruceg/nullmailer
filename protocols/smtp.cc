@@ -145,9 +145,9 @@ void protocol_send(fdibuf* in, int fd)
   if (!hh) protocol_fail(1, "$HELOHOST is not set");
   smtp conn(fd);
   conn.docmd("", 200);
-  conn.docmd("HELO " + hh, 200);
 
   if (user != 0 && pass != 0) {
+    conn.docmd("EHLO " + hh, 200);
     if (auth_method == AUTH_LOGIN) {
       mystring encoded;
       base64_encode(user, encoded);
@@ -167,6 +167,8 @@ void protocol_send(fdibuf* in, int fd)
       conn.docmd(encoded, 200);
     }
   }
+  else
+    conn.docmd("HELO " + hh, 200);
 
   conn.send(in);
 }

@@ -4,7 +4,11 @@ Changes in version 1.03
 
 - Fixed the SMTP protocol module to send QUIT on protocol failures.
 
-- Added support for the SMTP AUTH LOGIN method.
+- Added support for the SMTP AUTH LOGIN method.  Thanks to Sean
+  MacLennan for the suggestion.
+
+- Fixed the SMTP protocol module to send EHLO instead of HELO when doing
+  authentication.  Thanks to Norbert Tretkowski for pointing this out.
 
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
