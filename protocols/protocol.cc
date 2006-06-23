@@ -1,5 +1,5 @@
 // nullmailer -- a simple relay-only MTA
-// Copyright (C) 1999-2003  Bruce Guenter <bruce@untroubled.org>
+// Copyright (C) 2006  Bruce Guenter <bruce@untroubled.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 
 const char* user = 0;
 const char* pass = 0;
+int auth_method = AUTH_PLAIN;
 const char* cli_help_suffix = "";
 const char* cli_args_usage = "remote-address < mail-file";
 const int cli_args_min = 1;
@@ -40,6 +41,8 @@ cli_option cli_options[] = {
     "Set the user name for authentication", 0 },
   { 0, "pass", cli_option::string, 0, &pass,
     "Set the password for authentication", 0 },
+  { 0, "auth-login", cli_option::flag, AUTH_LOGIN, &auth_method,
+    "Use AUTH LOGIN instead of AUTH PLAIN in SMTP", 0 },
   {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
 

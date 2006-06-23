@@ -4,6 +4,8 @@ Changes in version 1.03
 
 - Fixed the SMTP protocol module to send QUIT on protocol failures.
 
+- Added support for the SMTP AUTH LOGIN method.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------

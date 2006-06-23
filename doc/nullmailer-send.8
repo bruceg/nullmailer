@@ -64,6 +64,13 @@ which also requires SMTP authentication, use:
     smarthost.dom smtp --port=2525 --user=user --pass=pass
 .EE
 
+If your smarthost requires LOGIN authentication instead of the default
+PLAIN method, use:
+
+.EX
+    smarthost.dom smtp --port=2525 --auth-login --user=user --pass=pass
+.EE
+
 Blank lines and lines starting with a pound are ignored.
 .SH FILES
 .TP
