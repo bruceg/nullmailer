@@ -69,8 +69,8 @@ void qmqp::send(fdibuf* msg, unsigned long size, const mystring& env)
   if(!skip_envelope(msg))
     protocol_fail(ERR_MSG_READ, "Error re-reading message");
   unsigned long fullsize = strlen(itoa(size)) + 1 + size + 1 + env.length();
-  out << itoa(fullsize) << ":"	// Start the "outer" netstring
-      << itoa(size) << ":";	// Start the message netstring
+  out << itoa(fullsize) << ":";	// Start the "outer" netstring
+  out << itoa(size) << ":";	// Start the message netstring
   fdbuf_copy(*msg, out, true);	// Send out the message
   out << ","			// End the message netstring
       << env			// The envelope is already encoded

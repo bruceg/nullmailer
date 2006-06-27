@@ -12,6 +12,8 @@ Changes in version 1.03
 
 - Fixed compile breakage on Solaris due to use of setenv.
 
+- Fixed netstring length bug in QMQP sending module.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
