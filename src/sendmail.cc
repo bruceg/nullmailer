@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include "fdbuf/fdbuf.h"
 #include "defines.h"
+#include "setenv.h"
 #include "cli++/cli++.h"
 
 const char* cli_program = "sendmail";
@@ -71,25 +72,6 @@ cli_option cli_options[] = {
   { 'X', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
   {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
-
-#ifdef HAVE_SETENV
-// Sometimes we need an explicit declaration.
-extern "C" int setenv(const char*, const char*, int);
-#else
-// This is not really a full emulation of setenv, but close enough
-int setenv(const char* var, const char* val, int overwrite)
-{
-  size_t varlen = strlen(var);
-  size_t vallen = strlen(val);
-  char* str = (char*)malloc(varlen+vallen+2);
-  if (str == 0) return -1;
-  memcpy(str, var, varlen);
-  str[varlen] = '=';
-  memcpy(str+varlen+1, val, vallen);
-  str[varlen+vallen+1] = 0;
-  return putenv(str);
-}
-#endif
 
 bool setenvelope(char* str)
 {

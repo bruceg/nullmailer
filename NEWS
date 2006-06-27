@@ -10,6 +10,8 @@ Changes in version 1.03
 - Fixed the SMTP protocol module to send EHLO instead of HELO when doing
   authentication.  Thanks to Norbert Tretkowski for pointing this out.
 
+- Fixed compile breakage on Solaris due to use of setenv.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------

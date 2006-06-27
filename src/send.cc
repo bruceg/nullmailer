@@ -38,6 +38,7 @@
 #include "hostname.h"
 #include "itoa.h"
 #include "list.h"
+#include "setenv.h"
 
 typedef list<mystring> slist;
 
