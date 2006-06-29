@@ -23,6 +23,7 @@
 #include "defines.h"
 #include <ctype.h>
 #include <errno.h>
+#include <pwd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
@@ -254,6 +255,10 @@ void setup_from()
   if(!user) user = getenv("MAILUSER");
   if(!user) user = getenv("USER");
   if(!user) user = getenv("LOGNAME");
+  if(!user) {
+      struct passwd *pw = getpwuid(getuid());
+      if (pw) user = pw->pw_name;
+  }
   if(!user) user = "unknown";
 
   mystring host = getenv("NULLMAILER_HOST");

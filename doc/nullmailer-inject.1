@@ -182,9 +182,10 @@ The user name is set by
 .BR USER ,
 or
 .BR LOGNAME ,
-whichever comes first or
+whichever comes first.  If none of the above are set the name is taken
+from the password file, or set to
 .I unknown
-if none of the above are set.
+if that fails.
 
 The host name is set by the canonicalized value of
 .BR NULLMAILER_HOST ,

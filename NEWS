@@ -14,6 +14,10 @@ Changes in version 1.03
 
 - Fixed netstring length bug in QMQP sending module.
 
+- If the sender name cannot be determined from the environment
+  variables, try to pull it from /etc/passwd before using "unknown".
+  Thanks Roderick Schertler.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
