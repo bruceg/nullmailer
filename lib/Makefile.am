@@ -16,7 +16,7 @@ libmisc_a_SOURCES = \
 	itoa.h itoa.cc \
 	makefield.cc \
 	netstring.h netstring.cc \
-	setenv.cc
+	setenv.cc setenv.h
 
 libnullmailer_a_SOURCES =
 libnullmailer.a: mergelib.sh libmisc.a fdbuf/libfdbuf.a \
