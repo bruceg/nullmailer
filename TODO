@@ -16,7 +16,7 @@
   - PATTERN can be "@FQDN" which matches any user.
 
 - For version 1.1:
-  - Add a "failed" queue directory for permanently failed messages.
+  - Generate bounces for permanently failed messages.
 
 - For version 2: three-state queueing
   - Queue message partially (tmp -> holding)
