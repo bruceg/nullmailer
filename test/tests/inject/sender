@@ -46,8 +46,8 @@ testvar NULLMAILER_HOST test3.org '@test3.org$'
 
 testcanon NULLMAILER_HOST test3 '@test3.domain.org$'
 
-echo "Checking that inject uses 'unknown'"
-inj | grep -q '^unknown@'
+echo "Checking that inject uses getpwnam"
+inj | grep -q "^`id -un`@"
 
 testvar LOGNAME name1 '^name1@'
 

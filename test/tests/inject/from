@@ -41,8 +41,8 @@ testvar MAILHOST test2.org '@test2.org>$'
 
 testvar NULLMAILER_HOST test3.org '@test3.org>$'
 
-echo "Checking that inject uses 'unknown'"
-inj | grep -q ' <unknown@'
+echo "Checking that inject uses getpwnam"
+inj | grep -q " <`id -un`@"
 
 testvar LOGNAME name1 ' <name1@'
 
