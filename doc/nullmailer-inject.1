@@ -208,6 +208,12 @@ host name set above, but may be overridden by
 .BR NULLMAILER_SUSER
 and
 .BR NULLMAILER_SHOST .
+
+If
+.BR NULLMAILER_QUEUE
+is set, the program named is used in place of
+.B nullmailer-queue
+to queue the formatted message.
 .SH CONTROL FILES
 When reading the following files, a single line is read and stripped
 of all leading and trailing whitespace characters.

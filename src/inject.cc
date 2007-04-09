@@ -78,6 +78,7 @@ typedef list<mystring> slist;
 // static bool do_debug = false;
 
 static mystring cur_line;
+static mystring nqueue;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Configuration
@@ -88,12 +89,19 @@ extern void canonicalize(mystring& domain);
 
 void read_config()
 {
+  const char* env;
   mystring tmp;
   read_hostnames();
   if(!config_read("idhost", idhost))
     idhost = me;
   else
     canonicalize(idhost);
+  if ((env = getenv("NULLMAILER_QUEUE")) != 0)
+    nqueue = env;
+  else {
+    nqueue = SBIN_DIR;
+    nqueue += "/nullmailer-queue";
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -421,14 +429,8 @@ static pid_t pid = 0;
 
 void exec_queue()
 {
-  if(chdir(SBIN_DIR) == -1) {
-    fout << "nullmailer-inject: Could not change directory to " << SBIN_DIR
-	 << ": " << strerror(errno) << endl;
-    exit(1);
-  }
-  else
-    execl("nullmailer-queue", "nullmailer-queue", 0);
-  fout << "nullmailer-inject: Could not exec nullmailer-queue: "
+  execl(nqueue.c_str(), nqueue.c_str(), 0);
+  fout << "nullmailer-inject: Could not exec " << nqueue << ": "
        << strerror(errno) << endl;
   exit(1);
 }

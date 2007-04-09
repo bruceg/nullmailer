@@ -1,6 +1,9 @@
-rm -rf /tmp/nm
-mkdir -p /tmp/nm/var/nullmailer/{queue,tmp}
-mkdir -p /tmp/nm/etc/nullmailer
+tmpdir=/tmp/nm
+rm -rf $tmpdir
+mkdir -p $tmpdir/var/nullmailer/{queue,tmp}
+mkdir -p $tmpdir/sbin
+mkdir -p $tmpdir/etc/nullmailer
+mknod $tmpdir/var/nullmailer/trigger p
 
 #not() { if "$@"; then return 1; else return 0; fi }
 not() { ! safe "$@"; }
@@ -36,8 +39,20 @@ injectfield() {
 }
 protocol() { local p=$1; shift; ../protocols/$p "$@" >/dev/null 2>&1; }
 
+startsend() {
+  ../src/nullmailer-send >$tmpdir/sendlog 2>&1 &
+  sendpid=$!
+  sleep 1
+}
+killsend() {
+  kill $sendpid
+  sleep 1
+}
+
 export PATH=/bin:/usr/bin:/usr/local/bin
+export NULLMAILER_QUEUE=$PWD/../src/nullmailer-queue
 rm -f $SYSCONFDIR/*
-echo f.q.d.n >/tmp/nm/etc/nullmailer/me
-echo q.d.n >/tmp/nm/etc/nullmailer/defaultdomain
+echo f.q.d.n >$SYSCONFDIR/me
+echo q.d.n >$SYSCONFDIR/defaultdomain
+echo smtp 127.0.0.1 >$SYSCONFDIR/remotes
 set -e

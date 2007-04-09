@@ -1,0 +1,14 @@
+. functions
+
+echo 'Testing that inject queues messages properly.'
+
+echo 'To: nobody' | inject
+test $( ls $tmpdir/var/nullmailer/queue | wc -l ) = 1
+egrep -i '^to: *nobody' $tmpdir/var/nullmailer/queue/* >/dev/null
+
+echo 'Testing that inject honors $NULLMAILER_QUEUE.'
+
+rm -f $tmpdir/var/nullmailer/queue/*
+NULLMAILER_QUEUE=/bin/cat
+echo 'To: nobody' | inject >/dev/null
+test $( ls $tmpdir/var/nullmailer/queue | wc -l ) = 0
