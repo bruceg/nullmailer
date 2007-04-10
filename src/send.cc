@@ -1,5 +1,5 @@
 // nullmailer -- a simple relay-only MTA
-// Copyright (C) 2005  Bruce Guenter <bruce@untroubled.org>
+// Copyright (C) 2007  Bruce Guenter <bruce@untroubled.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,7 +38,10 @@
 #include "hostname.h"
 #include "itoa.h"
 #include "list.h"
+#include "selfpipe.h"
 #include "setenv.h"
+
+selfpipe selfpipe;
 
 typedef list<mystring> slist;
 
@@ -98,6 +101,7 @@ unsigned ws_split(const mystring& str, slist& lst)
 
 static rlist remotes;
 static int pausetime = 60;
+static int sendtimeout = 60*60;
 
 bool load_remotes()
 {
@@ -126,6 +130,8 @@ bool load_config()
   
   if(!config_readint("pausetime", pausetime))
     pausetime = 60;
+  if(!config_readint("sendtimeout", sendtimeout))
+    sendtimeout = 60*60;
 
   return result;
 }
@@ -180,6 +186,23 @@ void exec_protocol(int fd, remote& remote)
 bool catchsender(pid_t pid)
 {
   int status;
+
+  for (;;) {
+    switch (selfpipe.waitsig(sendtimeout)) {
+    case 0:			// timeout
+      kill(pid, SIGTERM);
+      waitpid(pid, &status, 0);
+      fail("Sending timed out, killing protocol");
+    case -1:
+      fail("Error waiting for the child signal.");
+    case SIGCHLD:
+      break;
+    default:
+      continue;
+    }
+    break;
+  }
+
   if(waitpid(pid, &status, 0) == -1)
     fail("Error catching the child process return value.");
   else {
@@ -308,6 +331,12 @@ int main(int, char*[])
   read_hostnames();
   if (!config_read("helohost", hh)) hh = me;
   setenv("HELOHOST", hh.c_str(), 1);
+
+  if(!selfpipe) {
+    fout << "Could not set up self-pipe." << endl;
+    return 1;
+  }
+  selfpipe.catchsig(SIGCHLD);
   
   if(!open_trigger())
     return 1;

@@ -16,6 +16,7 @@ libmisc_a_SOURCES = \
 	itoa.h itoa.cc \
 	makefield.cc \
 	netstring.h netstring.cc \
+	selfpipe.cc selfpipe.h \
 	setenv.cc setenv.h
 
 libnullmailer_a_SOURCES =

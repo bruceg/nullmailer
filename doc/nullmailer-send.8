@@ -72,6 +72,16 @@ PLAIN method, use:
 .EE
 
 Blank lines and lines starting with a pound are ignored.
+.TP
+.B sendtimeout
+The number of seconds to wait for a remote module listed above to
+complete sending a message before killing it and trying again (defaults
+to
+.IR 3600 ).
+If this is set to
+.IR 0 ,
+.B nullmailer-send
+will wait forever for messages to complete sending.
 .SH FILES
 .TP
 .B /var/nullmailer/queue
