@@ -429,7 +429,7 @@ static pid_t pid = 0;
 
 void exec_queue()
 {
-  execl(nqueue.c_str(), nqueue.c_str(), 0);
+  execl(nqueue.c_str(), nqueue.c_str(), NULL);
   fout << "nullmailer-inject: Could not exec " << nqueue << ": "
        << strerror(errno) << endl;
   exit(1);
