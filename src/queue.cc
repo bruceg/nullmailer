@@ -31,7 +31,6 @@
 #include "mystring/mystring.h"
 #include "fdbuf/fdbuf.h"
 #include "configio.h"
-#include "canonicalize.h"
 #include "hostname.h"
 
 #define fail(MSG) do{ fout << "nullmailer-queue: " << MSG << endl; return false; }while(0)
