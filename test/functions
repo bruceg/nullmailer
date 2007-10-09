@@ -1,9 +1,11 @@
 tmpdir=/tmp/nm
 rm -rf $tmpdir
 mkdir -p $tmpdir/var/nullmailer/{queue,tmp}
-mkdir -p $tmpdir/sbin
+mkdir -p $tmpdir/libexec
 mkdir -p $tmpdir/etc/nullmailer
 mknod $tmpdir/var/nullmailer/trigger p
+ln -s $PWD/../protocols $tmpdir/libexec/nullmailer
+ln -s $PWD/../src $tmpdir/sbin
 
 #not() { if "$@"; then return 1; else return 0; fi }
 not() { ! safe "$@"; }
@@ -26,6 +28,7 @@ error() {
 }
 
 inject() { ../src/nullmailer-inject "$@"; }
+mailq() { ../src/mailq "$@"; }
 injectlines() {
   for line in "$@"; do
     echo "$line"
@@ -49,10 +52,11 @@ killsend() {
   sleep 1
 }
 
-export PATH=/bin:/usr/bin:/usr/local/bin
-export NULLMAILER_QUEUE=$PWD/../src/nullmailer-queue
+PATH=/bin:/usr/bin:/usr/local/bin
+NULLMAILER_QUEUE=$PWD/../src/nullmailer-queue
+export NULLMAILER_QUEUE PATH
 rm -f $SYSCONFDIR/*
 echo f.q.d.n >$SYSCONFDIR/me
 echo q.d.n >$SYSCONFDIR/defaultdomain
-echo smtp 127.0.0.1 >$SYSCONFDIR/remotes
+echo 127.0.0.1 smtp >$SYSCONFDIR/remotes
 set -e
