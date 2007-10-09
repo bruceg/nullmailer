@@ -37,6 +37,7 @@
 #include "canonicalize.h"
 #include "configio.h"
 #include "cli++/cli++.h"
+#include "makefield.h"
 
 enum {
   use_args, use_both, use_either, use_header
@@ -83,7 +84,7 @@ static mystring nqueue;
 ///////////////////////////////////////////////////////////////////////////////
 // Configuration
 ///////////////////////////////////////////////////////////////////////////////
-mystring idhost;
+static mystring idhost;
 
 extern void canonicalize(mystring& domain);
 
@@ -370,9 +371,6 @@ bool read_header()
   return !header_has_errors;
 }
 
-extern mystring make_messageid();
-extern mystring make_date();
-
 mystring make_recipient_list()
 {
   mystring result;
@@ -394,7 +392,7 @@ bool fix_header()
     if(!header_has_date)
       headers.append("Date: " + make_date());
     if(!header_has_mid)
-      headers.append("Message-Id: " + make_messageid());
+      headers.append("Message-Id: " + make_messageid(idhost));
     if(!header_has_from)
       headers.append("From: " + from);
     if(!header_has_to && !header_has_cc && header_add_to &&
@@ -407,7 +405,7 @@ bool fix_header()
     if(!header_has_rdate)
       headers.append("Resent-Date: " + make_date());
     if(!header_has_rmid)
-      headers.append("Resent-Message-Id: " + make_messageid());
+      headers.append("Resent-Message-Id: " + make_messageid(idhost));
     if(!header_has_rfrom)
       headers.append("Resent-From: " + from);
     if(!header_has_rto && !header_has_rcc && header_add_to &&

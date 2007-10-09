@@ -58,10 +58,8 @@ mystring make_date()
   return mystringjoin(buf) + tz;
 }
 
-extern mystring idhost;
-
 // Message ID strings have the form SECONDS.USEC.PID.nullmailer@HOST
-mystring make_messageid()
+mystring make_messageid(const mystring& idhost)
 {
   struct timeval tv;
   gettimeofday(&tv, 0);
