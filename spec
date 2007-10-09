@@ -83,9 +83,7 @@ fi
 /usr/lib/sendmail
 %dir /usr/libexec/nullmailer
 /usr/libexec/nullmailer/*
-/usr/man/man1/*
-/usr/man/man7/*
-/usr/man/man8/*
+%{_mandir}/*/*
 %attr(04711,nullmail,nullmail) /usr/sbin/nullmailer-queue
 /usr/sbin/nullmailer-send
 /usr/sbin/sendmail

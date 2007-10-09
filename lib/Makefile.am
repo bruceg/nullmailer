@@ -14,7 +14,7 @@ libmisc_a_SOURCES = \
 	errcodes.h errcodes.cc \
 	hostname.h hostname.cc \
 	itoa.h itoa.cc \
-	makefield.cc \
+	makefield.cc makefield.h \
 	netstring.h netstring.cc \
 	selfpipe.cc selfpipe.h \
 	setenv.cc setenv.h
