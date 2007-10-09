@@ -124,7 +124,12 @@ bool load_remotes()
 
 bool load_config()
 {
+  mystring hh;
   bool result = true;
+
+  if (!config_read("helohost", hh))
+    hh = me;
+  setenv("HELOHOST", hh.c_str(), 1);
 
   if(!load_remotes())
     result = false;
@@ -323,11 +328,7 @@ bool do_select()
 
 int main(int, char*[])
 {
-  mystring hh;
-
   read_hostnames();
-  if (!config_read("helohost", hh)) hh = me;
-  setenv("HELOHOST", hh.c_str(), 1);
 
   if(!selfpipe) {
     fout << "Could not set up self-pipe." << endl;
