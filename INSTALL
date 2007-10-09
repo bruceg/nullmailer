@@ -1,0 +1,14 @@
+To build and install nullmailer, run:
+
+	./configure
+	make
+	sudo make install install-root
+
+The default installation expects that a user and group "nullmail" have
+already been set up.  The install steps will create all appropriate
+configuration and queue directories, and change their ownership as needed.
+
+You may set the installation directory and other parameters by options
+to ./configure.  To see them, run:
+
+	./configure --help
