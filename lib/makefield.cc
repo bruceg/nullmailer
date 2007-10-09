@@ -74,3 +74,13 @@ mystring make_messageid(const mystring& idhost)
   tmp += '>';
   return tmp;
 }
+
+mystring make_boundary()
+{
+  struct timeval tv;
+  gettimeofday(&tv, 0);
+  mystring tmp = itoa(tv.tv_sec);
+  tmp += ".";
+  tmp += itoa(tv.tv_usec, 6);
+  return tmp;
+}
