@@ -45,8 +45,9 @@ selfpipe selfpipe;
 
 typedef list<mystring> slist;
 
-#define fail(MSG) do { ferr << MSG << endl; return false; } while(0)
-#define fail_sys(MSG) do{ ferr << MSG << strerror(errno) << endl; return false; }while(0)
+#define fail(MSG) do { fout << MSG << endl; return false; } while(0)
+#define fail2(MSG1,MSG2) do{ fout << MSG1 << MSG2 << endl; return false; }while(0)
+#define fail_sys(MSG) do{ fout << MSG << strerror(errno) << endl; return false; }while(0)
 
 struct remote
 {
@@ -179,10 +180,6 @@ void exec_protocol(int fd, remote& remote)
   execv(args[0], (char**)args);
 }
 
-#undef fail
-#define fail(MSG) do { fout << MSG << endl; return false; } while(0)
-#define fail2(MSG1,MSG2) do{ fout << MSG1 << MSG2 << endl; return false; }while(0)
-
 bool catchsender(pid_t pid)
 {
   int status;
@@ -194,7 +191,7 @@ bool catchsender(pid_t pid)
       waitpid(pid, &status, 0);
       fail("Sending timed out, killing protocol");
     case -1:
-      fail("Error waiting for the child signal.");
+      fail_sys("Error waiting for the child signal: ");
     case SIGCHLD:
       break;
     default:
@@ -204,7 +201,7 @@ bool catchsender(pid_t pid)
   }
 
   if(waitpid(pid, &status, 0) == -1)
-    fail("Error catching the child process return value.");
+    fail_sys("Error catching the child process return value: ");
   else {
     if(WIFEXITED(status)) {
       status = WEXITSTATUS(status);
@@ -233,7 +230,7 @@ bool send_one(mystring filename, remote& remote)
   pid_t pid = fork();
   switch(pid) {
   case -1:
-    fail("Fork failed.");
+    fail_sys("Fork failed: ");
   case 0:
     exec_protocol(fd, remote);
     exit(ERR_EXEC_FAILED);
@@ -242,7 +239,7 @@ bool send_one(mystring filename, remote& remote)
     if(!catchsender(pid))
       return false;
     if(unlink(filename.c_str()) == -1)
-      fail("Can't unlink file.");
+      fail_sys("Can't unlink file: ");
   }
   return true;
 }
@@ -283,7 +280,7 @@ bool open_trigger()
   trigger2 = open(QUEUE_TRIGGER, O_WRONLY|O_NONBLOCK);
 #endif
   if(trigger == -1)
-    fail("Could not open trigger file.");
+    fail_sys("Could not open trigger file: ");
   return true;
 }
 
@@ -316,7 +313,7 @@ bool do_select()
     reload_files = true;
   }
   else if(s == -1 && errno != EINTR)
-    fail("Internal error in select.");
+    fail_sys("Internal error in select: ");
   else if(s == 0)
     reload_files = true;
   if(reload_files)
