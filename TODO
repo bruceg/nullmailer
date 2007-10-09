@@ -1,8 +1,10 @@
 - Add support for SMTP AUTH CRAM-MD5
 
-- Convert all proto modules to use timedout reads.
+- Add support for SMTPS
 
-- Add support for authentication to protocols.
+- Add support for SMTP STARTTLS
+
+- Convert all proto modules to use timedout reads.
 
 - Add patterns to the remotes file, to allow messages to be delivered to
   different remotes based on the sender or recipient addresses
@@ -14,13 +16,17 @@
     it must be matched exactly (before qualification).
   - PATTERN can be "@FQDN" which matches any user.
 
-- For version 1.1:
+- For version 1.5:
+  - New program: nullmailer-bounce
+    reads a queued message on stdin, writes a bounce on stdout
+  - New program: nullmailer-ddn
+    reads a queued message on stdin, writes a DDN on stdout
   - Generate bounces for permanently failed messages.
   - Generate DDNs for messages older than a configurable time.
   - Generate bounces for temporarily failing messages after a
     configurable time.
   - Queue bounce from <> to sender
-  - Queue double bounce from <#@[]> to config/doublebounceto
+  - Queue double bounce from <#@[]> to doublebounceto or adminaddr
   - Optionally move bounces to a seperate directory
   - Move triple bounces to a seperate directory
 
