@@ -34,8 +34,8 @@ do
 	error 1 protocol $p -p foo localhost <testmail
 
 	tcpserver 0 24680 date & job=$!
-	sleep 1
 	trap "kill $job" EXIT
+	sleep 1
 	echo "Testing protocol failure with $p."
 	error 11 protocol $p -p 24680 localhost <testmail
 	kill $job
