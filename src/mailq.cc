@@ -23,6 +23,7 @@
 #include "defines.h"
 #include "fdbuf/fdbuf.h"
 #include "itoa.h"
+#include "mystring/mystring.h"
 #include <dirent.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -33,6 +34,8 @@
 
 int main(int, char*[])
 {
+  mystring line;
+
   if(chdir(QUEUE_MSG_DIR))
     fail("Cannot change directory to queue.");
   DIR* dir = opendir(QUEUE_MSG_DIR);
@@ -52,7 +55,14 @@ int main(int, char*[])
       fout << "?????";
     else
       fout << itoa(statbuf.st_size);
-    fout << " bytes" << endl;
+    fout << " bytes";
+    fdibuf in(name);
+    if (in.getline(line)) {
+      fout << " from <" << line << '>';
+      while (in.getline(line) && !!line)
+	fout << "\n  to <" << line << '>';
+    }
+    fout << endl;
   }
   closedir(dir);
   return 0;

@@ -2,6 +2,8 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.04
 
+- Added support for reporting the sender and recipients in mailq.
+
 - Added a send timeout in nullmailer-send, to kill sending messages that
   stall.
 
