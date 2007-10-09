@@ -1,0 +1,10 @@
+. functions
+
+echo "Testing the output of the mailq command"
+echo To: nobody@nowhere | inject
+
+mailq | head -n 1 | egrep -q '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [0-9]+ bytes from <.*>$' \
+|| { echo "Header is misformatted."; exit 1; }
+
+mailq | tail -n 1 | egrep -q '^  to <nobody@nowhere.q.d.n>$' \
+|| { echo "Recipient is misformatted."; exit 1; }

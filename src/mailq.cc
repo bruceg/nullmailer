@@ -48,7 +48,7 @@ int main(int, char*[])
       continue;
     time_t time = atoi(name);
     char timebuf[100];
-    strftime(timebuf, 100, "%Y-%m-%d %H:%M:%S  ", localtime(&time));
+    strftime(timebuf, 100, "%Y-%m-%d %H:%M:%S ", localtime(&time));
     fout << timebuf;
     struct stat statbuf;
     if(stat(name, &statbuf) == -1) 
