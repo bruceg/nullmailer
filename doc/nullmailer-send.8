@@ -40,6 +40,16 @@ before retrying sending the contents of the queue.
 .SH CONTROL FILES
 All the control files are reread each time the queue is run.
 .TP
+.B helohost
+Sets the environment variable
+.B $HELOHOST
+which is used by the SMTP protocol module to set the parameter given to
+the
+.I HELO
+command.  Defaults to the value of the
+.B me
+configuration file.
+.TP
 .B pausetime
 The number of seconds to pause between successive queue runs when
 there are messages in the queue (defaults to

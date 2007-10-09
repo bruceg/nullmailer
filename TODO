@@ -1,12 +1,11 @@
 - Add support for SMTP AUTH CRAM-MD5
 
-- Document proto/smtp use $HELOHOST for the HELO string.
-
 - Convert all proto modules to use timedout reads.
 
 - Add support for authentication to protocols.
 
-*** Add a delayed delivery notification system somehow ***
+- Add patterns to the remotes file, to allow messages to be delivered to
+  different remotes based on the sender or recipient addresses
 
 - Remove "adminaddr" facility from -queue, and add a more general
   destination address rewriting facility to -inject:
@@ -17,6 +16,13 @@
 
 - For version 1.1:
   - Generate bounces for permanently failed messages.
+  - Generate DDNs for messages older than a configurable time.
+  - Generate bounces for temporarily failing messages after a
+    configurable time.
+  - Queue bounce from <> to sender
+  - Queue double bounce from <#@[]> to config/doublebounceto
+  - Optionally move bounces to a seperate directory
+  - Move triple bounces to a seperate directory
 
 - For version 2: three-state queueing
   - Queue message partially (tmp -> holding)
