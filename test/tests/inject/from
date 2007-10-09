@@ -35,6 +35,10 @@ echo test >$SYSCONFDIR/defaulthost
 echo domain.org >$SYSCONFDIR/defaultdomain
 inj | grep -q '@test.domain.org>$'
 
+echo "Checking that inject ignores config/defaultdomain for localhost"
+echo localhost >$SYSCONFDIR/defaulthost
+inj | grep -q '@localhost>$'
+
 testvar HOSTNAME test1.org '@test1.org>$'
 
 testvar MAILHOST test2.org '@test2.org>$'
