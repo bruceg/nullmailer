@@ -1,6 +1,6 @@
 AC_INIT
 AC_CONFIG_SRCDIR([lib/defines.h])
-AM_INIT_AUTOMAKE(nullmailer, 1.04)
+AM_INIT_AUTOMAKE(nullmailer, 1.05)
 AM_CONFIG_HEADER(config.h)
 AC_PROG_MAKE_SET
 
