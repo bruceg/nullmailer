@@ -1,6 +1,6 @@
 bin_PROGRAMS = \
 	mailq \
-	nullmailer-bounce \
+	nullmailer-dsn \
 	nullmailer-inject
 sbin_PROGRAMS = \
 	nullmailer-queue \
@@ -14,8 +14,8 @@ INCLUDES = -I../lib -I../lib/cli++
 mailq_SOURCES = mailq.cc
 mailq_LDADD = ../lib/libnullmailer.a
 
-nullmailer_bounce_SOURCES = bounce.cc
-nullmailer_bounce_LDADD = ../lib/cli++/libcli++.a ../lib/libnullmailer.a
+nullmailer_dsn_SOURCES = dsn.cc
+nullmailer_dsn_LDADD = ../lib/cli++/libcli++.a ../lib/libnullmailer.a
 
 nullmailer_inject_SOURCES = inject.cc
 nullmailer_inject_LDADD = ../lib/cli++/libcli++.a ../lib/libnullmailer.a
