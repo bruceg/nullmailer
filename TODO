@@ -17,7 +17,6 @@
   - PATTERN can be "@FQDN" which matches any user.
 
 - For version 1.5:
-  - Make -dsn generate reports suitable for DDNs as well
   - Generate bounces for permanently failed messages.
   - Generate DDNs for messages older than a configurable time.
   - Generate bounces for temporarily failing messages after a

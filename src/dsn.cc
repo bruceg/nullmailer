@@ -20,6 +20,8 @@
 // <nullmailer-subscribe@lists.untroubled.org>.
 
 #include "config.h"
+#include <sys/types.h>
+#include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -40,17 +42,22 @@
 
 typedef list<mystring> slist;
 
-static unsigned long opt_timestamp = 0;
-static unsigned long opt_last_attempt = 0;
+static time_t opt_timestamp = 0;
+static time_t opt_last_attempt = 0;
+static time_t opt_retry_until = 0;
 static const char* opt_envelope_id = 0;
 static const char* opt_status = 0;
 static const char* opt_remote = 0;
 static const char* opt_smtp_diagnostic = 0;
+static int opt_ddn = 0;
 
 const char* cli_program = "nullmailer-dsn";
 const char* cli_help_prefix =
 "Reformat a queued message into a delivery status notification (DSN)\n";
-const char* cli_help_suffix = "";
+const char* cli_help_suffix =
+"\n"
+"The status code must be in the form 4.#.# or 5.#.#. If the status\n"
+"code starts with 4, a delivery delay notification is generated.\n";
 const char* cli_args_usage = "status-code < message";
 const int cli_args_min = 1;
 const int cli_args_max = 1;
@@ -61,6 +68,8 @@ cli_option cli_options[] = {
   { 0, "last-attempt", cli_option::uinteger, 0, &opt_last_attempt,
     "UNIX timestamp of the last attempt",
     "access time on the input message" },
+  { 0, "retry-until", cli_option::uinteger, 0, &opt_retry_until,
+    "UNIX timestamp of the (future) final attempt", 0 },
   { 0, "envelope-id", cli_option::string, 0, &opt_envelope_id,
     "Original envelope ID", 0 },
   { 0, "remote", cli_option::string, 0, &opt_remote,
@@ -91,6 +100,14 @@ int cli_main(int, char* argv[])
   if (opt_last_attempt == 0)
     opt_last_attempt = msgstat.st_atime;
   opt_status = argv[0];
+  if ((opt_status[0] != '4' && opt_status[0] != '5')
+      || opt_status[1] != '.'
+      || !isdigit(opt_status[2])
+      || opt_status[3] != '.'
+      || !isdigit(opt_status[4])
+      || opt_status[5] != '\0')
+    die1("Status must be in the format 4.#.# or 5.#.#");
+  opt_ddn = opt_status[0] == '4';
 
   if (!config_read("doublebounceto", doublebounceto)
       || !doublebounceto)
@@ -135,11 +152,21 @@ int cli_main(int, char* argv[])
     "Content-Type: text/plain; charset=us-ascii\n"
     "\n"
     "This is the nullmailer delivery system.  The message attached below\n"
-    "could not be delivered to the configured remote servers.\n"
-    "\n"
-    "Sender: <" << sender << ">\n";
+       << (opt_ddn
+	   ? "has not been"
+	   : "could not be")
+       << " delivered to one or more of the intended recipients:\n"
+    "\n";
   for (slist::const_iter recipient(recipients); recipient; recipient++)
-    fout << "Recipient: <" << (*recipient) << ">\n";
+    fout << "\t<" << (*recipient) << ">\n";
+  if (opt_ddn) {
+    if (opt_retry_until > 0)
+      fout << "\nDelivery will continue to be attempted until "
+	   << make_date(opt_retry_until) << '\n';
+    fout << "\n"
+      "A final delivery status notification will be generated if delivery\n"
+      "proves to be impossible within the configured time limit.\n";
+  }
 
   /* delivery-status portion */
   fout << "\n"
@@ -154,14 +181,15 @@ int cli_main(int, char* argv[])
   for (slist::const_iter recipient(recipients); recipient; recipient++) {
     fout << "\n"
       "Final-Recipient: rfc822; " << (*recipient) << "\n"
-      "Action: failed\n"	// "delayed" for DDNs
+      "Action: " << (opt_ddn ? "delayed": "failed") << "\n"
       "Status: " << opt_status << "\n"
       "Last-Attempt-Date: " << make_date(opt_last_attempt) << '\n';
     if (opt_remote != 0)
       fout << "Remote-MTA: dns; " << opt_remote << '\n';
     if (opt_smtp_diagnostic != 0)
       fout << "Diagnostic-Code: SMTP; " << opt_smtp_diagnostic << '\n';
-    // Delayed messages add a Will-Retry-Until: DATE
+    if (opt_ddn and opt_retry_until > 0)
+      fout << "Will-Retry-Until: " << make_date(opt_retry_until) << '\n';
   }
 
   /* Copy the message */
