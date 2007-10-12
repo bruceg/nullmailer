@@ -26,10 +26,11 @@
 #include "itoa.h"
 #include "mystring/mystring.h"
 
-mystring make_date()
+mystring make_date(time_t t)
 {
   char buf[256];
-  time_t t = time(0);
+  if (t == 0)
+    t = time(0);
   struct tm* l = localtime(&t);
   strftime(buf, 256, "%a, %d %b %Y %H:%M:%S ", l);
 #ifdef TM_HAS_GMTOFF
