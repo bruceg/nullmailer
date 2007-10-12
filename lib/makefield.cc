@@ -63,7 +63,14 @@ mystring make_messageid(const mystring& idhost)
 {
   struct timeval tv;
   gettimeofday(&tv, 0);
-  mystring tmp = mystringjoin("<") + itoa(tv.tv_sec) + ".";
-  tmp = tmp + itoa(tv.tv_usec, 6) + ".";
-  return tmp + itoa(getpid()) + ".nullmailer@" + idhost + ">";
+  mystring tmp = "<";
+  tmp += itoa(tv.tv_sec);
+  tmp += '.';
+  tmp += itoa(tv.tv_usec, 6);
+  tmp += '.';
+  tmp += itoa(getpid());
+  tmp += ".nullmailer@";
+  tmp += idhost;
+  tmp += '>';
+  return tmp;
 }
