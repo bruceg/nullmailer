@@ -30,6 +30,7 @@
 #include "cli++/cli++.h"
 #include "itoa.h"
 #include "defines.h"
+#include "list.h"
 #include "mystring/mystring.h"
 #include "fdbuf/fdbuf.h"
 #include "canonicalize.h"
@@ -37,16 +38,22 @@
 #include "hostname.h"
 #include "makefield.h"
 
+typedef list<mystring> slist;
+
 static unsigned long opt_timestamp = 0;
 static unsigned long opt_last_attempt = 0;
+static const char* opt_envelope_id = 0;
+static const char* opt_status = 0;
+static const char* opt_remote = 0;
+static const char* opt_smtp_diagnostic = 0;
 
 const char* cli_program = "nullmailer-dsn";
 const char* cli_help_prefix =
 "Reformat a queued message into a delivery status notification (DSN)\n";
 const char* cli_help_suffix = "";
-const char* cli_args_usage = "< message";
-const int cli_args_min = 0;
-const int cli_args_max = 0;
+const char* cli_args_usage = "status-code < message";
+const int cli_args_min = 1;
+const int cli_args_max = 1;
 cli_option cli_options[] = {
   { 0, "orig-timestamp", cli_option::uinteger, 0, &opt_timestamp,
     "UNIX timestamp on the original message",
@@ -54,6 +61,12 @@ cli_option cli_options[] = {
   { 0, "last-attempt", cli_option::uinteger, 0, &opt_last_attempt,
     "UNIX timestamp of the last attempt",
     "access time on the input message" },
+  { 0, "envelope-id", cli_option::string, 0, &opt_envelope_id,
+    "Original envelope ID", 0 },
+  { 0, "remote", cli_option::string, 0, &opt_remote,
+    "Name of remote server", 0 },
+  { 0, "smtp-diagnostic", cli_option::string, 0, &opt_smtp_diagnostic,
+    "SMTP error message", 0 },
   {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
 
@@ -63,11 +76,12 @@ cli_option cli_options[] = {
 static mystring sender;
 static mystring doublebounceto;
 static mystring line;
+static slist recipients;
 
 static mystring idhost;
 static const mystring boundary = make_boundary();
 
-int cli_main(int, char*[])
+int cli_main(int, char* argv[])
 {
   struct stat msgstat;
   if (fstat(0, &msgstat) < 0)
@@ -76,6 +90,7 @@ int cli_main(int, char*[])
     opt_timestamp = msgstat.st_ctime;
   if (opt_last_attempt == 0)
     opt_last_attempt = msgstat.st_atime;
+  opt_status = argv[0];
 
   if (!config_read("doublebounceto", doublebounceto)
       || !doublebounceto)
@@ -90,6 +105,13 @@ int cli_main(int, char*[])
     die1sys("Could not read sender address from message: ");
   if (!sender && !doublebounceto)
     die1("Nowhere to send double bounce");
+  while (fin.getline(line)) {
+    if (!line)
+      break;
+    recipients.append(line);
+  }
+  if (recipients.count() == 0)
+    die1("No recipients were read from message");
 
   if (!!sender)
     fout << '\n' << sender;
@@ -112,32 +134,35 @@ int cli_main(int, char*[])
     "--" << boundary << "\n"
     "Content-Type: text/plain; charset=us-ascii\n"
     "\n"
-    "The original message was received at " << make_date(opt_timestamp) << "\n"
-    "from " << sender << "\n"
+    "This is the nullmailer delivery system.  The message attached below\n"
+    "could not be delivered to the configured remote servers.\n"
     "\n"
-    "   ----- The following addresses had permanent fatal errors -----\n";
-
-  while (fin.getline(line)) {
-    if (!line)
-      break;
-    fout << '<' << line << ">\n";
-  }
+    "Sender: <" << sender << ">\n";
+  for (slist::const_iter recipient(recipients); recipient; recipient++)
+    fout << "Recipient: <" << (*recipient) << ">\n";
 
   /* delivery-status portion */
   fout << "\n"
     "--" << boundary << "\n"
     "Content-Type: message/delivery-status\n"
     "\n"
-    "Reporting-MTA: dns; HOSTNAME\n"
-    "Received-From-MTA: DNS; [IP]\n"
-    "Arrival-Date: " << make_date(opt_timestamp) << "\n"
-    "\n"
-    "Final-Recipient: RFC822; ADDR\n"
-    "X-Actual-Recipient: RFC822; ADDR\n"
-    "Action: failed\n"
-    "Status: #.#.#\n"
-    "Diagnostic-Code: SMTP; 552 #.#.# MESSAGE\n"
-    "Last-Attempt-Date: " << make_date(opt_last_attempt) << '\n';
+    "Reporting-MTA: x-local-hostname; " << me << "\n"
+    "Arrival-Date: " << make_date(opt_timestamp) << "\n";
+  if (opt_envelope_id != 0)
+    fout << "Original-Envelope-Id: " << opt_envelope_id << '\n';
+
+  for (slist::const_iter recipient(recipients); recipient; recipient++) {
+    fout << "\n"
+      "Final-Recipient: rfc822; " << (*recipient) << "\n"
+      "Action: failed\n"	// "delayed" for DDNs
+      "Status: " << opt_status << "\n"
+      "Last-Attempt-Date: " << make_date(opt_last_attempt) << '\n';
+    if (opt_remote != 0)
+      fout << "Remote-MTA: dns; " << opt_remote << '\n';
+    if (opt_smtp_diagnostic != 0)
+      fout << "Diagnostic-Code: SMTP; " << opt_smtp_diagnostic << '\n';
+    // Delayed messages add a Will-Retry-Until: DATE
+  }
 
   /* Copy the message */
   fout << "\n"
