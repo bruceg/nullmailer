@@ -80,7 +80,9 @@ mystring make_boundary()
   struct timeval tv;
   gettimeofday(&tv, 0);
   mystring tmp = itoa(tv.tv_sec);
-  tmp += ".";
+  tmp += '.';
   tmp += itoa(tv.tv_usec, 6);
+  tmp += '.';
+  tmp += itoa(getpid());
   return tmp;
 }
