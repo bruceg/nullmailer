@@ -211,7 +211,7 @@ bool catchsender(pid_t pid)
     if(WIFEXITED(status)) {
       status = WEXITSTATUS(status);
       if(status)
-	fail2("Sending failed: ", errorstr[status]);
+	fail2("Sending failed: ", errorstr(status));
       else {
 	fout << "Sent file." << endl;
 	return true;

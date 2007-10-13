@@ -21,25 +21,29 @@
 
 #include "errcodes.h"
 
-const char* const errorstr[] = {
-  "No error",
-  "Unspecified error",
-  "Host not found",
-  "Host has no address",
-  "Fatal error in gethostbyname",
-  "Temporary error in gethostbyname",
-  "Socket failed",
-  "Connection refused",
-  "Connection timed out",
-  "Host or network unreachable",
-  "Connection failed",
-  "Protocol error",
-  "Could not open message",
-  "Could not read message",
-  "Could not write message",
-  "Could not exec program",
-  "Server refused the message",
-  "Temporary error in sending the message",
-  "Permanent error in sending the message",
-  "Command-line usage error",
-};
+const char* errorstr(int code)
+{
+  switch (code) {
+  case 0: return "No error";
+  case ERR_HOST_NOT_FOUND: return "Host not found";
+  case ERR_NO_ADDRESS: return "Host has no address";
+  case ERR_GHBN_FATAL: return "Fatal error in gethostbyname";
+  case ERR_GHBN_TEMP: return "Temporary error in gethostbyname";
+  case ERR_SOCKET: return "Socket failed";
+  case ERR_CONN_REFUSED: return "Connection refused";
+  case ERR_CONN_TIMEDOUT: return "Connection timed out";
+  case ERR_CONN_UNREACHABLE: return "Host or network unreachable";
+  case ERR_CONN_FAILED: return "Connection failed";
+  case ERR_PROTO: return "Protocol error";
+  case ERR_MSG_OPEN: return "Could not open message";
+  case ERR_MSG_READ: return "Could not read message";
+  case ERR_MSG_WRITE: return "Could not write message";
+  case ERR_EXEC_FAILED: return "Could not exec program";
+  case ERR_MSG_TEMPFAIL: return "Temporary error in sending the message";
+  case ERR_MSG_REFUSED: return "Server refused the message";
+  case ERR_MSG_PERMFAIL: return "Permanent error in sending the message";
+  }
+  return (code & ERR_PERMANENT_FLAG)
+    ? "Unspecified permanent error"
+    : "Unspecified temporary error";
+}
