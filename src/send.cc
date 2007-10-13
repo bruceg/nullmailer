@@ -24,6 +24,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -43,6 +44,8 @@
 
 selfpipe selfpipe;
 
+typedef enum { tempfail=-1, permfail=0, success=1 } tristate;
+
 struct message
 {
   time_t timestamp;
@@ -52,9 +55,13 @@ struct message
 typedef list<mystring> slist;
 typedef list<struct message> msglist;
 
-#define fail(MSG) do { fout << MSG << endl; return false; } while(0)
-#define fail2(MSG1,MSG2) do{ fout << MSG1 << MSG2 << endl; return false; }while(0)
-#define fail_sys(MSG) do{ fout << MSG << strerror(errno) << endl; return false; }while(0)
+#define msg1(MSG) do{ fout << MSG << endl; }while(0)
+#define msg2(MSG1,MSG2) do{ fout << MSG1 << MSG2 << endl; }while(0)
+#define msg1sys(MSG) do{ fout << MSG << strerror(errno) << endl; }while(0)
+#define fail(MSG) do { msg1(MSG); return false; } while(0)
+#define fail2(MSG1,MSG2) do{ msg2(MSG1,MSG2); return false; }while(0)
+#define fail1sys(MSG) do{ msg1sys(MSG); return false; }while(0)
+#define tempfail1sys(MSG) do{ msg1sys(MSG); return tempfail; }while(0)
 
 struct remote
 {
@@ -167,7 +174,7 @@ bool load_messages()
   fout << "Rescanning queue." << endl;
   DIR* dir = opendir(".");
   if(!dir)
-    fail_sys("Cannot open queue directory: ");
+    fail1sys("Cannot open queue directory: ");
   messages.empty();
   struct dirent* entry;
   while((entry = readdir(dir)) != 0) {
@@ -199,7 +206,7 @@ void exec_protocol(int fd, remote& remote)
   execv(args[0], (char**)args);
 }
 
-bool catchsender(pid_t pid)
+tristate catchsender(pid_t pid)
 {
   int status;
 
@@ -207,10 +214,12 @@ bool catchsender(pid_t pid)
     switch (selfpipe.waitsig(sendtimeout)) {
     case 0:			// timeout
       kill(pid, SIGTERM);
+      fout << "Sending timed out, killing protocol" << endl;
       waitpid(pid, &status, 0);
-      fail("Sending timed out, killing protocol");
+      return tempfail;
     case -1:
-      fail_sys("Error waiting for the child signal: ");
+      msg1sys("Error waiting for the child signal: ");
+      return tempfail;
     case SIGCHLD:
       break;
     default:
@@ -219,29 +228,36 @@ bool catchsender(pid_t pid)
     break;
   }
 
-  if(waitpid(pid, &status, 0) == -1)
-    fail_sys("Error catching the child process return value: ");
+  if(waitpid(pid, &status, 0) == -1) {
+    fout << "Error catching the child process return value: "
+	 << strerror(errno) << endl;
+    return tempfail;
+  }
   else {
     if(WIFEXITED(status)) {
       status = WEXITSTATUS(status);
-      if(status)
-	fail2("Sending failed: ", errorstr(status));
+      if(status) {
+	fout << "Sending failed: " << errorstr(status) << endl;
+	return (status & ERR_PERMANENT_FLAG) ? permfail : tempfail;
+      }
       else {
 	fout << "Sent file." << endl;
-	return true;
+	return success;
       }
     }
-    else
-      fail("Sending process crashed or was killed.");
+    else {
+      fout << "Sending process crashed or was killed." << endl;
+      return tempfail;
+    }
   }
 }
 
-bool send_one(mystring filename, remote& remote)
+tristate send_one(mystring filename, remote& remote)
 {
   int fd = open(filename.c_str(), O_RDONLY);
   if(fd == -1) {
     fout << "Can't open file '" << filename << "'" << endl;
-    return false;
+    return tempfail;
   }
   fout << "Starting delivery: protocol: " << remote.proto
        << " host: " << remote.host
@@ -249,42 +265,74 @@ bool send_one(mystring filename, remote& remote)
   pid_t pid = fork();
   switch(pid) {
   case -1:
-    fail_sys("Fork failed: ");
+    msg1sys("Fork failed: ");
+    return tempfail;
   case 0:
     exec_protocol(fd, remote);
     exit(ERR_EXEC_FAILED);
   default:
     close(fd);
-    if(!catchsender(pid))
-      return false;
-    if(unlink(filename.c_str()) == -1)
-      fail_sys("Can't unlink file: ");
+    return catchsender(pid);
+  }
+}
+
+bool bounce_msg(struct message& msg)
+{
+  mystring failed = "../failed/";
+  failed += msg.filename;
+  fout << "Moving message " << msg.filename << " into failed" << endl;
+  if (rename(msg.filename.c_str(), failed.c_str()) == -1) {
+    fout << "Can't rename file: " << strerror(errno) << endl;
+    return false;
   }
   return true;
 }
 
-bool send_all()
+void send_all()
 {
-  if(!load_config())
-    fail("Could not load the config");
-  if(remotes.count() <= 0)
-    fail("No remote hosts listed for delivery");
+  if(!load_config()) {
+    fout << "Could not load the config" << endl;
+    return;
+  }
+  if(remotes.count() <= 0) {
+    fout << "No remote hosts listed for delivery";
+    return;
+  }
   if(messages.count() == 0)
-    return true;
+    return;
   fout << "Starting delivery, "
        << itoa(messages.count()) << " message(s) in queue." << endl;
   for(rlist::iter remote(remotes); remote; remote++) {
     msglist::iter msg(messages);
     while(msg) {
-      if(send_one((*msg).filename, *remote))
-	messages.remove(msg);
-      else
+      switch (send_one((*msg).filename, *remote)) {
+      case tempfail:
+	if (time(0) - (*msg).timestamp > queuelifetime) {
+	  if (bounce_msg(*msg)) {
+	    messages.remove(msg);
+	    continue;
+	  }
+	}
 	msg++;
+	break;
+      case permfail:
+	if (bounce_msg(*msg))
+	  messages.remove(msg);
+	else
+	  msg++;
+	break;
+      default:
+	if(unlink((*msg).filename.c_str()) == -1) {
+	  fout << "Can't unlink file: " << strerror(errno) << endl;
+	  msg++;
+	}
+	else
+	  messages.remove(msg);
+      }
     }
   }
   fout << "Delivery complete, "
        << itoa(messages.count()) << " message(s) remain." << endl;
-  return true;
 }
 
 static int trigger;
@@ -299,7 +347,7 @@ bool open_trigger()
   trigger2 = open(QUEUE_TRIGGER, O_WRONLY|O_NONBLOCK);
 #endif
   if(trigger == -1)
-    fail_sys("Could not open trigger file: ");
+    fail1sys("Could not open trigger file: ");
   return true;
 }
 
@@ -332,7 +380,7 @@ bool do_select()
     reload_messages = true;
   }
   else if(s == -1 && errno != EINTR)
-    fail_sys("Internal error in select: ");
+    fail1sys("Internal error in select: ");
   else if(s == 0)
     reload_messages = true;
   if(reload_messages)

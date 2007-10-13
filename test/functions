@@ -1,7 +1,7 @@
 tmpdir=/tmp/nm
 rm -rf $tmpdir
 mkdir -p \
-    $tmpdir/var/nullmailer/{queue,tmp} \
+    $tmpdir/var/nullmailer/{failed,queue,tmp} \
     $tmpdir/libexec/nullmailer \
     $tmpdir/etc/nullmailer
 mknod $tmpdir/var/nullmailer/trigger p
@@ -13,7 +13,7 @@ start() {
     mkdir -p $tmpdir/service/$name
     {
 	echo '#!/bin/sh'
-	echo exec "$@"
+	echo exec "$@" '>log 2>err'
     } >$tmpdir/service/$name/run
     chmod +x $tmpdir/service/$name/run
     supervise $tmpdir/service/$name </dev/null >/dev/null 2>&1 &

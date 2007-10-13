@@ -6,6 +6,8 @@ SUBDIRS = doc lib protocols src test
 
 install-data-local:
 	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/failed
+	chmod 700 $(DESTDIR)$(localstatedir)/failed
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/queue
 	chmod 700 $(DESTDIR)$(localstatedir)/queue
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/tmp

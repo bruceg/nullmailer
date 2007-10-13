@@ -38,3 +38,6 @@ echo 'Testing sending with a succeeding protocol'
 send_message 0 2.0.0
 echo 'Testing sending with a failing protocol'
 not send_message 1 5.2.2
+echo 'Testing handling of a permanent failure'
+send_message 33 5.2.2
+test -e $tmpdir/var/nullmailer/failed/$msgid
