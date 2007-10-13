@@ -43,7 +43,14 @@
 
 selfpipe selfpipe;
 
+struct message
+{
+  time_t timestamp;
+  mystring filename;
+};
+
 typedef list<mystring> slist;
+typedef list<struct message> msglist;
 
 #define fail(MSG) do { fout << MSG << endl; return false; } while(0)
 #define fail2(MSG1,MSG2) do{ fout << MSG1 << MSG2 << endl; return false; }while(0)
@@ -103,6 +110,7 @@ unsigned ws_split(const mystring& str, slist& lst)
 static rlist remotes;
 static int pausetime = 60;
 static int sendtimeout = 60*60;
+static int queuelifetime = 7*24*60*60;
 
 bool load_remotes()
 {
@@ -138,33 +146,39 @@ bool load_config()
     pausetime = 60;
   if(!config_readint("sendtimeout", sendtimeout))
     sendtimeout = 60*60;
+  if(!config_readint("queuelifetime", queuelifetime))
+    queuelifetime = 7*24*60*60;
 
   return result;
 }
 
-static slist files;
-static bool reload_files = false;
+static msglist messages;
+static bool reload_messages = false;
 
 void catch_alrm(int)
 {
   signal(SIGALRM, catch_alrm);
-  reload_files = true;
+  reload_messages = true;
 }
 
-bool load_files()
+bool load_messages()
 {
-  reload_files = false;
+  reload_messages = false;
   fout << "Rescanning queue." << endl;
   DIR* dir = opendir(".");
   if(!dir)
     fail_sys("Cannot open queue directory: ");
-  files.empty();
+  messages.empty();
   struct dirent* entry;
   while((entry = readdir(dir)) != 0) {
     const char* name = entry->d_name;
-    if(name[0] == '.')
+    struct stat st;
+    if (stat(name, &st) < 0) {
+      fout << "Could not stat " << name << ", skipping." << endl;
       continue;
-    files.append(name);
+    }
+    struct message m = { st.st_mtime, name };
+    messages.append(m);
   }
   closedir(dir);
   return true;
@@ -255,21 +269,21 @@ bool send_all()
     fail("Could not load the config");
   if(remotes.count() <= 0)
     fail("No remote hosts listed for delivery");
-  if(files.count() == 0)
+  if(messages.count() == 0)
     return true;
   fout << "Starting delivery, "
-       << itoa(files.count()) << " message(s) in queue." << endl;
+       << itoa(messages.count()) << " message(s) in queue." << endl;
   for(rlist::iter remote(remotes); remote; remote++) {
-    slist::iter file(files);
-    while(file) {
-      if(send_one(*file, *remote))
-	files.remove(file);
+    msglist::iter msg(messages);
+    while(msg) {
+      if(send_one((*msg).filename, *remote))
+	messages.remove(msg);
       else
-	file++;
+	msg++;
     }
   }
   fout << "Delivery complete, "
-       << itoa(files.count()) << " message(s) remain." << endl;
+       << itoa(messages.count()) << " message(s) remain." << endl;
   return true;
 }
 
@@ -311,18 +325,18 @@ bool do_select()
   timeout.tv_sec = pausetime;
   timeout.tv_usec = 0;
   int s = select(trigger+1, &readfds, 0, 0,
-		 (files.count() == 0) ? 0 : &timeout);
+		 (messages.count() == 0) ? 0 : &timeout);
   if(s == 1) {
     fout << "Trigger pulled." << endl;
     read_trigger();
-    reload_files = true;
+    reload_messages = true;
   }
   else if(s == -1 && errno != EINTR)
     fail_sys("Internal error in select: ");
   else if(s == 0)
-    reload_files = true;
-  if(reload_files)
-    load_files();
+    reload_messages = true;
+  if(reload_messages)
+    load_messages();
   return true;
 }
 
@@ -346,7 +360,7 @@ int main(int, char*[])
   signal(SIGALRM, catch_alrm);
   signal(SIGHUP, SIG_IGN);
   load_config();
-  load_files();
+  load_messages();
   for(;;) {
     send_all();
     if (pausetime == 0) break;
