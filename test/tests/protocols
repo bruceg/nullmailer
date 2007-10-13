@@ -33,13 +33,11 @@ do
 	echo "Testing usage error with $p (invalid integer)."
 	error 1 protocol $p -p foo localhost <testmail
 
-	tcpserver 0 24680 date & job=$!
-	trap "kill $job" EXIT
+	start server tcpserver 0 24680 date
 	sleep 1
 	echo "Testing protocol failure with $p."
 	error 11 protocol $p -p 24680 localhost <testmail
-	kill $job
-	trap - EXIT
+	stop server
 done
 
 rm -f testmail
