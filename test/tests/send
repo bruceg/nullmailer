@@ -1,0 +1,40 @@
+. functions
+
+cat <<EOF >$tmpdir/libexec/nullmailer/dummy
+#!/bin/sh
+code=\$1
+shift
+echo "\$@" >&2
+exit \$code
+EOF
+chmod +x $tmpdir/libexec/nullmailer/dummy
+
+echo 127.0.0.1 smtp >$SYSCONFDIR/remotes
+
+# Start up the servers
+start send $PWD/../src/nullmailer-send
+start server tcpserver 0 24680 date
+
+make_message() {
+  msgid=$(date +%s).$$.me
+  cat <<EOF >$tmpdir/var/nullmailer/tmp/$msgid
+me@nowhere
+me@nowhere
+
+Subject: test
+EOF
+  mv -f $tmpdir/var/nullmailer/tmp/$msgid $tmpdir/var/nullmailer/queue/$msgid
+}
+
+send_message() {
+  echo 127.0.0.1 dummy $@ >$SYSCONFDIR/remotes
+  make_message
+  svc -a $tmpdir/service/send
+  sleep 1
+  not test -e $tmpdir/var/nullmailer/queue/$msgid
+}
+
+echo 'Testing sending with a succeeding protocol'
+send_message 0 2.0.0
+echo 'Testing sending with a failing protocol'
+not send_message 1 5.2.2
