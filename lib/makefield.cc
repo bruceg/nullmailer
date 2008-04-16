@@ -36,7 +36,7 @@ mystring make_date()
   long tznum = l->TM_HAS_GMTOFF/60;
 #else
   long tznum = -timezone/60;
-#if TM_HAS_ISDST
+#ifdef TM_HAS_ISDST
   int daylight = l->TM_HAS_ISDST;
 #endif // TM_HAS_ISDST
   if(daylight)
