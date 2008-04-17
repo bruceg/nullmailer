@@ -1,5 +1,5 @@
 // nullmailer -- a simple relay-only MTA
-// Copyright (C) 2007  Bruce Guenter <bruce@untroubled.org>
+// Copyright (C) 2008  Bruce Guenter <bruce@untroubled.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,36 +55,40 @@ enum node_type {
 struct token
 {
   const node_type type;
+  const bool has_ws;
   const mystring str;
 
   token(node_type);
-  token(node_type, mystring);
+  token(node_type, bool, mystring);
 };
 
 token::token(node_type t)
-  : type(t)
+  : type(t), has_ws(false)
 {
 }
 
-token::token(node_type t, mystring s)
-  : type(t), str(s)
+token::token(node_type t, bool w, mystring s)
+  : type(t), has_ws(w), str(s)
 {
 }
 
 struct anode : public token
 {
   anode* next;
-  anode(node_type, const char*, const char*);
-  anode(node_type, mystring);
+  anode(node_type, const char*, const char*, const char*);
+  anode(node_type, bool, mystring);
 };
 
-anode::anode(node_type t, const char* start, const char* end)
-  : token(t, mystring(start, end-start)), next(0)
+anode::anode(node_type t,
+	     const char* wstart,
+	     const char* start,
+	     const char* end)
+  : token(t, start > wstart, mystring(start, end-start)), next(0)
 {
 }
 
-anode::anode(node_type t, mystring s)
-  : token(t, s), next(0)
+anode::anode(node_type t, bool w, mystring s)
+  : token(t, w, s), next(0)
 {
 }
 
@@ -194,17 +198,17 @@ static bool isatom(char ch)
   return !(isspace(ch) || issymbol(ch) || isctl(ch));
 }
 
-static anode* tokenize_atom(const char* &ptr)
+static anode* tokenize_atom(const char* wstart, const char* &ptr)
 {
   if(!isatom(*ptr)) return 0;
   const char* start = ptr;
   do {
     ++ptr;
   } while(isatom(*ptr));
-  return new anode(ATOM, start, ptr);
+  return new anode(ATOM, wstart, start, ptr);
 }
 
-static anode* tokenize_comment(const char* &ptr)
+static anode* tokenize_comment(const char* wstart, const char* &ptr)
 {
   if(*ptr != LPAREN) return 0;
   unsigned count = 0;
@@ -218,7 +222,7 @@ static anode* tokenize_comment(const char* &ptr)
     else if(ch == RPAREN) {
       --count;
       if(!count)
-	return new anode(COMMENT, start, ++ptr);
+	return new anode(COMMENT, wstart, start, ++ptr);
     }
     else if(ch == CR)
       return 0;			// ERROR
@@ -228,7 +232,7 @@ static anode* tokenize_comment(const char* &ptr)
   return 0;			// ERROR
 }
 
-static anode* tokenize_domain_literal(const char* &ptr)
+static anode* tokenize_domain_literal(const char* wstart, const char* &ptr)
 {
   if(*ptr != LSQBRACKET) return 0;
   const char* start = ptr;
@@ -245,10 +249,10 @@ static anode* tokenize_domain_literal(const char* &ptr)
   while(isspace(*ptr)) ++ptr;
   if(*ptr != RSQBRACKET)
     return 0;			// ERROR
-  return new anode(DOMAIN_LITERAL, start, ptr);
+  return new anode(DOMAIN_LITERAL, wstart, start, ptr);
 }
 
-static anode* tokenize_quoted_string(const char* &ptr)
+static anode* tokenize_quoted_string(const char* wstart, const char* &ptr)
 {
   if(*ptr != QUOTE) return 0;
   const char* start = ptr;
@@ -262,16 +266,17 @@ static anode* tokenize_quoted_string(const char* &ptr)
   }
   if(*ptr != QUOTE) return 0;
   ++ptr;
-  return new anode(QUOTED_STRING, start, ptr);
+  return new anode(QUOTED_STRING, wstart, start, ptr);
 }
 
 static anode* tokenize(const char* &ptr)
 {
+  const char* wstart = ptr;
   while(isspace(*ptr)) ++ptr;
   char ch = *ptr;
   switch(ch) {
   case 0:
-    return new anode(EOT, ptr, ptr);
+    return new anode(EOT, wstart, ptr, ptr);
   case LABRACKET:
   case RABRACKET:
   case AT:
@@ -281,22 +286,22 @@ static anode* tokenize(const char* &ptr)
   case ESCAPE:
   case PERIOD:
     ++ptr;
-    return new anode((node_type)ch, ptr-1, ptr);
+    return new anode((node_type)ch, wstart, ptr-1, ptr);
   case LPAREN:
-    return tokenize_comment(ptr);
+    return tokenize_comment(wstart, ptr);
   case LSQBRACKET:
-    return tokenize_domain_literal(ptr);
+    return tokenize_domain_literal(wstart, ptr);
   case QUOTE:
-    return tokenize_quoted_string(ptr);
+    return tokenize_quoted_string(wstart, ptr);
   default:
-    return tokenize_atom(ptr);
+    return tokenize_atom(wstart, ptr);
   }
 }
 
 anode* tokenize(const mystring str)
 {
   const char* ptr = str.c_str();
-  anode* head = new anode(EMPTY, ptr, ptr);
+  anode* head = new anode(EMPTY, ptr, ptr, ptr);
   anode* tail = head;
   anode* tmp;
   while((tmp = tokenize(ptr)) != 0) {
@@ -520,6 +525,8 @@ RULE(phrase)
     // FIXME: need to handle comments in here, and the spacing is broken
     // for the case of phrases like "a.b"
     if(r1.next->type == PERIOD) {
+      if (r1.next->has_ws)
+	r1.str += ' ';
       r1.str += ".";
       r1.next = r1.next->next;
     }
@@ -527,7 +534,8 @@ RULE(phrase)
       result r2 = match_word(r1.next);
       if(!r2)
 	break;
-      r1.str += " ";
+      if (r1.next->has_ws)
+	r1.str += " ";
       r1.str += r2.str;
       r1.comment += r2.comment;
       r1.next = r2.next;
