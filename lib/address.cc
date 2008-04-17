@@ -522,8 +522,6 @@ RULE(phrase)
   ENTER("word *(word / PERIOD / CFWS)");
   MATCHRULE(r1, word);
   for(;;) {
-    // FIXME: need to handle comments in here, and the spacing is broken
-    // for the case of phrases like "a.b"
     if(r1.next->type == PERIOD) {
       if (r1.next->has_ws)
 	r1.str += ' ';
