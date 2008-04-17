@@ -74,15 +74,9 @@ token::token(node_type t, mystring s)
 struct anode : public token
 {
   anode* next;
-  anode(node_type);
   anode(node_type, const char*, const char*);
   anode(node_type, mystring);
 };
-
-anode::anode(node_type t)
-  : token(t), next(0)
-{
-}
 
 anode::anode(node_type t, const char* start, const char* end)
   : token(t, mystring(start, end-start)), next(0)
@@ -146,7 +140,7 @@ result::result(const result& r)
 #include "fdbuf/fdbuf.h"
 static const char indentstr[] = "                       ";
 static const char* indent = indentstr + sizeof indentstr - 1;
-#define ENTER(R) do{ fout << indent-- << __FUNCTION__ << ": " << node->str << ": " << R << endl; }while(0)
+#define ENTER(R) do{ fout << indent-- << __FUNCTION__ << ": \"" << node->str << "\": " << R << endl; }while(0)
 #define FAIL(MSG) do{ fout << ++indent << __FUNCTION__ << ": failed: " << MSG << endl; return result(); }while(0)
 #define RETURNR(R) do{ fout << ++indent << __FUNCTION__ << ": succeded str=" << R.str << " comment=" << R.comment << " addr=" << R.addr << endl; return (R); }while(0)
 #define RETURN(N,S,C,L) do{ result _result(N,S,C,L); RETURNR(_result); }while(0)
@@ -277,7 +271,7 @@ static anode* tokenize(const char* &ptr)
   char ch = *ptr;
   switch(ch) {
   case 0:
-    return new anode(EOT);
+    return new anode(EOT, ptr, ptr);
   case LABRACKET:
   case RABRACKET:
   case AT:
@@ -287,7 +281,7 @@ static anode* tokenize(const char* &ptr)
   case ESCAPE:
   case PERIOD:
     ++ptr;
-    return new anode((node_type)ch);
+    return new anode((node_type)ch, ptr-1, ptr);
   case LPAREN:
     return tokenize_comment(ptr);
   case LSQBRACKET:
@@ -301,10 +295,10 @@ static anode* tokenize(const char* &ptr)
 
 anode* tokenize(const mystring str)
 {
-  anode* head = new anode(EMPTY);
+  const char* ptr = str.c_str();
+  anode* head = new anode(EMPTY, ptr, ptr);
   anode* tail = head;
   anode* tmp;
-  const char* ptr = str.c_str();
   while((tmp = tokenize(ptr)) != 0) {
     tail = tail->next = tmp;
     if(tmp->type == EOT) {
