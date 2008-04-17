@@ -319,10 +319,10 @@ static mystring quote(const mystring& in)
   const char* ptrin = in.c_str();
   bool quoted = false;
   for(; length; ++ptrin, ++ptrout, --length) {
-    if(issymbol(*ptrin)) {
+    if(*ptrin == QUOTE || *ptrin == ESCAPE)
       *ptrout++ = ESCAPE;
+    if(issymbol(*ptrin))
       quoted = true;
-    }
     *ptrout = *ptrin;
   }
   *ptrout = 0;
