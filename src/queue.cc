@@ -181,6 +181,7 @@ bool deliver()
 
 int main(int, char*[])
 {
+  umask(077);
   if(config_read("adminaddr", adminaddr) && !!adminaddr) {
     remapadmin = true;
     read_hostnames();
