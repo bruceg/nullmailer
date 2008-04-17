@@ -514,16 +514,24 @@ RULE(route_addr)
 
 RULE(phrase)
 {
-  ENTER("word *word");
+  ENTER("word *(word / PERIOD / CFWS)");
   MATCHRULE(r1, word);
   for(;;) {
-    result r2 = match_word(r1.next);
-    if(!r2)
-      break;
-    r1.str += " ";
-    r1.str += r2.str;
-    r1.comment += r2.comment;
-    r1.next = r2.next;
+    // FIXME: need to handle comments in here, and the spacing is broken
+    // for the case of phrases like "a.b"
+    if(r1.next->type == PERIOD) {
+      r1.str += ".";
+      r1.next = r1.next->next;
+    }
+    else {
+      result r2 = match_word(r1.next);
+      if(!r2)
+	break;
+      r1.str += " ";
+      r1.str += r2.str;
+      r1.comment += r2.comment;
+      r1.next = r2.next;
+    }
   }
   RETURNR(r1);
 }

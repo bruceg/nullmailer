@@ -6,6 +6,8 @@ Changes in version 1.05
 
 - Fixed handling of TM_HAS_ISDST on Solaris.
 
+- Fixed a few address parsing glitches.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------

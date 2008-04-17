@@ -193,6 +193,9 @@ int main()
   TEST("\"a.b\" <c@d.e>",
        "\"a.b\" <c@d.e>",
        "c@d.e\n");
+  TEST("Mr. T <c@d.e>",
+       "Mr. T <c@d.e>",
+       "c@d.e\n");
   
   fout << itoa(count) << " tests run, ";
   fout << itoa(failed) << " failed." << endl;
