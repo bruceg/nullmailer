@@ -424,7 +424,7 @@ RULE(route)
     if(node->type != AT) break;
     node = node->next;
     MATCHRULE(r, domain);
-    str += "@";
+    str += AT;
     str += r.str;
     comment += r.comment;
     ++count;
@@ -464,10 +464,10 @@ RULE(local_part)
     if(!r1)
       break;
     r.next = r1.next;
-    r.str += ".";
+    r.str += PERIOD;
     r.str += r1.str;
     r.comment += r1.comment;
-    r.addr += ".";
+    r.addr += PERIOD;
     r.addr += r1.addr;
   }
   RETURNR(r);
@@ -486,9 +486,9 @@ RULE(addr_spec)
     result r2 = match_domain(node);
     if(!r2) break;
     if(!!domain) {
-      r.str += "@";
+      r.str += AT;
       r.str += domain;
-      r.addr += "@";
+      r.addr += AT;
       r.addr += domain;
     }
     domain = r2.addr;
@@ -527,7 +527,7 @@ RULE(phrase)
     if(r1.next->type == PERIOD) {
       if (r1.next->has_ws)
 	r1.str += ' ';
-      r1.str += ".";
+      r1.str += PERIOD;
       r1.next = r1.next->next;
     }
     else {
@@ -535,7 +535,7 @@ RULE(phrase)
       if(!r2)
 	break;
       if (r1.next->has_ws)
-	r1.str += " ";
+	r1.str += ' ';
       r1.str += r2.str;
       r1.comment += r2.comment;
       r1.next = r2.next;
