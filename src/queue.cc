@@ -139,7 +139,7 @@ bool dump(int fd)
     return false;
   if(!fdbuf_copy(fin, out))
     fail("Error copying the message to the queue file.");
-  if(!out.flush())
+  if(!out.sync())
     fail("Error flushing the output file.");
   if(!out.close())
     fail("Error closing the output file.");
