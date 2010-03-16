@@ -177,7 +177,7 @@ static bool isctl(char c)
   
 static bool isqtext(char c)
 {
-  return c && c != QUOTE && c != ESCAPE && c != CR;
+  return c && c != QUOTE && c != ESCAPE;
 }
 
 static bool isdtext(char c)
@@ -350,6 +350,9 @@ static mystring unquote(const mystring& in)
     ptrin++;
     modified = true;
   }
+  // Skip leading whitespace before copying to out
+  for(; length > 0 && isspace(*ptrin); ++ptrin, --length, modified = true)
+    ;
   for(; length; ++ptrin, ++ptrout, --length) {
     if(isqpair(ptrin)) {
       ++ptrin;
@@ -358,6 +361,9 @@ static mystring unquote(const mystring& in)
     }
     *ptrout = *ptrin;
   }
+  // Skip trailing whitespace copied into out
+  for(; ptrout > out && isspace(ptrout[-1]); --ptrout, modified = true)
+    ;
   *ptrout = 0;
   if(modified)
     return out;

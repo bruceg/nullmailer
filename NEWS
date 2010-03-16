@@ -5,6 +5,8 @@ Changes in version 1.06
 - Make sure to sync and not just flush queue files to protect against
   crashes during sensitive operations.
 
+- Fix handling of whitespace in quoted strings in headers.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
