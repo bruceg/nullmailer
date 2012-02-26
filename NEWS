@@ -2,12 +2,12 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.06
 
-- Make sure to sync and not just flush queue files to protect against
-  crashes during sensitive operations.
+- Made nullmailer-queue sync and not just flush queued files to protect
+  against crashes during sensitive operations.
 
-- Fix handling of whitespace in quoted strings in headers.
+- Fixed handling of whitespace in quoted strings in headers.
 
-- Fix handling of timeouts when sending.
+- Fixed handling of timeouts when sending.
 
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
