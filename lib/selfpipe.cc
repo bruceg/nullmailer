@@ -84,19 +84,21 @@ int selfpipe::caught()
 
 int selfpipe::waitsig(int timeout)
 {
-  fd_set fdset;
-  FD_ZERO(&fdset);
-  FD_SET(fds[0], &fdset);
-  struct timeval tv;
-  tv.tv_sec = timeout;
-  tv.tv_usec = 0;
-  int s;
-  while ((s = select(fds[0] + 1, &fdset, 0, 0,
+  if (timeout > 0) {
+    fd_set fdset;
+    FD_ZERO(&fdset);
+    FD_SET(fds[0], &fdset);
+    struct timeval tv;
+    tv.tv_sec = timeout;
+    tv.tv_usec = 0;
+    int s;
+    while ((s = select(fds[0] + 1, &fdset, 0, 0,
 		     (timeout <= 0) ? 0 : &tv)) == -1) {
-    if (errno != EINTR)
-      return -1;
+      if (errno != EINTR)
+        return -1;
+    }
+    if (s != 1)
+      return 0;
   }
-  if (s == 1)
-    return caught();
-  return 0;
+  return caught();
 }
