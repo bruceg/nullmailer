@@ -194,6 +194,7 @@ bool catchsender(pid_t pid)
     case 0:			// timeout
       kill(pid, SIGTERM);
       waitpid(pid, &status, 0);
+      selfpipe.waitsig();	// catch the signal from killing the child
       fail("Sending timed out, killing protocol");
     case -1:
       fail_sys("Error waiting for the child signal: ");

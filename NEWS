@@ -7,6 +7,8 @@ Changes in version 1.06
 
 - Fix handling of whitespace in quoted strings in headers.
 
+- Fix handling of timeouts when sending.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
