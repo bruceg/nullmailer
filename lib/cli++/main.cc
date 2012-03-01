@@ -49,14 +49,14 @@ static void build_options()
   options[optionc-1] = &help_option;
 }
 
-static inline unsigned max(unsigned a, unsigned b)
+static inline int max(int a, int b)
 {
   return (a>b) ? a : b;
 }
 
-static const char* fill(unsigned i)
+static const char* fill(int i)
 {
-  static unsigned lastlen = 0;
+  static int lastlen = 0;
   static char* buf = 0;
   if(i > lastlen) {
     delete[] buf;
@@ -73,39 +73,43 @@ static void show_usage()
   fout << "usage: " << cli_program << " [flags] " << cli_args_usage << endl;
 }
 
-static unsigned calc_max_width()
+int calc_width(const cli_option* o)
 {
-  // maxwidth is the maximum width of the long argument
-  unsigned maxwidth = 0;
-  for(unsigned i = 0; i < optionc; i++) {
-    unsigned width = 0;
-    cli_option* o = options[i];
-    if(o->name) {
-      width += strlen(o->name);
-      switch(o->type) {
-      case cli_option::string:     width += 6; break;
-      case cli_option::integer:    width += 4; break;
-      case cli_option::uinteger:   width += 4; break;
-      case cli_option::stringlist: width += 5; break;
-      case cli_option::flag:       break;
-      case cli_option::counter:    break;
-      }
+  int width = (o->ch || !cli_only_long) ? 4 : 2;
+  if (o->name) {
+    width += strlen(o->name) + 2 + !cli_only_long;
+    switch (o->type) {
+    case cli_option::string:     width += 6; break;
+    case cli_option::integer:    width += 4; break;
+    case cli_option::uinteger:   width += 4; break;
+    case cli_option::stringlist: width += 5; break;
+    case cli_option::flag:       break;
+    case cli_option::counter:    break;
     }
-    if(width > maxwidth)
-      maxwidth = width;
   }
+  return width;
+}
+
+static int calc_max_width()
+{
+  // maxwidth is the maximum width of the option text prefix
+  int maxwidth = 0;
+  for(unsigned i = 0; i < optionc; i++)
+    maxwidth = max(maxwidth, calc_width(options[i]));
   return maxwidth;
 }
 
-static void show_option(cli_option* o, unsigned maxwidth)
+static void show_option(const cli_option* o, int maxwidth)
 {
   if(o == &help_option)
     fout << '\n';
+  fout << "  ";
   if(o->ch)
-    fout << "  -" << o->ch;
-  else
-    fout << "    ";
-  fout << (o->ch && o->name ? ", " : "  ");
+    fout << '-' << o->ch;
+  else if (!cli_only_long)
+    fout << "  ";
+  if (o->ch || !cli_only_long)
+    fout << (o->ch && o->name ? ", " : "  ");
   if(o->name) {
     const char* extra = "";
     switch(o->type) {
@@ -116,21 +120,22 @@ static void show_option(cli_option* o, unsigned maxwidth)
     case cli_option::flag:       break;
     case cli_option::counter:    break;
     }
-    fout << "--" << o->name << extra
-	 << fill(maxwidth - strlen(o->name) - strlen(extra) + 2);
+    fout << (cli_only_long ? "-" : "--") << o->name << extra
+	 << fill(maxwidth - strlen(o->name) - strlen(extra) - !cli_only_long
+		 - (o->ch || !cli_only_long ? 4 : 0));
   }
   else
-    fout << fill(maxwidth+4);
+    fout << fill(maxwidth-3);
   fout << o->helpstr << '\n';
   if(o->defaultstr)
-    fout << fill(maxwidth+10) << "(Defaults to " << o->defaultstr << ")\n";
+    fout << fill(maxwidth+3) << "(Defaults to " << o->defaultstr << ")\n";
 }
 
 static void show_help()
 {
   if(cli_help_prefix)
     fout << cli_help_prefix;
-  unsigned maxwidth = calc_max_width();
+  int maxwidth = calc_max_width();
   for(unsigned i = 0; i < optionc; i++)
     show_option(options[i], maxwidth);
   if(cli_help_suffix)
