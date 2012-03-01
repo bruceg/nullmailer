@@ -1,7 +1,7 @@
 localstatedir = @localstatedir@/nullmailer
 sysconfdir = @sysconfdir@/nullmailer
 
-EXTRA_DIST = BUGS HOWTO INSTALL TODO YEAR2000 scripts/*
+EXTRA_DIST = BUGS HOWTO INSTALL TODO scripts/*
 SUBDIRS = doc lib protocols src test
 
 install-data-local:

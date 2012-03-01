@@ -18,7 +18,7 @@ DOCS=
 
 # Set EXTRAS to a list of any other extra files that should go into the
 # base directory in the destination site.
-EXTRAS="ChangeLog ChangeLog.old HOWTO NEWS README TODO YEAR2000"
+EXTRAS="ChangeLog ChangeLog.old HOWTO NEWS README TODO"
 
 # Set EXTRAS_VER to a list of any other extra files that should go into
 # the version-numbered directory in the destination site.
