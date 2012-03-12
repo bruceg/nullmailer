@@ -111,42 +111,41 @@ bool setenvelope(char* str)
   return true;
 }
 
-int parseargs()
+int do_exec(const char* program, const char* xarg1, int argc, char* argv[])
+{
+  if(chdir(BIN_DIR) == -1) {
+    ferr << "sendmail: Could not change directory to " << BIN_DIR << endl;
+    return 1;
+  }
+
+  const char* newargv[argc+3];
+  newargv[0] = program;
+  int j = 1;
+  if (xarg1)
+    newargv[j++] = xarg1;
+  for(int i = 0; i < argc; i++)
+    newargv[j++] = argv[i];
+  newargv[j] = 0;
+
+  execv(newargv[0], (char**)newargv);
+  ferr << "sendmail: Could not exec " << program << '.' << endl;
+  return 1;
+}
+
+int cli_main(int argc, char* argv[])
 {
   if(o_sender)
     setenv("NULLMAILER_NAME", o_sender, 1);
   if(o_from)
     if(!setenvelope(o_from))
       return -1;
-  if (o_mode == mode_smtp) {
+  switch (o_mode) {
+  case mode_smtp:
     ferr << "sendmail: option -bs is unsupported" << endl;
     return -1;
+  case mode_mailq:
+    return do_exec("mailq", 0, 0, 0);
+  default:
+    return do_exec("nullmailer-inject", use_header ? "-b" : "-e", argc, argv);
   }
-  return 0;
-}
-
-int cli_main(int argc, char* argv[])
-{
-  if(chdir(BIN_DIR) == -1) {
-    ferr << "sendmail: Could not change directory to " << BIN_DIR << endl;
-    return 1;
-  }
-  
-  if(parseargs() < 0)
-    return 1;
-
-  char* newargv[argc+3];
-  newargv[0] = "nullmailer-inject";
-  int j = 1;
-  if(use_header)
-    newargv[j++] = "-b";
-  else
-    newargv[j++] = "-e";
-  for(int i = 0; i < argc; i++)
-    newargv[j++] = argv[i];
-  newargv[j] = 0;
-
-  execv(newargv[0], newargv);
-  ferr << "sendmail: Could not exec nullmailer-inject." << endl;
-  return 1;
 }
