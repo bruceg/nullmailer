@@ -261,9 +261,20 @@ int cli_option::parse_long_noeq(const char* arg)
 
 static int parse_long(int, char* argv[])
 {
-  const char* arg = argv[0]+2;
+  const char* arg = argv[0]+1;
+  // Handle both short and long args
+  if (arg[0] == '-')
+    ++arg;
   for(unsigned j = 0; j < optionc; j++) {
     cli_option* o = options[j];
+    if (cli_only_long && o->ch) {
+      if (arg[0] == o->ch) {
+	if (arg[1] == '\0')
+	  return o->parse_long_noeq(argv[1]);
+	else if (arg[1] == '=')
+	  return o->parse_long_eq(arg+2);
+      }
+    }
     if(o->name) {
       size_t len = strlen(o->name);
       if(!memcmp(arg, o->name, len)) {
@@ -274,7 +285,7 @@ static int parse_long(int, char* argv[])
       }
     }
   }
-  ferr << argv0 << ": unknown option string: '--" << arg << "'" << endl;
+  ferr << argv0 << ": unknown option string: '" << argv[0] << "'" << endl;
   return -1;
 }
 
@@ -293,9 +304,9 @@ static int parse_args(int argc, char* argv[])
       i++;
       break;
     }
-    int j = (arg[1] != '-') ?
-      parse_short(argc-i, argv+i) :
-      parse_long(argc-i, argv+i);
+    int j = (!cli_only_long && arg[1] != '-')
+      ? parse_short(argc-i, argv+i)
+      : parse_long(argc-i, argv+i);
     if(j < 0)
       usage(1);
     else
