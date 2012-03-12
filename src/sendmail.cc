@@ -34,43 +34,70 @@ const char* cli_help_suffix = 0;
 const char* cli_args_usage = "[recipients] <message";
 const int cli_args_min = 0;
 const int cli_args_max = -1;
+const bool cli_only_long = true;
+
+enum mode { mode_normal, mode_mailq, mode_smtp };
 
 static int o_dummyi;
 static const char* o_dummys;
 static const char* o_sender = 0;
-static const char* o_mode = 0;
+static int o_mode = 0;
 static char* o_from;
 static int use_header = false;
 
 cli_option cli_options[] = {
-  { 'B', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'b', 0, cli_option::string, 0, &o_mode, "Ignored", 0 },
-  { 'C', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'd', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'F', 0, cli_option::string, 0, &o_sender,
+  { 'B', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  {  0, "bm",  cli_option::flag, mode_normal, &o_mode,
+     "Read mail from standard input (default)", 0 },
+  {  0, "bp",  cli_option::flag, mode_mailq, &o_mode,
+     "List information about mail queue", 0 },
+  {  0, "bs",  cli_option::flag, mode_smtp, &o_mode,
+     "Handle SMTP commands on standard input", 0 },
+  { 'C', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  { 'd', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  { 'F', 0,    cli_option::string, 0, &o_sender,
     "Set the full name of the sender", 0 },
-  { 'f', 0, cli_option::string, 0, &o_from,
+  { 'f', 0,    cli_option::string, 0, &o_from,
     "Set the envelope sender address", 0 },
-  { 'h', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'i', 0, cli_option::flag, 0, &o_dummyi, "Ignored", 0 },
-  { 'L', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'm', 0, cli_option::flag,   0, &o_dummyi, "Ignored", 0 },
-  { 'N', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'n', 0, cli_option::flag, 0, &o_dummyi, "Ignored", 0 },
-  { 'O', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'o', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'p', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'q', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'R', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'r', 0, cli_option::string, 0, &o_from,
+  { 'h', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  { 'i', 0,    cli_option::flag, 0, &o_dummyi, "Ignored", 0 },
+  { 'L', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  { 'm', 0,    cli_option::flag,   0, &o_dummyi, "Ignored", 0 },
+  { 'N', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  { 'n', 0,    cli_option::flag, 0, &o_dummyi, "Ignored", 0 },
+  { 'O', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  {  0, "odb", cli_option::flag, 0, &o_dummyi,
+     "Deliver in background (always true)", 0 },
+  {  0, "odf", cli_option::flag, 0, &o_dummyi,
+     "Deliver in foreground (ignored)", 0 },
+  {  0, "oem", cli_option::flag, 0, &o_dummyi,
+     "Ignored", 0 },
+  {  0, "em",  cli_option::flag, 0, &o_dummyi,
+     "Ignored", 0 },
+  {  0, "oep", cli_option::flag, 0, &o_dummyi,
+     "Ignored", 0 },
+  {  0, "ep",  cli_option::flag, 0, &o_dummyi,
+     "Ignored", 0 },
+  {  0, "oeq", cli_option::flag, 0, &o_dummyi,
+     "Ignored", 0 },
+  {  0, "eq",  cli_option::flag, 0, &o_dummyi,
+     "Ignored", 0 },
+  {  0, "oi",  cli_option::flag, 0, &o_dummyi,
+     "Ignored", 0 },
+  {  0, "om",  cli_option::flag, 0, &o_dummyi,
+     "Ignored", 0 },
+  { 'p', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  { 'q', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  { 'R', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  { 'r', 0,    cli_option::string, 0, &o_from,
     "An alternate and obsolete form of the -f flag", 0 },
-  { 't', 0, cli_option::flag, 1, &use_header,
+  { 't', 0,    cli_option::flag, 1, &use_header,
     "Read message for recipients", 0 },
-  { 'U', 0, cli_option::flag, 0, &o_dummyi, "Ignored", 0 },
-  { 'V', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  { 'v', 0, cli_option::flag, 0, &o_dummyi, "Ignored", 0 },
-  { 'X', 0, cli_option::string, 0, &o_dummys, "Ignored", 0 },
-  {0, 0, cli_option::flag, 0, 0, 0, 0}
+  { 'U', 0,    cli_option::flag, 0, &o_dummyi, "Ignored", 0 },
+  { 'V', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  { 'v', 0,    cli_option::flag, 0, &o_dummyi, "Ignored", 0 },
+  { 'X', 0,    cli_option::string, 0, &o_dummys, "Ignored", 0 },
+  CLI_OPTION_END
 };
 
 bool setenvelope(char* str)
@@ -91,7 +118,7 @@ int parseargs()
   if(o_from)
     if(!setenvelope(o_from))
       return -1;
-  if (o_mode && !strcmp(o_mode, "s")) {
+  if (o_mode == mode_smtp) {
     ferr << "sendmail: option -bs is unsupported" << endl;
     return -1;
   }
