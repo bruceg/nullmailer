@@ -235,26 +235,34 @@ static int parse_short(int argc, char* argv[])
   return 0;
 }
 
-int cli_option::parse_long_eq(const char* arg)
+static void option_error(const cli_option* o, int as_short, const char* text)
+{
+  ferr << argv0 << ": option ";
+  if (as_short)
+    ferr << '-' << o->ch;
+  else
+    ferr << (cli_only_long ? "-" : "--") << o->name;
+  ferr << text << endl;
+}
+
+int cli_option::parse_long_eq(const char* arg, int as_short)
 {
   if(type == flag || type == counter) {
-    ferr << argv0 << ": option --" << name
-	 << " does not take a value." << endl;
+    option_error(this, as_short, " does not take a value.");
     return -1;
   }
   else
     return set(arg)-1;
 }
 
-int cli_option::parse_long_noeq(const char* arg)
+int cli_option::parse_long_noeq(const char* arg, int as_short)
 {
   if(type == flag || type == counter)
     return set(0);
   else if(arg)
     return set(arg);
   else {
-    ferr << argv0 << ": option --" << name
-	 << " requires a value." << endl;
+    option_error(this, as_short, " requires a value.");
     return -1;
   }
 }
@@ -270,18 +278,18 @@ static int parse_long(int, char* argv[])
     if (cli_only_long && o->ch) {
       if (arg[0] == o->ch) {
 	if (arg[1] == '\0')
-	  return o->parse_long_noeq(argv[1]);
+	  return o->parse_long_noeq(argv[1], true);
 	else if (arg[1] == '=')
-	  return o->parse_long_eq(arg+2);
+	  return o->parse_long_eq(arg+2, true);
       }
     }
     if(o->name) {
       size_t len = strlen(o->name);
       if(!memcmp(arg, o->name, len)) {
 	if(arg[len] == '\0')
-	  return o->parse_long_noeq(argv[1]);
+	  return o->parse_long_noeq(argv[1], false);
 	else if(arg[len] == '=')
-	  return o->parse_long_eq(arg+len+1);
+	  return o->parse_long_eq(arg+len+1, false);
       }
     }
   }
