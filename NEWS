@@ -2,7 +2,7 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.10
 
-- Added support for -bp (mailq) mode in the sendmail wrapper.
+- Added support for -bp (mailq) and -bs (SMTP) mode in the sendmail wrapper.
 
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/

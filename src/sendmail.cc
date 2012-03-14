@@ -141,8 +141,7 @@ int cli_main(int argc, char* argv[])
       return -1;
   switch (o_mode) {
   case mode_smtp:
-    ferr << "sendmail: option -bs is unsupported" << endl;
-    return -1;
+    return do_exec("nullmailer-smtpd", 0, 0, 0);
   case mode_mailq:
     return do_exec("mailq", 0, 0, 0);
   default:
