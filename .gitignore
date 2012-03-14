@@ -23,6 +23,7 @@ src/mailq
 src/nullmailer-inject
 src/nullmailer-queue
 src/nullmailer-send
+src/nullmailer-smtpd
 src/sendmail
 stamp-h.in
 stamp-h1

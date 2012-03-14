@@ -1,6 +1,7 @@
 bin_PROGRAMS = \
 	mailq \
-	nullmailer-inject
+	nullmailer-inject \
+	nullmailer-smtpd
 sbin_PROGRAMS = \
 	nullmailer-queue \
 	nullmailer-send \
@@ -21,6 +22,9 @@ nullmailer_queue_LDADD = ../lib/libnullmailer.a
 
 nullmailer_send_SOURCES = send.cc
 nullmailer_send_LDADD = ../lib/libnullmailer.a
+
+nullmailer_smtpd_SOURCES = smtpd.cc
+nullmailer_smtpd_LDADD = ../lib/libnullmailer.a
 
 sendmail_SOURCES = sendmail.cc
 sendmail_LDADD = ../lib/cli++/libcli++.a ../lib/libnullmailer.a
