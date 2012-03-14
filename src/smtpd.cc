@@ -31,6 +31,7 @@ static const char resp_goodbye[] = "221 2.0.0 Good bye";
 static const char resp_help[] = "214 2.0.0 Help not available";
 static const char resp_mail_bad[] = "554 5.1.2 Sender invalid";
 static const char resp_mail_ok[] = "250 2.1.0 Sender accepted";
+static const char resp_need_param[] = "501 5.5.2 Syntax error, command requires a parameter";
 static const char resp_no_mail[] = "503 5.5.1 You must send a valid sender first";
 static const char resp_no_param[] = "501 5.5.2 Syntax error, no parameters allowed";
 static const char resp_no_queue[] = "451 4.3.0 Starting nullmailer-queue failed";
@@ -194,8 +195,10 @@ static bool DATA(mystring& param)
   return respond(status ? resp_queue_exiterr : resp_queue_ok);
 }
 
-static bool HELO(mystring&)
+static bool HELO(mystring& param)
 {
+  if (!param)
+    return respond(resp_need_param);
   return respond(resp_ok);
 }
 
@@ -206,6 +209,8 @@ static bool HELP(mystring&)
 
 static bool MAIL(mystring& param)
 {
+  if (!param)
+    return respond(resp_need_param);
   sender = parse_addr_arg(param);
   return respond(!sender ? resp_mail_bad : resp_mail_ok);
 }
@@ -223,6 +228,8 @@ static bool QUIT(mystring&)
 
 static bool RCPT(mystring& param)
 {
+  if (!param)
+    return respond(resp_need_param);
   if (!sender)
     return respond(resp_no_mail);
   mystring tmp = parse_addr_arg(param);
