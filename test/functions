@@ -47,6 +47,7 @@ error() {
 
 inject() { ../src/nullmailer-inject "$@"; }
 mailq() { ../src/mailq "$@"; }
+smtpd() { ../src/nullmailer-smtpd "$@"; }
 injectlines() {
   for line in "$@"; do
     echo "$line"
