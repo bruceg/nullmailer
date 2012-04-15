@@ -45,6 +45,8 @@ public:
   int put(mystring cmd, mystring& result);
   void docmd(mystring cmd, int range, mystring& result);
   void docmd(mystring cmd, int range);
+  void auth_login(void);
+  void auth_plain(void);
   void send_data(fdibuf* msg);
   void send_envelope(fdibuf* msg);
   void send(fdibuf* msg);
@@ -112,6 +114,28 @@ void smtp::docmd(mystring cmd, int range)
   docmd(cmd, range, msg);
 }
 
+void smtp::auth_login(void)
+{
+  mystring encoded;
+  base64_encode(user, encoded);
+  docmd("AUTH LOGIN " + encoded, 300);
+  encoded = "";
+  base64_encode(pass, encoded);
+  docmd(encoded, 200);
+}
+
+void smtp::auth_plain(void)
+{
+  mystring plain(user);
+  plain += '\0';
+  plain += user;
+  plain += '\0';
+  plain += pass;
+  mystring encoded = "AUTH PLAIN ";
+  base64_encode(plain, encoded);
+  docmd(encoded, 200);
+}
+
 void smtp::send_envelope(fdibuf* msg)
 {
   mystring tmp;
@@ -153,24 +177,10 @@ void protocol_send(fdibuf* in, int fd)
 
   if (user != 0 && pass != 0) {
     conn.docmd("EHLO " + hh, 200);
-    if (auth_method == AUTH_LOGIN) {
-      mystring encoded;
-      base64_encode(user, encoded);
-      conn.docmd("AUTH LOGIN " + encoded, 300);
-      encoded = "";
-      base64_encode(pass, encoded);
-      conn.docmd(encoded, 200);
-    }
-    else {
-      mystring plain(user);
-      plain += '\0';
-      plain += user;
-      plain += '\0';
-      plain += pass;
-      mystring encoded = "AUTH PLAIN ";
-      base64_encode(plain, encoded);
-      conn.docmd(encoded, 200);
-    }
+    if (auth_method == AUTH_LOGIN)
+      conn.auth_login();
+    else
+      conn.auth_plain();
   }
   else
     conn.docmd("HELO " + hh, 200);
