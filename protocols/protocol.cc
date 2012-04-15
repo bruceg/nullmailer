@@ -29,7 +29,7 @@
 
 const char* user = 0;
 const char* pass = 0;
-int auth_method = AUTH_PLAIN;
+int auth_method = AUTH_DETECT;
 const char* cli_help_suffix = "";
 const char* cli_args_usage = "remote-address < mail-file";
 const int cli_args_min = 1;
@@ -42,7 +42,7 @@ cli_option cli_options[] = {
   { 0, "pass", cli_option::string, 0, &pass,
     "Set the password for authentication", 0 },
   { 0, "auth-login", cli_option::flag, AUTH_LOGIN, &auth_method,
-    "Use AUTH LOGIN instead of AUTH PLAIN in SMTP", 0 },
+    "Use AUTH LOGIN instead of auto-detecting in SMTP", 0 },
   {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
 

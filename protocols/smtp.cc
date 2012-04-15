@@ -38,6 +38,7 @@ class smtp
 {
   fdibuf in;
   fdobuf out;
+  mystring caps;
 public:
   smtp(int fd);
   ~smtp();
@@ -45,6 +46,8 @@ public:
   int put(mystring cmd, mystring& result);
   void docmd(mystring cmd, int range, mystring& result);
   void docmd(mystring cmd, int range);
+  void dohelo(bool ehlo);
+  bool hascap(const char* name, const char* word = NULL);
   void auth_login(void);
   void auth_plain(void);
   void send_data(fdibuf* msg);
@@ -71,7 +74,7 @@ int smtp::get(mystring& str)
       tmp = tmp.left(tmp.length()-1);
     code = atoi(tmp.c_str());
     if(!!str)
-      str += "/";
+      str += "\n";
     str += tmp;
     if(tmp[3] != '-')
       break;
@@ -112,6 +115,46 @@ void smtp::docmd(mystring cmd, int range)
 {
   mystring msg;
   docmd(cmd, range, msg);
+}
+
+void smtp::dohelo(bool ehlo)
+{
+  mystring hh = getenv("HELOHOST");
+  if (!hh) protocol_fail(1, "$HELOHOST is not set");
+  docmd((ehlo ? "EHLO " : "HELO ") + hh, 200, caps);
+}
+
+static int issep(char ch)
+{
+  return ch == ' ' || ch == '\n' || ch == '\0';
+}
+
+bool smtp::hascap(const char* name, const char* word)
+{
+  const size_t namelen = strlen(name);
+  int i = -1;
+  do {
+    const char* s = caps.c_str() + i + 5;
+    if (strncasecmp(s, name, namelen) == 0) {
+      if (s[namelen] == '\n')
+	return word == NULL;
+      else if (s[namelen] == ' ') {
+	if (word == NULL)
+	  return true;
+	s += namelen + 1;
+	const size_t wordlen = strlen(word);
+	do {
+	  if (strncasecmp(s, word, wordlen) == 0 && issep(s[wordlen]))
+	    return true;
+	  while (!issep(*s))
+	    ++s;
+	} while (*s++ == ' ');
+	return false;
+      }
+    }
+    i = caps.find_first('\n', i+1);
+  } while (i > 0);
+  return false;
 }
 
 void smtp::auth_login(void)
@@ -170,20 +213,27 @@ void protocol_prep(fdibuf*)
 
 void protocol_send(fdibuf* in, int fd)
 {
-  mystring hh = getenv("HELOHOST");
-  if (!hh) protocol_fail(1, "$HELOHOST is not set");
   smtp conn(fd);
   conn.docmd("", 200);
 
   if (user != 0 && pass != 0) {
-    conn.docmd("EHLO " + hh, 200);
+    conn.dohelo(true);
     if (auth_method == AUTH_LOGIN)
       conn.auth_login();
-    else
+    else if (auth_method == AUTH_PLAIN)
       conn.auth_plain();
+    else {
+      // Detect method
+      if (conn.hascap("AUTH", "PLAIN"))
+	conn.auth_plain();
+      else if (conn.hascap("AUTH", "LOGIN"))
+	conn.auth_login();
+      else
+	protocol_fail(ERR_MSG_TEMPFAIL, "Server does not advertise any supported authentication methods");
+    }
   }
   else
-    conn.docmd("HELO " + hh, 200);
+    conn.dohelo(false);
 
   conn.send(in);
 }

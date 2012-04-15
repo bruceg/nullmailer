@@ -6,8 +6,9 @@
 extern void protocol_fail(int e, const char* msg);
 extern void protocol_succ(const char* msg);
 
-#define AUTH_PLAIN 0
+#define AUTH_DETECT 0
 #define AUTH_LOGIN 1
+#define AUTH_PLAIN 2
 extern const char* user;
 extern const char* pass;
 extern int auth_method;
