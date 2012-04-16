@@ -19,4 +19,8 @@ libfdbuf_a_SOURCES = \
 	fdobuf_seek.cc \
 	fdobuf_signed.cc \
 	fdobuf_unsigned.cc \
+	tlsibuf.h \
+	tlsibuf.cc \
+	tlsobuf.h \
+	tlsobuf.cc \
 	$(mystring_sources)
