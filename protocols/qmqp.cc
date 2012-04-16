@@ -36,16 +36,16 @@ const char* cli_help_prefix = "Send an emal message via QMQP\n";
 
 class qmqp 
 {
-  fdibuf in;
-  fdobuf out;
+  fdibuf& in;
+  fdobuf& out;
 public:
-  qmqp(int fd);
+  qmqp(fdibuf& netin, fdobuf& netout);
   ~qmqp();
   void send(fdibuf& msg, unsigned long size, const mystring& env);
 };
 
-qmqp::qmqp(int fd)
-  : in(fd), out(fd)
+qmqp::qmqp(fdibuf& netin, fdobuf& netout)
+  : in(netin), out(netout)
 {
 }
 
@@ -125,9 +125,9 @@ void protocol_prep(fdibuf& in)
     protocol_fail(ERR_MSG_READ, "Error reading message");
 }
 
-void protocol_send(fdibuf& in, int fd)
+void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout)
 {
   alarm(60*60);			// Connection must close after an hour
-  qmqp conn(fd);
+  qmqp conn(netin, netout);
   conn.send(in, msg_size, msg_envelope);
 }

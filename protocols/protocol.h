@@ -16,6 +16,6 @@ extern int auth_method;
 extern int port;
 
 extern void protocol_prep(fdibuf& in);
-extern void protocol_send(fdibuf& in, int fd);
+extern void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout);
 
 #endif

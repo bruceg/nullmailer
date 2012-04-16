@@ -71,7 +71,11 @@ int cli_main(int, char* argv[])
   int fd = tcpconnect(remote, port);
   if(fd < 0)
     protocol_fail(-fd, "Connect failed");
-  protocol_send(in, fd);
+  fdibuf netin(fd);
+  fdobuf netout(fd);
+  if (!netin || !netout)
+    protocol_fail(ERR_MSG_TEMPFAIL, "Error allocating I/O buffers");
+  protocol_send(in, netin, netout);
   return 0;
 }
 

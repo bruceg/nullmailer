@@ -36,11 +36,11 @@ const char* cli_help_prefix = "Send an email message via SMTP\n";
 
 class smtp 
 {
-  fdibuf in;
-  fdobuf out;
+  fdibuf& in;
+  fdobuf& out;
   mystring caps;
 public:
-  smtp(int fd);
+  smtp(fdibuf& netin, fdobuf& netout);
   ~smtp();
   int get(mystring& str);
   int put(mystring cmd, mystring& result);
@@ -55,8 +55,8 @@ public:
   void send(fdibuf& msg);
 };
 
-smtp::smtp(int fd)
-  : in(fd), out(fd)
+smtp::smtp(fdibuf& netin, fdobuf& netout)
+  : in(netin), out(netout)
 {
 }
 
@@ -211,9 +211,9 @@ void protocol_prep(fdibuf&)
 {
 }
 
-void protocol_send(fdibuf& in, int fd)
+void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout)
 {
-  smtp conn(fd);
+  smtp conn(netin, netout);
   conn.docmd("", 200);
 
   if (user != 0 && pass != 0) {
