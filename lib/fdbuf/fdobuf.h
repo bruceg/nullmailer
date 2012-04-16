@@ -78,6 +78,7 @@ public:
   int error_number() const { return errnum; }
 protected:
   virtual bool nflush(bool withsync);
+  virtual ssize_t _write(const char* buf, ssize_t len);
 
   unsigned bufpos;		// Current write position in the buffer
   unsigned count;		// Number of bytes written by last operation

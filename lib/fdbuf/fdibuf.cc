@@ -66,8 +66,8 @@ bool fdibuf::refill()
   }
   unsigned oldbuflength = buflength;
   if(buflength < bufsize) {
-    ssize_t red = ::read(fd, buf+buflength, bufsize-buflength);
-    if(red == -1) {
+    ssize_t red = _read(buf+buflength, bufsize-buflength);
+    if(red < 0) {
       errnum = errno;
       flags |= flag_error;
     }
@@ -116,8 +116,8 @@ bool fdibuf::read_large(char* data, unsigned datalen)
   // After the buffer is empty and there's still data to read,
   // read it straight from the fd instead of copying it through the buffer.
   while(datalen > 0) {
-    ssize_t red = ::read(fd, data, datalen);
-    if(red == -1) {
+    ssize_t red = _read(data, datalen);
+    if(red < 0) {
       errnum = errno;
       flags |= flag_error;
       break;
@@ -184,6 +184,11 @@ bool fdibuf::seek(unsigned o)
 bool fdibuf::seekfwd(unsigned o)
 {
   return seek(tell() + o);
+}
+
+ssize_t fdibuf::_read(char* buf, ssize_t len)
+{
+  return ::read(fd, buf, len);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
