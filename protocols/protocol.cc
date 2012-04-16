@@ -29,6 +29,7 @@
 
 const char* user = 0;
 const char* pass = 0;
+int port = 0;
 int auth_method = AUTH_DETECT;
 const char* cli_help_suffix = "";
 const char* cli_args_usage = "remote-address < mail-file";
@@ -61,6 +62,10 @@ void protocol_succ(const char* msg)
 int cli_main(int, char* argv[])
 {
   const char* remote = argv[0];
+  if (port == 0)
+    port = default_port;
+  if (port < 0)
+    protocol_fail(ERR_MSG_TEMPFAIL, "Invalid value for --port");
   fdibuf in(0, true);
   protocol_prep(&in);
   int fd = tcpconnect(remote, port);

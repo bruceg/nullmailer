@@ -30,7 +30,7 @@
 #include "mystring/mystring.h"
 #include "protocol.h"
 
-int port = 25;
+const int default_port = 25;
 const char* cli_program = "smtp";
 const char* cli_help_prefix = "Send an email message via SMTP\n";
 
