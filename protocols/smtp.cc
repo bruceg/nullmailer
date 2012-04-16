@@ -50,9 +50,9 @@ public:
   bool hascap(const char* name, const char* word = NULL);
   void auth_login(void);
   void auth_plain(void);
-  void send_data(fdibuf* msg);
-  void send_envelope(fdibuf* msg);
-  void send(fdibuf* msg);
+  void send_data(fdibuf& msg);
+  void send_envelope(fdibuf& msg);
+  void send(fdibuf& msg);
 };
 
 smtp::smtp(int fd)
@@ -179,20 +179,20 @@ void smtp::auth_plain(void)
   docmd(encoded, 200);
 }
 
-void smtp::send_envelope(fdibuf* msg)
+void smtp::send_envelope(fdibuf& msg)
 {
   mystring tmp;
-  msg->getline(tmp);
+  msg.getline(tmp);
   docmd("MAIL FROM:<" + tmp + ">", 200);
-  while(msg->getline(tmp) && !!tmp)
+  while(msg.getline(tmp) && !!tmp)
     docmd("RCPT TO:<" + tmp + ">", 200);
 }
 
-void smtp::send_data(fdibuf* msg)
+void smtp::send_data(fdibuf& msg)
 {
   docmd("DATA", 300);
   mystring tmp;
-  while(msg->getline(tmp)) {
+  while(msg.getline(tmp)) {
     if((tmp[0] == '.' && !(out << ".")) ||
        !(out << tmp << "\r\n"))
       protocol_fail(ERR_MSG_WRITE, "Error sending message to remote");
@@ -201,17 +201,17 @@ void smtp::send_data(fdibuf* msg)
   protocol_succ(tmp.c_str());
 }
 
-void smtp::send(fdibuf* msg)
+void smtp::send(fdibuf& msg)
 {
   send_envelope(msg);
   send_data(msg);
 }
 
-void protocol_prep(fdibuf*)
+void protocol_prep(fdibuf&)
 {
 }
 
-void protocol_send(fdibuf* in, int fd)
+void protocol_send(fdibuf& in, int fd)
 {
   smtp conn(fd);
   conn.docmd("", 200);

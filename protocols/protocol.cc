@@ -67,11 +67,11 @@ int cli_main(int, char* argv[])
   if (port < 0)
     protocol_fail(ERR_MSG_TEMPFAIL, "Invalid value for --port");
   fdibuf in(0, true);
-  protocol_prep(&in);
+  protocol_prep(in);
   int fd = tcpconnect(remote, port);
   if(fd < 0)
     protocol_fail(-fd, "Connect failed");
-  protocol_send(&in, fd);
+  protocol_send(in, fd);
   return 0;
 }
 

@@ -41,7 +41,7 @@ class qmqp
 public:
   qmqp(int fd);
   ~qmqp();
-  void send(fdibuf* msg, unsigned long size, const mystring& env);
+  void send(fdibuf& msg, unsigned long size, const mystring& env);
 };
 
 qmqp::qmqp(int fd)
@@ -53,25 +53,25 @@ qmqp::~qmqp()
 {
 }
 
-bool skip_envelope(fdibuf* msg)
+bool skip_envelope(fdibuf& msg)
 {
-  if(!msg->rewind())
+  if(!msg.rewind())
     return false;
   mystring tmp;
-  while(msg->getline(tmp))
+  while(msg.getline(tmp))
     if(!tmp)
       break;
   return msg;
 }
   
-void qmqp::send(fdibuf* msg, unsigned long size, const mystring& env)
+void qmqp::send(fdibuf& msg, unsigned long size, const mystring& env)
 {
   if(!skip_envelope(msg))
     protocol_fail(ERR_MSG_READ, "Error re-reading message");
   unsigned long fullsize = strlen(itoa(size)) + 1 + size + 1 + env.length();
   out << itoa(fullsize) << ":";	// Start the "outer" netstring
   out << itoa(size) << ":";	// Start the message netstring
-  fdbuf_copy(*msg, out, true);	// Send out the message
+  fdbuf_copy(msg, out, true);	// Send out the message
   out << ","			// End the message netstring
       << env			// The envelope is already encoded
       << ",";			// End the "outer" netstring
@@ -88,21 +88,21 @@ void qmqp::send(fdibuf* msg, unsigned long size, const mystring& env)
   }
 }
 
-bool compute_size(fdibuf* msg, unsigned long& size)
+bool compute_size(fdibuf& msg, unsigned long& size)
 {
   char buf[4096];
   size = 0;
-  while(msg->read(buf, 4096))
-    size += msg->last_count();
-  if(msg->eof())
-    size += msg->last_count();
+  while(msg.read(buf, 4096))
+    size += msg.last_count();
+  if(msg.eof())
+    size += msg.last_count();
   return size > 0;
 }
 
-bool make_envelope(fdibuf* msg, mystring& env)
+bool make_envelope(fdibuf& msg, mystring& env)
 {
   mystring tmp;
-  while(msg->getline(tmp)) {
+  while(msg.getline(tmp)) {
     if(!tmp)
       return true;
     env += str2net(tmp);
@@ -110,7 +110,7 @@ bool make_envelope(fdibuf* msg, mystring& env)
   return false;
 }
     
-bool preload_data(fdibuf* msg, unsigned long& size, mystring& env)
+bool preload_data(fdibuf& msg, unsigned long& size, mystring& env)
 {
   return make_envelope(msg, env) &&
     compute_size(msg, size);
@@ -119,13 +119,13 @@ bool preload_data(fdibuf* msg, unsigned long& size, mystring& env)
 static unsigned long msg_size;
 static mystring msg_envelope;
 
-void protocol_prep(fdibuf* in)
+void protocol_prep(fdibuf& in)
 {
   if(!preload_data(in, msg_size, msg_envelope))
     protocol_fail(ERR_MSG_READ, "Error reading message");
 }
 
-void protocol_send(fdibuf* in, int fd)
+void protocol_send(fdibuf& in, int fd)
 {
   alarm(60*60);			// Connection must close after an hour
   qmqp conn(fd);
