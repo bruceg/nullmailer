@@ -31,6 +31,7 @@ const char* user = 0;
 const char* pass = 0;
 int port = 0;
 int auth_method = AUTH_DETECT;
+int use_ssl = 0;
 const char* cli_help_suffix = "";
 const char* cli_args_usage = "remote-address < mail-file";
 const int cli_args_min = 1;
@@ -44,6 +45,8 @@ cli_option cli_options[] = {
     "Set the password for authentication", 0 },
   { 0, "auth-login", cli_option::flag, AUTH_LOGIN, &auth_method,
     "Use AUTH LOGIN instead of auto-detecting in SMTP", 0 },
+  { 0, "ssl", cli_option::flag, 1, &use_ssl,
+    "Connect using SSL (on an alternate port by default)", 0 },
   {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
 
@@ -63,9 +66,9 @@ int cli_main(int, char* argv[])
 {
   const char* remote = argv[0];
   if (port == 0)
-    port = default_port;
+    port = use_ssl ? default_ssl_port : default_port;
   if (port < 0)
-    protocol_fail(ERR_MSG_TEMPFAIL, "Invalid value for --port");
+    protocol_fail(ERR_USAGE, "Invalid value for --port");
   fdibuf in(0, true);
   protocol_prep(in);
   int fd = tcpconnect(remote, port);
