@@ -26,10 +26,6 @@
 #include "errcodes.h"
 #include "protocol.h"
 #include "cli++.h"
-#include <gnutls/gnutls.h>
-#include <gnutls/abstract.h>
-#include "fdbuf/tlsibuf.h"
-#include "fdbuf/tlsobuf.h"
 
 const char* user = 0;
 const char* pass = 0;
@@ -49,8 +45,10 @@ cli_option cli_options[] = {
     "Set the password for authentication", 0 },
   { 0, "auth-login", cli_option::flag, AUTH_LOGIN, &auth_method,
     "Use AUTH LOGIN instead of auto-detecting in SMTP", 0 },
+#ifdef HAVE_TLS
   { 0, "ssl", cli_option::flag, 1, &use_ssl,
     "Connect using SSL (on an alternate port by default)", 0 },
+#endif
   {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
 

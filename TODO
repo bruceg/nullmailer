@@ -1,7 +1,6 @@
 - Add support for SMTP AUTH CRAM-MD5
 
 - SSL/TLS support:
-  - Add configure option
   - Add certificate verification unless --ssl-insecure
   - Add support for STARTTLS
 

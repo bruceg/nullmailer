@@ -4,6 +4,9 @@ To build and install nullmailer, run:
 	make
 	sudo make install install-root
 
+To enable SSL/TLS support, add "--enable-tls" to the configure command
+line above.
+
 The default installation expects that a user and group "nullmail" have
 already been set up.  The install steps will create all appropriate
 configuration and queue directories, and change their ownership as needed.
