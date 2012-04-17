@@ -212,10 +212,22 @@ void protocol_prep(fdibuf&)
 {
 }
 
-void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout)
+static int did_starttls = 0;
+
+void protocol_starttls(fdibuf& netin, fdobuf& netout)
 {
   smtp conn(netin, netout);
   conn.docmd("", 200);
+  conn.dohelo(true);
+  conn.docmd("STARTTLS", 200);
+  did_starttls = 1;
+}
+
+void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout)
+{
+  smtp conn(netin, netout);
+  if (!did_starttls)
+    conn.docmd("", 200);
 
   if (user != 0 && pass != 0) {
     conn.dohelo(true);

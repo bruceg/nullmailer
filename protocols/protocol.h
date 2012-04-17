@@ -16,9 +16,11 @@ extern const char* pass;
 extern int auth_method;
 extern int port;
 extern int use_ssl;
+extern int use_starttls;
 
 extern void protocol_prep(fdibuf& in);
 extern void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout);
+extern void protocol_starttls(fdibuf& netin, fdobuf& netout);
 
 extern void tls_init(const char* remote);
 extern void tls_send(fdibuf& in, int fd);

@@ -126,6 +126,13 @@ void protocol_prep(fdibuf& in)
     protocol_fail(ERR_MSG_READ, "Error reading message");
 }
 
+void protocol_starttls(fdibuf& netin, fdobuf& netout)
+{
+  protocol_fail(ERR_USAGE, "QMQP does not support STARTTLS");
+  (void)netin;
+  (void)netout;
+}
+
 void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout)
 {
   alarm(60*60);			// Connection must close after an hour
