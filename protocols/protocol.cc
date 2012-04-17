@@ -66,61 +66,13 @@ void protocol_succ(const char* msg)
   exit(0);
 }
 
-static void do_plain(fdibuf& in, int fd)
+static void plain_send(fdibuf& in, int fd)
 {
   fdibuf netin(fd);
   fdobuf netout(fd);
   if (!netin || !netout)
     protocol_fail(ERR_MSG_TEMPFAIL, "Error allocating I/O buffers");
   protocol_send(in, netin, netout);
-}
-
-static int gnutls_wrap(int ret, const char* msg)
-{
-  if (ret < 0) {
-    mystring m = msg;
-    m += ": ";
-    m += gnutls_strerror(ret);
-    protocol_fail(ERR_MSG_TEMPFAIL, m.c_str());
-  }
-  return ret;
-}
-
-static gnutls_session_t tls_session;
-
-static void tls_init(const char* remote)
-{
-  gnutls_anon_client_credentials_t anon_cred;
-  gnutls_certificate_credentials_t creds;
-  gnutls_wrap(gnutls_global_init(),
-	      "Error initializing TLS library");
-  gnutls_wrap(gnutls_certificate_allocate_credentials(&creds),
-	      "Error allocating TLS certificate");
-  gnutls_wrap(gnutls_init(&tls_session, GNUTLS_CLIENT),
-	      "Error creating TLS session");
-  gnutls_wrap(gnutls_priority_set_direct(tls_session, "NORMAL", NULL),
-	      "Error setting TLS options");
-  gnutls_credentials_set(tls_session, GNUTLS_CRD_CERTIFICATE, creds);
-}
-
-static void do_tls(fdibuf& in, int fd)
-{
-  int r;
-
-  gnutls_transport_set_ptr(tls_session, (gnutls_transport_ptr_t)fd);
-
-  do {
-    r = gnutls_handshake(tls_session);
-    if (gnutls_error_is_fatal(r))
-      gnutls_wrap(r, "Error completing TLS handshake");
-  } while (r < 0);
-
-  tlsibuf tlsin(tls_session);
-  tlsobuf tlsout(tls_session);
-  if (!tlsin || !tlsout)
-    protocol_fail(ERR_MSG_TEMPFAIL, "Error allocating I/O buffers");
-
-  protocol_send(in, tlsin, tlsout);
 }
 
 int cli_main(int, char* argv[])
@@ -138,9 +90,9 @@ int cli_main(int, char* argv[])
   if(fd < 0)
     protocol_fail(-fd, "Connect failed");
   if (use_ssl)
-    do_tls(in, fd);
+    tls_send(in, fd);
   else
-    do_plain(in, fd);
+    plain_send(in, fd);
   return 0;
 }
 

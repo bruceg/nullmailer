@@ -20,4 +20,7 @@ extern int use_ssl;
 extern void protocol_prep(fdibuf& in);
 extern void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout);
 
+extern void tls_init(const char* remote);
+extern void tls_send(fdibuf& in, int fd);
+
 #endif

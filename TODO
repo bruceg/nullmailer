@@ -3,7 +3,6 @@
 - SSL/TLS support:
   - Add configure option
   - Add certificate verification unless --ssl-insecure
-  - Move most SSL code into separate source
   - Add support for STARTTLS
 
 - Convert all proto modules to use timedout reads.
