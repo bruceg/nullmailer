@@ -31,6 +31,7 @@
 #include "protocol.h"
 
 const int default_port = 628;
+const int default_ssl_port = -1; // No standard for QMQP over SSL exists
 const char* cli_program = "qmqp";
 const char* cli_help_prefix = "Send an emal message via QMQP\n";
 
@@ -123,6 +124,13 @@ void protocol_prep(fdibuf& in)
 {
   if(!preload_data(in, msg_size, msg_envelope))
     protocol_fail(ERR_MSG_READ, "Error reading message");
+}
+
+void protocol_starttls(fdibuf& netin, fdobuf& netout)
+{
+  protocol_fail(ERR_USAGE, "QMQP does not support STARTTLS");
+  (void)netin;
+  (void)netout;
 }
 
 void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout)

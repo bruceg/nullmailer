@@ -74,9 +74,9 @@ protected:
 #endif
 };
 
+bool fdbuf_copy(class fdibuf&, class fdobuf&, bool noflush = false);
+
 #include "fdbuf/fdibuf.h"
 #include "fdbuf/fdobuf.h"
-
-bool fdbuf_copy(fdibuf&, fdobuf&, bool noflush = false);
 
 #endif // FDBUF__H__

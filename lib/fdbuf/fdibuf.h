@@ -17,6 +17,8 @@
 #ifndef FDBUF__FDIBUF__H__
 #define FDBUF__FDIBUF__H__
 
+#include "fdbuf.h"
+
 class fdibuf : protected fdbuf
 {
 public:
@@ -43,6 +45,7 @@ public:
 protected:
   unsigned count;		// Number of bytes read by last operation
   bool refill();
+  virtual ssize_t _read(char*, ssize_t);
 };
 
 extern fdibuf fin;

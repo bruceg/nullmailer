@@ -51,5 +51,14 @@ AC_CHECK_FUNCS(setenv srandom)
 AC_DEFINE(BUFSIZE, 4096, [Generic buffer size])
 AM_CONDITIONAL(FDBUF_NO_MYSTRING, false)
 
+AC_ARG_ENABLE(tls,
+ [  --enable-tls      Enable SSL/TLS support],
+ [case "${enableval}" in
+   yes) tls=true; AC_DEFINE(HAVE_TLS, 1, [Build in support for TLS]) ;;
+   no)  tls=false ;;
+   *) AC_MSG_ERROR(bad value ${enableval} for --enable-tls) ;;
+ esac],[tls=false])
+AM_CONDITIONAL(TLS, test x$tls = xtrue)
+
 AC_CONFIG_FILES([Makefile doc/Makefile lib/Makefile lib/cli++/Makefile lib/fdbuf/Makefile lib/mystring/Makefile protocols/Makefile src/Makefile test/Makefile])
 AC_OUTPUT

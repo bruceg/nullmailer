@@ -1,9 +1,5 @@
 - Add support for SMTP AUTH CRAM-MD5
 
-- Add support for SMTPS
-
-- Add support for SMTP STARTTLS
-
 - Convert all proto modules to use timedout reads.
 
 - Add patterns to the remotes file, to allow messages to be delivered to

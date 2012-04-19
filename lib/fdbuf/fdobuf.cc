@@ -70,8 +70,8 @@ bool fdobuf::nflush(bool withsync)
   if(flags)
     return false;
   while(bufstart < buflength) {
-    ssize_t written = ::write(fd, buf+bufstart, buflength-bufstart);
-    if(written == -1) {
+    ssize_t written = _write(buf+bufstart, buflength-bufstart);
+    if(written < 0) {
       flags |= flag_error;
       errnum = errno;
       return false;
@@ -145,8 +145,8 @@ bool fdobuf::write_large(const char* data, unsigned datalen)
   }
 
   while(datalen > 0) {
-    ssize_t written = ::write(fd, data, datalen);
-    if(written == -1) {
+    ssize_t written = _write(data, datalen);
+    if(written < 0) {
       flags |= flag_error;
       errnum = errno;
       unlock();
@@ -196,6 +196,11 @@ bool fdobuf::write(const char* data, unsigned datalen)
   if(bufpos > buflength) buflength = bufpos;
   unlock();
   return true;
+}
+
+ssize_t fdobuf::_write(const char* buf, ssize_t len)
+{
+  return ::write(fd, buf, len);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
