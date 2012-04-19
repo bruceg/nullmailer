@@ -51,6 +51,14 @@ cli_option cli_options[] = {
     "Connect using SSL (on an alternate port by default)", 0 },
   { 0, "starttls", cli_option::flag, 1, &use_starttls,
     "Use STARTTLS command", 0 },
+  { 0, "x509cafile", cli_option::string, 0, &tls_x509cafile,
+    "Certificate authority trust file", DEFAULT_CA_FILE },
+  { 0, "x509crlfile", cli_option::string, 0, &tls_x509crlfile,
+    "Certificate revocation list file", 0 },
+  { 0, "x509fmtder", cli_option::flag, true, &tls_x509derfmt,
+    "X.509 files are in DER format", "PEM format" },
+  { 0, "insecure", cli_option::flag, true, &tls_insecure,
+    "Don't abort if server certificate fails validation", 0 },
 #endif
   {0, 0, cli_option::flag, 0, 0, 0, 0}
 };

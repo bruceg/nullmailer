@@ -20,6 +20,7 @@
 // <nullmailer-subscribe@lists.untroubled.org>.
 
 #include <config.h>
+#include <unistd.h>
 #include "errcodes.h"
 #include "mystring/mystring.h"
 #include "protocol.h"
@@ -27,6 +28,11 @@
 #include <gnutls/abstract.h>
 #include "fdbuf/tlsibuf.h"
 #include "fdbuf/tlsobuf.h"
+
+int tls_insecure = false;
+const char* tls_x509cafile = NULL;
+const char* tls_x509crlfile = NULL;
+int tls_x509derfmt = false;
 
 static int gnutls_wrap(int ret, const char* msg)
 {
@@ -37,6 +43,33 @@ static int gnutls_wrap(int ret, const char* msg)
     protocol_fail(ERR_MSG_TEMPFAIL, m.c_str());
   }
   return ret;
+}
+
+static int cert_verify_callback(gnutls_session_t session)
+{
+  if (tls_x509cafile != NULL && !tls_insecure) {
+    // Verify the certificate
+    unsigned int status = 0;
+    gnutls_wrap(gnutls_certificate_verify_peers2(session, &status),
+		"Could not verify SSL/TLS certificate");
+    if (status != 0)
+      protocol_fail(ERR_MSG_TEMPFAIL, "Server SSL/TLS certificate is untrusted");
+
+    // Verify the hostname
+    unsigned int cert_list_size = 0;
+    const gnutls_datum_t* cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
+    const char* hostname = (const char*)gnutls_session_get_ptr(session);
+    gnutls_x509_crt_t crt;
+    gnutls_wrap(gnutls_x509_crt_init(&crt),
+		"Error allocating memory");
+    gnutls_wrap(gnutls_x509_crt_import(crt, &cert_list[0], GNUTLS_X509_FMT_DER),
+		"Error decoding SSL/TLS certificate");
+    if (gnutls_x509_crt_check_hostname(crt, hostname) == 0)
+      protocol_fail(ERR_MSG_TEMPFAIL, "Server SSL/TLS certificate does not match hostname");
+    gnutls_x509_crt_deinit(crt);
+  }
+  // All verification errors cause protocol to exit
+  return 0;
 }
 
 static gnutls_session_t tls_session;
@@ -56,6 +89,19 @@ void tls_init(const char* remote)
 	      "Error setting TLS credentials");
   gnutls_wrap(gnutls_server_name_set(tls_session, GNUTLS_NAME_DNS, remote, strlen(remote)),
 	      "Error setting TLS server name");
+  gnutls_session_set_ptr(tls_session, (void*)remote);
+  gnutls_certificate_set_verify_function(creds, cert_verify_callback);
+  gnutls_certificate_set_verify_flags(creds, 0);
+
+  gnutls_x509_crt_fmt_t x509fmt = tls_x509derfmt ? GNUTLS_X509_FMT_DER : GNUTLS_X509_FMT_PEM;
+  if (tls_x509cafile == NULL && access(DEFAULT_CA_FILE, R_OK) == 0)
+    tls_x509cafile = DEFAULT_CA_FILE;
+  if (tls_x509cafile != NULL)
+    gnutls_wrap(gnutls_certificate_set_x509_trust_file(creds, tls_x509cafile, x509fmt),
+		"Error loading SSL/TLS X.509 trust file");
+  if (tls_x509crlfile != NULL)
+    gnutls_wrap(gnutls_certificate_set_x509_crl_file(creds, tls_x509crlfile, x509fmt),
+		"Error loading SSL/TLS X.509 CRL file");
 }
 
 void tls_send(fdibuf& in, int fd)
