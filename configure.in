@@ -1,4 +1,5 @@
 AC_INIT
+AC_LANG([C++])
 AC_CONFIG_SRCDIR([lib/defines.h])
 AM_INIT_AUTOMAKE(nullmailer, 1.10)
 AM_CONFIG_HEADER(config.h)
