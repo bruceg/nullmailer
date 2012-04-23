@@ -108,7 +108,7 @@ int cli_main(int argc, char* argv[])
   if(parseargs() < 0)
     return 1;
 
-  char* newargv[argc+3];
+  const char* newargv[argc+3];
   newargv[0] = "nullmailer-inject";
   int j = 1;
   if(use_header)
@@ -119,7 +119,7 @@ int cli_main(int argc, char* argv[])
     newargv[j++] = argv[i];
   newargv[j] = 0;
 
-  execv(newargv[0], newargv);
+  execv(newargv[0], (char**)newargv);
   ferr << "sendmail: Could not exec nullmailer-inject." << endl;
   return 1;
 }
