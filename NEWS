@@ -6,6 +6,8 @@ Changes in version 1.10
 
 - Added support for auto-detection of login method in SMTP protocol.
 
+- Added support for -bp (mailq) and -bs (SMTP) mode in the sendmail wrapper.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------

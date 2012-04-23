@@ -25,9 +25,11 @@ struct cli_option
   const char* defaultstr;
 
   int set(const char* arg);
-  int parse_long_eq(const char* arg);
-  int parse_long_noeq(const char* arg);
+  int parse_long_eq(const char* arg, int as_short);
+  int parse_long_noeq(const char* arg, int as_short);
 };
+
+#define CLI_OPTION_END {0, 0, cli_option::flag, 0, 0, 0, 0}
 
 /* The following are required from the CLI program */
 extern const char* cli_program;
@@ -37,6 +39,7 @@ extern const char* cli_args_usage;
 extern const int cli_args_min;
 extern const int cli_args_max;
 extern cli_option cli_options[];
+extern const bool cli_only_long;
 extern int cli_main(int argc, char* argv[]);
 
 /* The following are provided to the CLI program */

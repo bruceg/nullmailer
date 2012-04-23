@@ -1,0 +1,71 @@
+. functions
+
+echo "Testing the nullmailer-smtpd program"
+
+out=$tmpdir/smtpd.out.$$
+trap 'rm -f $out' EXIT
+
+smtpd <<EOF 2>&1 | cat -v >$out
+HELO
+HELO somebody
+EHLO
+EHLO somebody
+HELP
+HELP something
+DATA
+RCPT
+RCPT TO:<r@example.com>
+MAIL
+MAIL FROM:<f@example.com>
+RCPT
+RCPT TO:<r@example.com>
+RSET
+RCPT TO:<r@example.com>
+mail from f@example.com
+rcpt to r@example.com
+rcpt <@example.org:r2@example.com>
+DATA
+Subject: test
+
+testing SMTP
+.
+QUIT
+QUIT
+EOF
+
+diff -u - $out <<EOF
+220 nullmailer-smtpd ready^M
+501 5.5.2 Syntax error, command requires a parameter^M
+250 2.3.0 OK^M
+501 5.5.2 Syntax error, command requires a parameter^M
+250 2.3.0 OK^M
+214 2.0.0 Help not available^M
+214 2.0.0 Help not available^M
+503 5.5.1 You must send a valid sender first^M
+501 5.5.2 Syntax error, command requires a parameter^M
+503 5.5.1 You must send a valid sender first^M
+501 5.5.2 Syntax error, command requires a parameter^M
+250 2.1.0 Sender accepted^M
+501 5.5.2 Syntax error, command requires a parameter^M
+250 2.1.5 Recipient accepted^M
+250 2.3.0 OK^M
+503 5.5.1 You must send a valid sender first^M
+250 2.1.0 Sender accepted^M
+250 2.1.5 Recipient accepted^M
+250 2.1.5 Recipient accepted^M
+354 End your message with a period on a line by itself^M
+250 2.6.0 Accepted message^M
+221 2.0.0 Good bye^M
+EOF
+
+echo '  testing queued message envelope'
+qf=$tmpdir/var/nullmailer/queue/*
+grep -q '^f@example.com$' $qf
+grep -q '^r@example.com$' $qf
+grep -q '^r2@example.com$' $qf
+echo '  testing queued message contents'
+grep -q '^Subject: test$' $qf
+grep -q '^Received: ' $qf
+grep -q '^testing SMTP$' $qf
+test $( wc -l < $qf ) = 9
+test $( wc -w < $qf ) = 21
