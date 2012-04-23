@@ -25,7 +25,10 @@
 #include "mystring/mystring.h"
 #include "protocol.h"
 #include <gnutls/gnutls.h>
+#ifdef HAVE_GNUTLS_SET_VERIFY_FUNCTION
 #include <gnutls/abstract.h>
+#endif
+#include <gnutls/x509.h>
 #include "fdbuf/tlsibuf.h"
 #include "fdbuf/tlsobuf.h"
 
@@ -45,7 +48,7 @@ static int gnutls_wrap(int ret, const char* msg)
   return ret;
 }
 
-static int cert_verify_callback(gnutls_session_t session)
+static int cert_verify(gnutls_session_t session)
 {
   if (tls_x509cafile != NULL && !tls_insecure) {
     // Verify the certificate
@@ -90,7 +93,9 @@ void tls_init(const char* remote)
   gnutls_wrap(gnutls_server_name_set(tls_session, GNUTLS_NAME_DNS, remote, strlen(remote)),
 	      "Error setting TLS server name");
   gnutls_session_set_ptr(tls_session, (void*)remote);
-  gnutls_certificate_set_verify_function(creds, cert_verify_callback);
+#ifdef HAVE_GNUTLS_SET_VERIFY_FUNCTION
+  gnutls_certificate_set_verify_function(creds, cert_verify);
+#endif
   gnutls_certificate_set_verify_flags(creds, 0);
 
   gnutls_x509_crt_fmt_t x509fmt = tls_x509derfmt ? GNUTLS_X509_FMT_DER : GNUTLS_X509_FMT_PEM;
@@ -115,6 +120,9 @@ void tls_send(fdibuf& in, int fd)
     if (gnutls_error_is_fatal(r))
       gnutls_wrap(r, "Error completing TLS handshake");
   } while (r < 0);
+#ifndef HAVE_GNUTLS_SET_VERIFY_FUNCTION
+  cert_verify(tls_session);
+#endif
 
   tlsibuf tlsin(tls_session);
   tlsobuf tlsout(tls_session);

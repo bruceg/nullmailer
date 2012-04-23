@@ -58,7 +58,12 @@ AC_ARG_ENABLE(tls,
    no)  tls=false ;;
    *) AC_MSG_ERROR(bad value ${enableval} for --enable-tls) ;;
  esac],[tls=false])
-AM_CONDITIONAL(TLS, test x$tls = xtrue)
+AM_CONDITIONAL(TLS, $tls)
+
+if $tls; then
+  AC_CHECK_LIB(gnutls, gnutls_certificate_set_verify_function,
+   [AC_DEFINE(HAVE_GNUTLS_SET_VERIFY_FUNCTION, 1, [libgnutls has gnutls_certificate_set_verify_function])])
+fi
 
 AC_CONFIG_FILES([Makefile doc/Makefile lib/Makefile lib/cli++/Makefile lib/fdbuf/Makefile lib/mystring/Makefile protocols/Makefile src/Makefile test/Makefile])
 AC_OUTPUT
