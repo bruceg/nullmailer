@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "lib/defines.h"
 #include "fdbuf/fdbuf.h"
 #include "mystring/mystring.h"
