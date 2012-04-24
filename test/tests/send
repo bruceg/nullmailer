@@ -30,7 +30,7 @@ send_message() {
   echo 127.0.0.1 dummy $@ >$SYSCONFDIR/remotes
   make_message
   svc -a $tmpdir/service/send
-  sleep 1
+  sleep 2
   not test -e $tmpdir/var/nullmailer/queue/$msgid
 }
 
