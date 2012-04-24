@@ -8,8 +8,8 @@ LISTURL='http://lists.untroubled.org/?list=nullmailer'
 # subscription.
 LISTSUB=nullmailer-subscribe@lists.untroubled.org
 
-# Set MAKERPM to non-empty if the tarball is to be built into a RPM.
-MAKERPM=true
+# Set MAKERPM to true if the tarball is to be built into a RPM.
+MAKERPM=false
 NOARCH=false
 
 # Set DOCS to the list of files that should go into the "docs" directory
