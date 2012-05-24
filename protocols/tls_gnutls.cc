@@ -25,9 +25,6 @@
 #include "mystring/mystring.h"
 #include "protocol.h"
 #include <gnutls/gnutls.h>
-#ifdef HAVE_GNUTLS_SET_VERIFY_FUNCTION
-#include <gnutls/abstract.h>
-#endif
 #include <gnutls/x509.h>
 #include "fdbuf/tlsibuf.h"
 #include "fdbuf/tlsobuf.h"
