@@ -2,7 +2,7 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.11
 
-- Added additional compatibility flags to the sendmail wrapper.
+- Simplify (and expand) handling of ignored sendmail options.
 
 - Fixed command-line interpretation of short options with values.
 
