@@ -36,6 +36,7 @@ static cli_option help_option = { 'h', "help", cli_option::flag,
 
 static cli_option** options;
 static unsigned optionc;
+static const char* short_options;
 
 static void build_options()
 {
@@ -47,6 +48,13 @@ static void build_options()
   for(unsigned i = 0; i < optionc-1; i++)
     options[i] = &cli_options[i];
   options[optionc-1] = &help_option;
+
+  char* so;
+  short_options = so = new char[optionc+1];
+  for (unsigned i = 0; i < optionc; i++)
+    if (options[i]->ch != 0)
+      *so++ = options[i]->ch;
+  *so = 0;
 }
 
 static inline int max(int a, int b)
@@ -275,14 +283,6 @@ static int parse_long(int, char* argv[])
     ++arg;
   for(unsigned j = 0; j < optionc; j++) {
     cli_option* o = options[j];
-    if (cli_only_long && o->ch) {
-      if (arg[0] == o->ch) {
-	if (arg[1] == '\0')
-	  return o->parse_long_noeq(argv[1], true);
-	else if (arg[1] == '=')
-	  return o->parse_long_eq(arg+2, true);
-      }
-    }
     if(o->name) {
       size_t len = strlen(o->name);
       if(!memcmp(arg, o->name, len)) {
@@ -295,6 +295,13 @@ static int parse_long(int, char* argv[])
   }
   ferr << argv0 << ": unknown option string: '" << argv[0] << "'" << endl;
   return -1;
+}
+
+static int parse_either(int argc, char* argv[])
+{
+  return (strchr(short_options, argv[0][1]) != 0)
+    ? parse_short(argc, argv)
+    : parse_long(argc, argv);
 }
 
 static int parse_args(int argc, char* argv[])
@@ -312,9 +319,9 @@ static int parse_args(int argc, char* argv[])
       i++;
       break;
     }
-    int j = (!cli_only_long && arg[1] != '-')
-      ? parse_short(argc-i, argv+i)
-      : parse_long(argc-i, argv+i);
+    int j = (arg[1] == '-') ? parse_long(argc-i, argv+i)
+      : cli_only_long ? parse_either(argc-i, argv+i)
+      : parse_short(argc-i, argv+i);
     if(j < 0)
       usage(1);
     else

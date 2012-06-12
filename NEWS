@@ -4,6 +4,8 @@ Changes in version 1.11
 
 - Added additional compatibility flags to the sendmail wrapper.
 
+- Fixed command-line interpretation of short options with values.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
