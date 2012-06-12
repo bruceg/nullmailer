@@ -6,6 +6,8 @@ Changes in version 1.11
 
 - Fixed command-line interpretation of short options with values.
 
+- Added support for SSL/TLS client certificates.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------

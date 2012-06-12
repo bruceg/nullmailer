@@ -30,6 +30,7 @@
 #include "fdbuf/tlsobuf.h"
 
 int tls_insecure = false;
+const char* tls_x509certfile = NULL;
 const char* tls_x509cafile = NULL;
 const char* tls_x509crlfile = NULL;
 int tls_x509derfmt = false;
@@ -96,6 +97,9 @@ void tls_init(const char* remote)
   gnutls_certificate_set_verify_flags(creds, 0);
 
   gnutls_x509_crt_fmt_t x509fmt = tls_x509derfmt ? GNUTLS_X509_FMT_DER : GNUTLS_X509_FMT_PEM;
+  if (tls_x509certfile != NULL)
+    gnutls_wrap(gnutls_certificate_set_x509_key_file(creds, tls_x509certfile, tls_x509certfile, x509fmt),
+		"Error setting SSL/TLS X.509 client certificate");
   if (tls_x509cafile == NULL && access(DEFAULT_CA_FILE, R_OK) == 0)
     tls_x509cafile = DEFAULT_CA_FILE;
   if (tls_x509cafile != NULL)

@@ -51,6 +51,8 @@ cli_option cli_options[] = {
     "Connect using SSL (on an alternate port by default)", 0 },
   { 0, "starttls", cli_option::flag, 1, &use_starttls,
     "Use STARTTLS command", 0 },
+  { 0, "x509certfile", cli_option::string, 0, &tls_x509certfile,
+    "Client certificate file", 0 },
   { 0, "x509cafile", cli_option::string, 0, &tls_x509cafile,
     "Certificate authority trust file", DEFAULT_CA_FILE },
   { 0, "x509crlfile", cli_option::string, 0, &tls_x509crlfile,

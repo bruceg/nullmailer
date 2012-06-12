@@ -26,6 +26,7 @@ extern void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout);
 extern void protocol_starttls(fdibuf& netin, fdobuf& netout);
 
 extern int tls_insecure;
+extern const char* tls_x509certfile;
 extern const char* tls_x509cafile;
 extern const char* tls_x509crlfile;
 extern int tls_x509derfmt;
