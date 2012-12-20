@@ -199,6 +199,8 @@ void smtp::send_data(fdibuf& msg)
       protocol_fail(ERR_MSG_WRITE, "Error sending message to remote");
   }
   docmd(".", 200, tmp);
+  out << "QUIT\r\n";
+  out.flush();
   protocol_succ(tmp.c_str());
 }
 
