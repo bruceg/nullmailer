@@ -23,6 +23,11 @@ writing a single byte to it, which causes this program to be awakened
 This procedure is done by
 .B nullmailer-queue
 to ensure that messages are delivered immediately.
+You can start delivery by hand from the command line like this:
+
+.EX
+    echo 1 > trigger
+.EE
 .P
 Delivery of messages consists of reading the list of remote servers and
 then trying to deliver the messages to these servers as follows.
@@ -67,6 +72,7 @@ by an optional protocol string, separated by white space.
 The protocol name defaults to
 .IR smtp ,
 and may be followed by command-line arguments for that module.
+
 For example, to connect to port 2525 on your SMTP smart host,
 which also requires SMTP authentication, use:
 
@@ -81,7 +87,14 @@ PLAIN method, use:
     smarthost.dom smtp --port=2525 --auth-login --user=user --pass=pass
 .EE
 
-Blank lines and lines starting with a pound are ignored.
+Blank lines and lines starting with a pound are ignored.  When called with
+the
+.B --help
+option, each protocol module will list its available command-line arguments:
+
+.EX
+    /usr/local/libexec/nullmailer/smtp --help
+.EE
 .TP
 .B sendtimeout
 The number of seconds to wait for a remote module listed above to
@@ -108,4 +121,6 @@ The protocol program directory.
 .SH SEE ALSO
 nullmailer-queue(8),
 nullmailer-inject(1),
-mailq(1)
+mailq(1),
+/usr/local/libexec/nullmailer/smtp --help,
+/usr/local/libexec/nullmailer/qmqp --help
