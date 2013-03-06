@@ -72,6 +72,7 @@ by an optional protocol string, separated by white space.
 The protocol name defaults to
 .IR smtp ,
 and may be followed by command-line arguments for that module.
+
 For example, to connect to port 2525 on your SMTP smart host,
 which also requires SMTP authentication, use:
 
@@ -86,7 +87,14 @@ PLAIN method, use:
     smarthost.dom smtp --port=2525 --auth-login --user=user --pass=pass
 .EE
 
-Blank lines and lines starting with a pound are ignored.
+Blank lines and lines starting with a pound are ignored.  When called with
+the
+.B --help
+option, each protocol module will list its available command-line arguments:
+
+.EX
+    /usr/local/libexec/nullmailer/smtp --help
+.EE
 .TP
 .B sendtimeout
 The number of seconds to wait for a remote module listed above to
