@@ -317,10 +317,17 @@ bool do_select()
   FD_ZERO(&readfds);
   FD_SET(trigger, &readfds);
   struct timeval timeout;
+
+  if (files.count() == 0)
+    pausetime = maxpause;
   timeout.tv_sec = pausetime;
   timeout.tv_usec = 0;
-  int s = select(trigger+1, &readfds, 0, 0,
-		 (files.count() == 0) ? 0 : &timeout);
+
+  pausetime *= 2;
+  if (pausetime > maxpause)
+    pausetime = maxpause;
+
+  int s = select(trigger+1, &readfds, 0, 0, &timeout);
   if(s == 1) {
     fout << "Trigger pulled." << endl;
     read_trigger();
@@ -329,12 +336,8 @@ bool do_select()
   }
   else if(s == -1 && errno != EINTR)
     fail_sys("Internal error in select: ");
-  else if(s == 0) {
+  else if(s == 0)
     reload_files = true;
-    pausetime *= 2;
-    if (pausetime > maxpause)
-      pausetime = maxpause;
-  }
   if(reload_files)
     load_files();
   return true;
