@@ -8,7 +8,7 @@ que() {
 }
 que-recip() {
 	set -e
-	que | sed -e '2,2!d' | grep -q "$@"
+	que | sed -e '2,/^$/!d' | grep -q "$@"
 }
 
 echo admin@remote >/tmp/nm/etc/nullmailer/adminaddr
@@ -37,6 +37,18 @@ echo "Checking that queue does not rewrite non-local users."
 que-recip -q '^user@nowhere.org$' <<EOF
 bruceg@qcc.sk.ca
 user@nowhere.org
+
+header
+
+data
+EOF
+
+echo admin1@remote1,admin2@remote2 >/tmp/nm/etc/nullmailer/adminaddr
+
+echo "Checking that queue rewrites to multiple adminaddr."
+que-recip -q '^admin2@remote2$' <<EOF
+bruceg@qcc.sk.ca
+user@localhost
 
 header
 

@@ -183,6 +183,7 @@ int main(int, char*[])
 {
   umask(077);
   if(config_read("adminaddr", adminaddr) && !!adminaddr) {
+    adminaddr = adminaddr.subst(',', '\n');
     remapadmin = true;
     read_hostnames();
   }

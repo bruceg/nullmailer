@@ -2,6 +2,8 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.12
 
+- Added support for multiple admin addresses in nullmailer-queue.
+
 - SMTP sender now sends a QUIT on success too.
 -------------------------------------------------------------------------------
 Changes in version 1.11
