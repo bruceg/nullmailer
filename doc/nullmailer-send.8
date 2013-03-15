@@ -23,6 +23,11 @@ writing a single byte to it, which causes this program to be awakened
 This procedure is done by
 .B nullmailer-queue
 to ensure that messages are delivered immediately.
+You can start delivery by hand from the command line like this:
+
+.EX
+    echo 1 > trigger
+.EE
 .P
 Delivery of messages consists of reading the list of remote servers and
 then trying to deliver the messages to these servers as follows.
