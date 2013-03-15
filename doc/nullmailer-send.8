@@ -86,7 +86,14 @@ PLAIN method, use:
     smarthost.dom smtp --port=2525 --auth-login --user=user --pass=pass
 .EE
 
-Blank lines and lines starting with a pound are ignored.
+Blank lines and lines starting with a pound are ignored. When called with
+the
+.B --help
+option, each protocol module will list its available command-line arguments:
+
+.EX
+    /usr/local/libexec/nullmailer/smtp --help
+.EE
 .TP
 .B sendtimeout
 The number of seconds to wait for a remote module listed above to
