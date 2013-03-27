@@ -345,8 +345,11 @@ bool is_continuation(const mystring& line)
 
 bool read_header()
 {
+  mystring cur_line;
   mystring whole;
-  while(fin.getline(cur_line)) {
+  for (;;) {
+    if (!fin.getline(cur_line))
+      cur_line = "";
     if(!cur_line || cur_line == "\r")
       break;
     if(!!whole && is_continuation(cur_line)) {

@@ -9,6 +9,8 @@ Changes in version 1.12
 - SMTP sender now sends a QUIT on success too.
 
 - Fixed sendmail -bs mode to properly strip leading periods.
+
+- Fixed duplicated final header line when message has no body.
 -------------------------------------------------------------------------------
 Changes in version 1.11
 
