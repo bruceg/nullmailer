@@ -28,6 +28,8 @@ DATA
 Subject: test
 
 testing SMTP
+.line 2
+..line 3
 .
 QUIT
 QUIT
@@ -67,5 +69,7 @@ echo '  testing queued message contents'
 grep -q '^Subject: test$' $qf
 grep -q '^Received: ' $qf
 grep -q '^testing SMTP$' $qf
-test $( wc -l < $qf ) = 9
-test $( wc -w < $qf ) = 21
+grep -q '^line 2$' $qf
+grep -q '^\.line 3$' $qf
+test $( wc -l < $qf ) = 11
+test $( wc -w < $qf ) = 25

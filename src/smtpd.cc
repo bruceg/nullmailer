@@ -183,6 +183,8 @@ static bool DATA(mystring& param)
   while (readline()) {
     if (line.length() == 1 && line[0] == '.')
       break;
+    if (line.length() > 1 && line[0] == '.')
+      line = line.sub(1, line.length() - 1);
     line += '\n';
     if (!qwrite(qfd, line.c_str(), line.length()))
       return respond(resp_qwrite_err);

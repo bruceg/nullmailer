@@ -5,6 +5,8 @@ Changes in version 1.12
 - Added support for multiple admin addresses in nullmailer-queue.
 
 - SMTP sender now sends a QUIT on success too.
+
+- Fixed sendmail -bs mode to properly strip leading periods.
 -------------------------------------------------------------------------------
 Changes in version 1.11
 
