@@ -55,10 +55,19 @@ command.  Defaults to the value of the
 .B me
 configuration file.
 .TP
+.B maxpause
+The maximum number of seconds to pause between successive queue runs
+(defaults to
+.IR 86400 ).
+.TP
 .B pausetime
-The number of seconds to pause between successive queue runs when
-there are messages in the queue (defaults to
+The minimum number of seconds to pause between successive queue runs
+when there are messages in the queue (defaults to
 .IR 60 ).
+Each time this timeout is reached, the timeout is doubled to a maximum
+of
+.BR maxpause .
+After new messages are injected, the timeout is reset.
 If this is set to
 .IR 0 ,
 nullmailer-send will exit immediately after going through the queue once

@@ -101,7 +101,9 @@ unsigned ws_split(const mystring& str, slist& lst)
 }
 
 static rlist remotes;
-static int pausetime = 60;
+static int minpause = 60;
+static int pausetime = minpause;
+static int maxpause = 24*60*60;
 static int sendtimeout = 60*60;
 
 bool load_remotes()
@@ -133,11 +135,17 @@ bool load_config()
 
   if(!load_remotes())
     result = false;
-  
-  if(!config_readint("pausetime", pausetime))
-    pausetime = 60;
+
+  int oldminpause = minpause;
+  if(!config_readint("pausetime", minpause))
+    minpause = 60;
+  if(!config_readint("maxpause", maxpause))
+    maxpause = 24*60*60;
   if(!config_readint("sendtimeout", sendtimeout))
     sendtimeout = 60*60;
+
+  if (minpause != oldminpause)
+    pausetime = minpause;
 
   return result;
 }
@@ -309,14 +317,22 @@ bool do_select()
   FD_ZERO(&readfds);
   FD_SET(trigger, &readfds);
   struct timeval timeout;
+
+  if (files.count() == 0)
+    pausetime = maxpause;
   timeout.tv_sec = pausetime;
   timeout.tv_usec = 0;
-  int s = select(trigger+1, &readfds, 0, 0,
-		 (files.count() == 0) ? 0 : &timeout);
+
+  pausetime *= 2;
+  if (pausetime > maxpause)
+    pausetime = maxpause;
+
+  int s = select(trigger+1, &readfds, 0, 0, &timeout);
   if(s == 1) {
     fout << "Trigger pulled." << endl;
     read_trigger();
     reload_files = true;
+    pausetime = minpause;
   }
   else if(s == -1 && errno != EINTR)
     fail_sys("Internal error in select: ");
@@ -350,7 +366,7 @@ int main(int, char*[])
   load_files();
   for(;;) {
     send_all();
-    if (pausetime == 0) break;
+    if (minpause == 0) break;
     do_select();
   }
   return 0;
