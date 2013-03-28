@@ -1,0 +1,27 @@
+.TH nullmailer-smtpd 8
+.SH NAME
+nullmailer-smtpd \- sendmail emulator interface for nullmailer
+.SH SYNOPSIS
+.B nullmailer-smtpd
+.SH DESCRIPTION
+This program is a front end program for
+.BR nullmailer-queue .
+It is invoked by
+.BR nullmailer-inject
+when mail senders request a
+.I sendmail \-bs
+SMTP interface for sending email.  This program accepts SMTP protocol
+on standard input.  On successful completion as far as the DATA command,
+this program executes
+.B nullmailer-queue
+directly with the appropriate sender and recipients.
+See the documentation for
+.B nullmailer-queue
+for details on how messages are queued.
+.SH RETURN VALUE
+Always exits 0.  Any errors are notified to the caller by SMTP extended error codes.
+.SH SEE ALSO
+nullmailer-queue(8)
+.SH "AUTHOR"
+This manual page was written by Nick Leverton <nick@leverton.org>
+for the Debian GNU/Linux distribution (but may be used by others).

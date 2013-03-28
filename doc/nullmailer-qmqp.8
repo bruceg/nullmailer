@@ -1,0 +1,68 @@
+.TH nullmailer-qmqp 8 "August 2012" "The Debian Project" ""
+.
+.SH NAME
+.
+nullmailer-qmqp \- qmqp mail sender for nullmailer
+.
+.SH SYNOPSIS
+.
+.B /usr/lib/nullmailer/qmqp [flags] remote-address < mail-file
+.
+.SH DESCRIPTION
+.
+Send an emal message via QMQP
+.
+.SH OPTIONS
+.TP
+.B -p, --port=INT
+Set the port number on the remote host to connect to
+.TP
+.B --user=VALUE
+Set the user name for authentication
+.TP
+.B --pass=VALUE
+Set the password for authentication
+.TP
+.B -d, --daemon
+use syslog exclusively 
+.TP
+.B -s, --syslog
+use syslog additionally
+.TP
+.B --auth-login
+Use AUTH LOGIN instead of auto-detecting in SMTP
+.TP
+.B --ssl
+Connect using SSL (on an alternate port by default)
+.TP
+.B --starttls
+Use STARTTLS command
+.TP
+.B --x509certfile=VALUE
+Client certificate file
+.TP
+.B --x509cafile=VALUE
+Certificate authority trust file
+(Defaults to /etc/ssl/certs/ca-certificates.crt)
+.TP
+.B --x509crlfile=VALUE
+Certificate revocation list file
+.TP
+.B --x509fmtder
+X.509 files are in DER format
+(Defaults to PEM format)
+.B --insecure
+Don't abort if server certificate fails validation
+.TP
+.B -h, --help
+Display this help and exit
+.TP
+.SH SEE ALSO
+.
+.BR nullmailer-send (8),
+.BR nullmailer-smtp (8)
+.
+.SH AUTHOR
+.
+This man page was written by Nick Leverton <nick@leverton.org> for the
+Debian project (but may be used by others).

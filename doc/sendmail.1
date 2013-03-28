@@ -17,8 +17,11 @@ It is used by programs that expect a
 interface for sending email.
 After parsing the command-line arguments, this program executes
 .B nullmailer-inject
-directly.
-See the documentation for
+directly, unless the
+.I \-bs
+option is specified in which case this program executes
+.B nullmailer-smtpd
+to inject the mail.  See the documentation for
 .B nullmailer-inject
 for details on how messages are reformatted and queued.
 .SH OPTIONS
@@ -26,6 +29,9 @@ for details on how messages are reformatted and queued.
 .B \-B TYPE
 .TP
 .B \-b MODE
+ \-bm        Read mail from standard input (default)
+ \-bp        List information about mail queue
+ \-bs        Handle SMTP commands on standard input
 .TP
 .B \-C FILE
 .TP
@@ -67,9 +73,9 @@ Sets the full name of the sender.
 Sets the envelope sender address.
 .TP
 .B \-r ADDRESS
-An alternate and obsolete form of the -f flag.
+An alternate and obsolete form of the \-f flag.
 .TP
 .B \-t
 Read message for recipients and ignore the command-line arguments.
 .SH SEE ALSO
-nullmailer-inject(1)
+nullmailer-inject(1), nullmailer-smtpd(8)
