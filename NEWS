@@ -11,6 +11,9 @@ Changes in version 1.12
 - Fixed sendmail -bs mode to properly strip leading periods.
 
 - Fixed duplicated final header line when message has no body.
+
+Development of this version has been sponsored by FutureQuest, Inc.
+ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
 Changes in version 1.11
 
