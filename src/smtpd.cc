@@ -214,6 +214,7 @@ static bool MAIL(mystring& param)
 {
   if (!param)
     return respond(resp_need_param);
+  do_reset();
   sender = parse_addr_arg(param);
   return respond(!sender ? resp_mail_bad : resp_mail_ok);
 }
