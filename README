@@ -1,8 +1,8 @@
 nullmailer
 Simple relay-only mail transport agent
 Bruce Guenter <bruce@untroubled.org>
-Version 1.12
-2013-04-04
+Version 1.13
+2013-04-15
 
 This is nullmailer, a sendmail/qmail/etc replacement MTA for hosts which
 relay to a fixed set of smart relays.  It is designed to be simple to
@@ -13,6 +13,9 @@ send an email to:
 	nullmailer-subscribe@lists.untroubled.org
 A mailing list archive is available at:
 	http://lists.untroubled.org/?list=nullmailer
+
+Development versions of @PACKAGE@ are available at GitHub:
+        https://github.com/bruceg/nullmailer
 
 This package is Copyright(C) 2013 Bruce Guenter, and may be copied
 according to the GNU GENERAL PUBLIC LICENSE (GPL) Version 2 or a later
