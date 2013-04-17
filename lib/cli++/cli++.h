@@ -54,6 +54,12 @@ extern void cli_error(int exit_value,
 		      const char* = 0,
 		      const char* = 0);
 
+extern void cli_syserror(int exit_value,
+			 const char*,
+			 const char* = 0,
+			 const char* = 0,
+			 const char* = 0);
+
 extern void cli_warning(const char*,
 		      const char* = 0,
 		      const char* = 0,
