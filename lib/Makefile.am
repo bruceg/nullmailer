@@ -8,7 +8,7 @@ libmisc_a_SOURCES = \
 	address.h address.cc \
 	base64.h base64.cc \
 	canonicalize.h canonicalize.cc \
-	configio.h config_read.cc config_readlist.cc config_readint.cc \
+	configio.h config_read.cc config_readlist.cc config_readint.cc config_syserr.cc \
 	connect.h tcpconnect.cc \
 	defines.h defines.cc \
 	errcodes.h errcodes.cc \

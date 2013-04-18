@@ -41,6 +41,8 @@
 #include "selfpipe.h"
 #include "setenv.h"
 
+const char* cli_program = "nullmailer-send";
+
 selfpipe selfpipe;
 
 typedef list<mystring> slist;

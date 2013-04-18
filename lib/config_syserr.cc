@@ -1,5 +1,5 @@
 // nullmailer -- a simple relay-only MTA
-// Copyright (C) 2012  Bruce Guenter <bruce@untroubled.org>
+// Copyright (C) 2013  Bruce Guenter <bruce@untroubled.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,26 +19,15 @@
 // available to discuss this package.  To subscribe, send an email to
 // <nullmailer-subscribe@lists.untroubled.org>.
 
+#include <errno.h>
 #include "config.h"
-#include "defines.h"
+#include "errcodes.h"
 #include "configio.h"
-#include "fdbuf/fdbuf.h"
+#include "cli++/cli++.h"
 
-bool config_readlist(const char* filename, list<mystring>& result)
+bool config_syserr(const char* filename)
 {
-  mystring fullname = CONFIG_DIR;
-  fullname += filename;
-  fdibuf in(fullname.c_str());
-  if(!in)
-    return config_syserr(fullname.c_str());
-  mystring tmp;
-  bool nonempty = false;
-  while(in.getline(tmp)) {
-    tmp = tmp.strip();
-    if(tmp[0] != '#' && tmp.length() > 0) {
-      result.append(tmp);
-      nonempty = true;
-    }
-  }
-  return nonempty;
+  if (errno != ENOENT)
+    cli_syserror(ERR_CONFIG, "Could not read config file \"", filename, "\"");
+  return false;
 }

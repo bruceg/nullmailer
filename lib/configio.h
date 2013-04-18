@@ -7,5 +7,6 @@
 bool config_read(const char* filename, mystring& result);
 bool config_readlist(const char* filename, list<mystring>& result);
 bool config_readint(const char* filename, int& result);
+bool config_syserr(const char* filename);
 
 #endif // NULLMAILER__CONFIGIO__H__

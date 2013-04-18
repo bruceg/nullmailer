@@ -33,6 +33,8 @@
 #include "configio.h"
 #include "hostname.h"
 
+const char* cli_program = "nullmailer-queue";
+
 #define fail(MSG) do{ fout << "nullmailer-queue: " << MSG << endl; return false; }while(0)
 
 pid_t pid = getpid();
