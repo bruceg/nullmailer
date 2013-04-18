@@ -57,9 +57,11 @@ struct remote
   
   mystring host;
   mystring proto;
+  mystring program;
   slist options;
   remote(const slist& list);
   ~remote();
+  void exec(int fd);
 };
 
 const mystring remote::default_proto = "smtp";
@@ -76,9 +78,24 @@ remote::remote(const slist& lst)
     for(++iter; iter; ++iter)
       options.append(*iter);
   }
+  program = PROTOCOL_DIR + proto;
 }
 
 remote::~remote() { }
+
+void remote::exec(int fd)
+{
+  if(close(0) == -1 || dup2(fd, 0) == -1 || close(fd) == -1)
+    return;
+  const char* args[3+options.count()];
+  unsigned i = 0;
+  args[i++] = program.c_str();
+  for(slist::const_iter opt(options); opt; opt++)
+    args[i++] = strdup((*opt).c_str());
+  args[i++] = host.c_str();
+  args[i++] = 0;
+  execv(args[0], (char**)args);
+}
 
 typedef list<remote> rlist;
 
@@ -176,21 +193,6 @@ bool load_files()
   return true;
 }
 
-void exec_protocol(int fd, remote& remote)
-{
-  if(close(0) == -1 || dup2(fd, 0) == -1 || close(fd) == -1)
-    return;
-  mystring program = PROTOCOL_DIR + remote.proto;
-  const char* args[3+remote.options.count()];
-  unsigned i = 0;
-  args[i++] = program.c_str();
-  for(slist::const_iter opt(remote.options); opt; opt++)
-    args[i++] = strdup((*opt).c_str());
-  args[i++] = remote.host.c_str();
-  args[i++] = 0;
-  execv(args[0], (char**)args);
-}
-
 bool catchsender(pid_t pid)
 {
   int status;
@@ -236,6 +238,7 @@ bool send_one(mystring filename, remote& remote)
     fout << "Can't open file '" << filename << "'" << endl;
     return false;
   }
+  const mystring program = PROTOCOL_DIR + remote.proto;
   fout << "Starting delivery: protocol: " << remote.proto
        << " host: " << remote.host
        << " file: " << filename << endl;
@@ -244,7 +247,7 @@ bool send_one(mystring filename, remote& remote)
   case -1:
     fail_sys("Fork failed: ");
   case 0:
-    exec_protocol(fd, remote);
+    remote.exec(fd);
     exit(ERR_EXEC_FAILED);
   default:
     close(fd);
