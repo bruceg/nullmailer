@@ -111,9 +111,7 @@ static int sendtimeout = 60*60;
 bool load_remotes()
 {
   slist rtmp;
-  if(!config_readlist("remotes", rtmp) ||
-     rtmp.count() == 0)
-    return false;
+  config_readlist("remotes", rtmp);
   remotes.empty();
   for(slist::const_iter r(rtmp); r; r++) {
     if((*r)[0] == '#')
@@ -123,20 +121,18 @@ bool load_remotes()
       continue;
     remotes.append(remote(parts));
   }
-  return remotes.count() > 0;
+  if (remotes.count() == 0)
+    fail("No remote hosts listed for delivery");
+  return true;
 }
 
 bool load_config()
 {
   mystring hh;
-  bool result = true;
 
   if (!config_read("helohost", hh))
     hh = me;
   setenv("HELOHOST", hh.c_str(), 1);
-
-  if(!load_remotes())
-    result = false;
 
   int oldminpause = minpause;
   if(!config_readint("pausetime", minpause))
@@ -149,7 +145,7 @@ bool load_config()
   if (minpause != oldminpause)
     pausetime = minpause;
 
-  return result;
+  return load_remotes();
 }
 
 static slist files;
@@ -263,7 +259,7 @@ bool send_one(mystring filename, remote& remote)
 bool send_all()
 {
   if(!load_config())
-    fail("Could not load the config");
+    return false;		// Error message already printed
   if(remotes.count() <= 0)
     fail("No remote hosts listed for delivery");
   if(files.count() == 0)
