@@ -58,7 +58,7 @@ struct remote
   mystring host;
   mystring proto;
   mystring program;
-  slist options;
+  mystring options;
   remote(const slist& list);
   ~remote();
   void exec(int fd);
@@ -75,9 +75,12 @@ remote::remote(const slist& lst)
     proto = default_proto;
   else {
     proto = *iter;
-    for(++iter; iter; ++iter)
-      options.append(*iter);
+    for(++iter; iter; ++iter) {
+      options += *iter;
+      options += '\n';
+    }
   }
+  options += '\n';
   program = PROTOCOL_DIR + proto;
 }
 
@@ -87,11 +90,10 @@ void remote::exec(int fd)
 {
   if(close(0) == -1 || dup2(fd, 0) == -1 || close(fd) == -1)
     return;
-  const char* args[3+options.count()];
+  const char* args[4];
   unsigned i = 0;
   args[i++] = program.c_str();
-  for(slist::const_iter opt(options); opt; opt++)
-    args[i++] = strdup((*opt).c_str());
+  args[i++] = options.c_str();
   args[i++] = host.c_str();
   args[i++] = 0;
   execv(args[0], (char**)args);
