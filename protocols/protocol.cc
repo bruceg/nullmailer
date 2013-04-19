@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include "connect.h"
 #include "errcodes.h"
+#include "list.h"
 #include "protocol.h"
 #include "cli++.h"
 
@@ -33,11 +34,14 @@ int port = 0;
 int auth_method = AUTH_DETECT;
 int use_ssl = 0;
 int use_starttls = 0;
+const char* remote = 0;
 const char* cli_help_suffix = "";
-const char* cli_args_usage = "remote-address < mail-file";
-const int cli_args_min = 1;
-const int cli_args_max = 1;
+const char* cli_args_usage = "< options 3< mail-file";
+const int cli_args_min = 0;
+const int cli_args_max = 0;
 cli_option cli_options[] = {
+  { 0, "host", cli_option::string, 0, &remote,
+    "Set the hostname for the remote", 0 },
   { 'p', "port", cli_option::integer, 0, &port,
     "Set the port number on the remote host to connect to", 0 },
   { 0, "user", cli_option::string, 0, &user,
@@ -91,16 +95,39 @@ static void plain_send(fdibuf& in, int fd)
     protocol_send(in, netin, netout);
 }
 
-int cli_main(int, char* argv[])
+static void parse_option(mystring line)
 {
-  const char* remote = argv[0];
+  if (line[0] != '-')
+    line = "--" + line;
+  const char* args[2] = { line.c_str(), NULL };
+  if (cli_parse_args(1, (char**)args) != 1)
+    exit(ERR_CONFIG);
+}
+
+static void parse_options(void)
+{
+  mystring line;
+  while (fin.getline(line, '\n')) {
+    if (line.length() == 0)
+      return;
+    parse_option(line);
+  }
+  if (!fin.eof())
+    exit(ERR_CONFIG);
+}
+
+int cli_main(int, char*[])
+{
+  parse_options();
+  if (remote == 0)
+    protocol_fail(ERR_USAGE, "Remote host not set");
   if (port == 0)
     port = use_ssl ? default_ssl_port : default_port;
   if (port < 0)
-    protocol_fail(ERR_USAGE, "Invalid value for --port");
+    protocol_fail(ERR_USAGE, "Invalid value for port");
   if (use_ssl || use_starttls)
     tls_init(remote);
-  fdibuf in(0, true);
+  fdibuf in(3, true);
   protocol_prep(in);
   int fd = tcpconnect(remote, port);
   if(fd < 0)

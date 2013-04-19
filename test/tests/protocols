@@ -16,27 +16,27 @@ EOF
 for p in smtp qmqp
 do
 	echo "Testing host not found error with $p."
-	error 2 protocol $p this.host.can.not.exist <testmail
+	error 2 protocol $p --host=this.host.can.not.exist </dev/null 3<testmail
 
 	echo "Testing connection refused error with $p."
-	error 7 protocol $p -p 24680 localhost <testmail
+	error 7 protocol $p -p 24680 --host=localhost </dev/null 3<testmail
 	
 	echo "Testing usage error with $p (zero args)."
-	error 1 protocol $p <testmail
+	error 1 protocol $p </dev/null 3<testmail
 	
 	echo "Testing usage error with $p (two args)."
-	error 1 protocol $p localhost foobar <testmail
+	error 1 protocol $p --host=localhost foobar </dev/null 3<testmail
 	
 	echo "Testing usage error with $p (unknown option)."
-	error 1 protocol $p -x localhost <testmail
+	error 1 protocol $p -x --host=localhost </dev/null 3<testmail
 	
 	echo "Testing usage error with $p (invalid integer)."
-	error 1 protocol $p -p foo localhost <testmail
+	error 1 protocol $p -p foo --host=localhost </dev/null 3<testmail
 
 	start server tcpserver 0 24680 date
 	sleep 1
 	echo "Testing protocol failure with $p."
-	error 11 protocol $p -p 24680 localhost <testmail
+	error 11 protocol $p -p 24680 --host=localhost </dev/null 3<testmail
 	stop server
 done
 
