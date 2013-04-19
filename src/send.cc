@@ -61,7 +61,7 @@ struct remote
   mystring options;
   remote(const slist& list);
   ~remote();
-  void exec(int fd);
+  void exec(int pfd[2], int fd);
 };
 
 const mystring remote::default_proto = "smtp";
@@ -70,13 +70,18 @@ remote::remote(const slist& lst)
 {
   slist::const_iter iter = lst;
   host = *iter;
+  options = "host=" + host + "\n";
   ++iter;
   if(!iter)
     proto = default_proto;
   else {
     proto = *iter;
     for(++iter; iter; ++iter) {
-      options += *iter;
+      mystring option = *iter;
+      // Strip prefix "--"
+      if (option[0] == '-' && option[1] == '-')
+	option = option.right(2);
+      options += option;
       options += '\n';
     }
   }
@@ -86,16 +91,15 @@ remote::remote(const slist& lst)
 
 remote::~remote() { }
 
-void remote::exec(int fd)
+void remote::exec(int pfd[2], int fd)
 {
-  if(close(0) == -1 || dup2(fd, 0) == -1 || close(fd) == -1)
+  if (dup2(pfd[0], 0) == -1
+      || close(pfd[0]) == -1
+      || close(pfd[1]) == -1
+      || dup2(fd, 3) == -1
+      || close(fd) == -1)
     return;
-  const char* args[4];
-  unsigned i = 0;
-  args[i++] = program.c_str();
-  args[i++] = options.c_str();
-  args[i++] = host.c_str();
-  args[i++] = 0;
+  const char* args[2] = { program.c_str(), NULL };
   execv(args[0], (char**)args);
 }
 
@@ -235,9 +239,15 @@ bool catchsender(pid_t pid)
 
 bool send_one(mystring filename, remote& remote)
 {
+  int pfd[2];
   int fd = open(filename.c_str(), O_RDONLY);
   if(fd == -1) {
     fout << "Can't open file '" << filename << "'" << endl;
+    return false;
+  }
+  if (pipe(pfd) == -1) {
+    fout << "Can't create pipe" << endl;
+    close(fd);
     return false;
   }
   const mystring program = PROTOCOL_DIR + remote.proto;
@@ -249,9 +259,13 @@ bool send_one(mystring filename, remote& remote)
   case -1:
     fail_sys("Fork failed: ");
   case 0:
-    remote.exec(fd);
+    remote.exec(pfd, fd);
     exit(ERR_EXEC_FAILED);
   default:
+    if (write(pfd[1], remote.options.c_str(), remote.options.length()) != (ssize_t)remote.options.length())
+      fout << "Warning: Writing options to protocol failed" << endl;
+    close(pfd[0]);
+    close(pfd[1]);
     close(fd);
     if(!catchsender(pid))
       return false;
