@@ -35,7 +35,7 @@ For each remote in the list, the named protocol handler is executed once
 for each message remaining in the queue.
 If the protocol handler succeeds, the message is removed from the queue
 and processing continues with the next message.
-If it fails, the remote is skipped and processing of the remaing
+If any messages remain in the queue, processing of the remaing
 messages continues with the next remote.
 When all the remotes have been tried,
 .B nullmailer-send
