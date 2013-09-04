@@ -77,13 +77,13 @@ void trigger()
   close(fd);
 }
 
-bool validate_addr(mystring& addr, bool doremap)
+bool validate_addr(mystring& addr, bool recipient)
 {
   int i = addr.find_last('@');
   if(i < 0)
     return false;
   mystring hostname = addr.right(i+1);
-  if(doremap && remapadmin) {
+  if(recipient && remapadmin) {
     if(hostname == me || hostname == "localhost")
       addr = adminaddr;
   }
