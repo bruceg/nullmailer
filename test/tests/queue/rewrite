@@ -10,6 +10,10 @@ que-recip() {
 	set -e
 	que | sed -e '2,/^$/!d' | grep -q "$@"
 }
+que-sender() {
+	set -e
+	que | head -n 1 | grep -q "$@"
+}
 
 echo admin@remote >/tmp/nm/etc/nullmailer/adminaddr
 
@@ -54,3 +58,25 @@ header
 
 data
 EOF
+
+echo "Checking that queue transmits the envelope sender normally."
+que-sender '^bruceg@qcc.sk.ca$' <<EOF
+bruceg@qcc.sk.ca
+user@localhost
+
+header
+
+data
+EOF
+
+echo "Checking that queue rewrites sender with allmailfrom."
+echo sender@remote3 >/tmp/nm/etc/nullmailer/allmailfrom
+que-sender '^sender@remote3$' <<EOF
+bruceg@qcc.sk.ca
+user@localhost
+
+header
+
+data
+EOF
+rm -f /tmp/nm/etc/nullmailer/allmailfrom

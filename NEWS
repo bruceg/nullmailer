@@ -2,6 +2,9 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.14
 
+- Added an "allmailfrom" control file to nullmailer-queue, causing all
+  messages to share a hard-coded envelope sender.
+
 - Improved handling of system errors when reading config files.
 
 Development of this version has been sponsored by FutureQuest, Inc.

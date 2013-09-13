@@ -41,6 +41,7 @@ pid_t pid = getpid();
 uid_t uid = getuid();
 time_t timesecs = time(0);
 mystring adminaddr;
+mystring allmailfrom;
 
 bool is_dir(const char* path)
 {
@@ -84,6 +85,8 @@ bool validate_addr(mystring& addr, bool recipient)
   mystring hostname = addr.right(i+1);
   if (recipient && !!adminaddr && (hostname == me || hostname == "localhost"))
     addr = adminaddr;
+  else if (!recipient && !!allmailfrom)
+    addr = allmailfrom;
   else if(hostname.find_first('.') < 0)
     return false;
   return true;
@@ -185,6 +188,7 @@ int main(int, char*[])
     adminaddr = adminaddr.subst(',', '\n');
     read_hostnames();
   }
+  config_read("allmailfrom", allmailfrom);
   
   if(!deliver())
     return 1;
