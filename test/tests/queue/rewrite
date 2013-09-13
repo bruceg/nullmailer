@@ -14,7 +14,7 @@ que-recip() {
 echo admin@remote >/tmp/nm/etc/nullmailer/adminaddr
 
 echo "Checking that queue rewrites user@localhost to adminaddr."
-que-recip -q '^admin@remote$' <<EOF
+que-recip '^admin@remote$' <<EOF
 bruceg@qcc.sk.ca
 user@localhost
 
@@ -24,7 +24,7 @@ data
 EOF
 
 echo "Checking that queue rewrites user@hostname to adminaddr."
-que-recip -q '^admin@remote$' <<EOF
+que-recip '^admin@remote$' <<EOF
 bruceg@qcc.sk.ca
 user@f.q.d.n
 
@@ -34,7 +34,7 @@ data
 EOF
 
 echo "Checking that queue does not rewrite non-local users."
-que-recip -q '^user@nowhere.org$' <<EOF
+que-recip '^user@nowhere.org$' <<EOF
 bruceg@qcc.sk.ca
 user@nowhere.org
 
@@ -46,7 +46,7 @@ EOF
 echo admin1@remote1,admin2@remote2 >/tmp/nm/etc/nullmailer/adminaddr
 
 echo "Checking that queue rewrites to multiple adminaddr."
-que-recip -q '^admin2@remote2$' <<EOF
+que-recip '^admin2@remote2$' <<EOF
 bruceg@qcc.sk.ca
 user@localhost
 
