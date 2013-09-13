@@ -41,7 +41,6 @@ pid_t pid = getpid();
 uid_t uid = getuid();
 time_t timesecs = time(0);
 mystring adminaddr;
-bool remapadmin = false;
 
 bool is_dir(const char* path)
 {
@@ -83,10 +82,8 @@ bool validate_addr(mystring& addr, bool recipient)
   if(i < 0)
     return false;
   mystring hostname = addr.right(i+1);
-  if(recipient && remapadmin) {
-    if(hostname == me || hostname == "localhost")
-      addr = adminaddr;
-  }
+  if (recipient && !!adminaddr && (hostname == me || hostname == "localhost"))
+    addr = adminaddr;
   else if(hostname.find_first('.') < 0)
     return false;
   return true;
@@ -186,7 +183,6 @@ int main(int, char*[])
   umask(077);
   if(config_read("adminaddr", adminaddr) && !!adminaddr) {
     adminaddr = adminaddr.subst(',', '\n');
-    remapadmin = true;
     read_hostnames();
   }
   
