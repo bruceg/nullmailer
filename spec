@@ -14,7 +14,7 @@ Conflicts: qmail
 Requires: supervise-scripts >= 3.2
 Requires: gnutls
 BuildRequires: gnutls-devel
-PreReq: shadow-utils
+Requires(pre,preun): shadow-utils
 
 %description
 Nullmailer is a mail transport agent designed to only relay all its
