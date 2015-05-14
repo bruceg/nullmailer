@@ -15,6 +15,7 @@ extern void protocol_succ(const char* msg);
 #define AUTH_PLAIN 2
 extern const char* user;
 extern const char* pass;
+extern const char* passfile;
 extern int auth_method;
 extern int port;
 extern int use_ssl;

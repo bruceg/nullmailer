@@ -26,9 +26,11 @@
 #include "errcodes.h"
 #include "protocol.h"
 #include "cli++.h"
+#include "configio.h"
 
 const char* user = 0;
 const char* pass = 0;
+const char* passfile = 0;
 int port = 0;
 int auth_method = AUTH_DETECT;
 int use_ssl = 0;
@@ -44,6 +46,8 @@ cli_option cli_options[] = {
     "Set the user name for authentication", 0 },
   { 0, "pass", cli_option::string, 0, &pass,
     "Set the password for authentication", 0 },
+  { 0, "pass-file", cli_option::string, 0, &passfile,
+    "Alternatively read the password from this configuration file", 0 },
   { 0, "auth-login", cli_option::flag, AUTH_LOGIN, &auth_method,
     "Use AUTH LOGIN instead of auto-detecting in SMTP", 0 },
 #ifdef HAVE_TLS
@@ -98,6 +102,17 @@ int cli_main(int, char* argv[])
     port = use_ssl ? default_ssl_port : default_port;
   if (port < 0)
     protocol_fail(ERR_USAGE, "Invalid value for --port");
+  /* pass & passfile are null pointers unless cli option given */
+  if (pass && passfile)
+    protocol_fail(ERR_USAGE, "Only one of --pass or --pass-file is permitted");
+  if (passfile) {
+    mystring passwd;
+    if (!config_read(passfile, passwd))
+      protocol_fail(ERR_USAGE, "Password file is empty or could not be read");
+    pass = strdup(passwd.c_str());
+    if (!pass)
+      protocol_fail(ERR_MSG_TEMPFAIL, "Error allocating password buffer");
+  }
   if (use_ssl || use_starttls)
     tls_init(remote);
   fdibuf in(0, true);
