@@ -33,6 +33,12 @@ do
 	echo "Testing usage error with $p (invalid integer)."
 	error 1 protocol $p -p foo localhost <testmail
 
+	echo "Testing usage error with $p (supplied both --pass & --pass-file)."
+	error 1 protocol $p --pass=password --pass-file=passwordfile localhost <testmail
+
+	echo "Testing usage error with $p (password file not read)."
+	error 1 protocol $p --pass-file=file.does.not.exist localhost <testmail
+
 	start server tcpserver 0 24680 date
 	sleep 1
 	echo "Testing protocol failure with $p."
