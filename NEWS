@@ -7,6 +7,8 @@ Changes in version 1.14
 
 - Improved handling of system errors when reading config files.
 
+- Secured handling of password options for protocol modules.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
