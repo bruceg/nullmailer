@@ -2,9 +2,8 @@
 
 cat <<EOF >$tmpdir/libexec/nullmailer/dummy
 #!/bin/sh
-code=\$1
-shift
-echo "\$@" >&2
+read host
+read code
 exit \$code
 EOF
 chmod +x $tmpdir/libexec/nullmailer/dummy

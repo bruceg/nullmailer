@@ -47,6 +47,7 @@ extern const char* argv0;
 extern const char* argv0base;
 extern const char* argv0dir;
 extern void usage(int exit_value, const char* errorstr = 0);
+extern int cli_parse_args(int argc, char* argv[]);
 
 extern void cli_error(int exit_value,
 		      const char*,
