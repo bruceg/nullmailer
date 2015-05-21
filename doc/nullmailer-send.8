@@ -121,9 +121,15 @@ Set the SMTP authentication password.
 .B auth-login
 Force SMTP "AUTH LOGIN" mode instead of auto-detecting.
 .TP
-.B ssl
-Connect using SSL. This will automatically switch the port to
+.B tls
+Connect using TLS.
+This will automatically switch the port to
 .IR 465 .
+.TP
+.B ssl
+Alias for the
+.B tls
+option for compatibility.
 .TP
 .B starttls
 Use the

@@ -6,7 +6,7 @@
 #define DEFAULT_CA_FILE "/etc/ssl/certs/ca-certificates.crt"
 
 extern const int default_port;
-extern const int default_ssl_port;
+extern const int default_tls_port;
 extern void protocol_fail(int e, const char* msg);
 extern void protocol_succ(const char* msg);
 
@@ -17,7 +17,7 @@ extern const char* user;
 extern const char* pass;
 extern int auth_method;
 extern int port;
-extern int use_ssl;
+extern int use_tls;
 extern int use_starttls;
 extern int tls_insecure;
 

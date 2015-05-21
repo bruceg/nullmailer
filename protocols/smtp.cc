@@ -31,7 +31,7 @@
 #include "protocol.h"
 
 const int default_port = 25;
-const int default_ssl_port = 465;
+const int default_tls_port = 465;
 const char* cli_program = "smtp";
 const char* cli_help_prefix = "Send an email message via SMTP\n";
 

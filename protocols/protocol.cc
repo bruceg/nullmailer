@@ -32,7 +32,7 @@ const char* user = 0;
 const char* pass = 0;
 int port = 0;
 int auth_method = AUTH_DETECT;
-int use_ssl = 0;
+int use_tls = 0;
 int use_starttls = 0;
 const char* remote = 0;
 const char* cli_help_suffix = "";
@@ -51,8 +51,10 @@ cli_option cli_options[] = {
   { 0, "auth-login", cli_option::flag, AUTH_LOGIN, &auth_method,
     "Use AUTH LOGIN instead of auto-detecting in SMTP", 0 },
 #ifdef HAVE_TLS
-  { 0, "ssl", cli_option::flag, 1, &use_ssl,
-    "Connect using SSL (on an alternate port by default)", 0 },
+  { 0, "tls", cli_option::flag, 1, &use_tls,
+    "Connect using TLS (on an alternate port by default)", 0 },
+  { 0, "ssl", cli_option::flag, 1, &use_tls,
+    "Alias for --tls", 0 },
   { 0, "starttls", cli_option::flag, 1, &use_starttls,
     "Use STARTTLS command", 0 },
   { 0, "x509certfile", cli_option::string, 0, &tls_x509certfile,
@@ -122,17 +124,17 @@ int cli_main(int, char*[])
   if (remote == 0)
     protocol_fail(ERR_USAGE, "Remote host not set");
   if (port == 0)
-    port = use_ssl ? default_ssl_port : default_port;
+    port = use_tls ? default_tls_port : default_port;
   if (port < 0)
     protocol_fail(ERR_USAGE, "Invalid value for port");
-  if (use_ssl || use_starttls)
+  if (use_tls || use_starttls)
     tls_init(remote);
   fdibuf in(3, true);
   protocol_prep(in);
   int fd = tcpconnect(remote, port);
   if(fd < 0)
     protocol_fail(-fd, "Connect failed");
-  if (use_ssl)
+  if (use_tls)
     tls_send(in, fd);
   else
     plain_send(in, fd);
