@@ -75,13 +75,13 @@ cli_option cli_options[] = {
 
 void protocol_fail(int e, const char* msg)
 {
-  ferr << cli_program << ": Failed: " << msg << endl;
+  fout << cli_program << ": Failed: " << msg << endl;
   exit(e);
 }
 
 void protocol_succ(const char* msg)
 {
-  ferr << cli_program << ": Succeeded: " << msg << endl;
+  fout << cli_program << ": Succeeded: " << msg << endl;
   exit(0);
 }
 
