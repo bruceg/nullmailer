@@ -20,6 +20,7 @@
 #include "config.h"
 #include <string.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #ifdef _REENTRANT
 #include <pthread.h>
