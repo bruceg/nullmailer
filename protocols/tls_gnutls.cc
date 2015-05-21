@@ -85,8 +85,13 @@ void tls_init(const char* remote)
 	      "Error allocating TLS certificate");
   gnutls_wrap(gnutls_init(&tls_session, GNUTLS_CLIENT),
 	      "Error creating TLS session");
+#ifdef HAVE_GNUTLS_PRIORITY_FUNCS
   gnutls_wrap(gnutls_priority_set_direct(tls_session, "NORMAL", NULL),
 	      "Error setting TLS options");
+#else
+  gnutls_wrap(gnutls_set_default_priority(tls_session),
+	      "Error setting TLS options");
+#endif
   gnutls_wrap(gnutls_credentials_set(tls_session, GNUTLS_CRD_CERTIFICATE, creds),
 	      "Error setting TLS credentials");
   gnutls_wrap(gnutls_server_name_set(tls_session, GNUTLS_NAME_DNS, remote, strlen(remote)),
