@@ -1,10 +1,13 @@
-noinst_PROGRAMS = address-test clitest0 clitest1
-EXTRA_DIST = address-trace.cc clitest.cc clitest.sh
+noinst_PROGRAMS = address-test argparse-test clitest0 clitest1
+EXTRA_DIST = address-trace.cc argparse.cc clitest.cc clitest.sh
 
 INCLUDES = -I../lib
 
 address_test_SOURCES = address-test.cc # address-trace.cc
 address_test_LDADD = ../lib/libnullmailer.a
+
+argparse_test_SOURCES = argparse-test.cc
+argparse_test_LDADD = ../lib/libnullmailer.a
 
 clitest0_CPPFLAGS = -DCLI_ONLY_LONG=false
 clitest0_SOURCES = clitest.cc
@@ -21,6 +24,7 @@ dist-hook: test
 
 test: all
 	./address-test
+	./argparse-test
 	sh clitest.sh
 	@failed=0; \
 	for test in `find tests -type f -not -name '.*.swp'`; do \

@@ -28,3 +28,4 @@ src/sendmail
 stamp-h.in
 stamp-h1
 test/address-test
+test/argparse-test
