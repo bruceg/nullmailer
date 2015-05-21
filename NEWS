@@ -11,6 +11,8 @@ Changes in version 1.14
 
 - Support standard shell quoting for options in the "remotes" file.
 
+- Added protocol option to set a separate TLS client private key file.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------

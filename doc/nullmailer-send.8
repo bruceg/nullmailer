@@ -139,6 +139,11 @@ command to initiate a TLS session.
 .B x509certfile=\fIFILENAME
 Set the filename for a TLS client certificate to send to the server.
 .TP
+.B x509keyfile=\fIFILENAME
+Set the filename for the private key for a TLS client certificate.
+Defaults to the same file name as
+.BR x509certfile .
+.TP
 .B x509cafile=\fIFILENAME
 Set the TLS certificate authority trust filename. Defaults to
 .IR /etc/ssl/certs/ca-certificates.crt .
