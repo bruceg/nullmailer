@@ -9,6 +9,8 @@ Changes in version 1.14
 
 - Secured handling of password options for protocol modules.
 
+- Support standard shell quoting for options in the "remotes" file.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------

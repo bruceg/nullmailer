@@ -81,11 +81,12 @@ by an optional protocol string, separated by white space.
 The protocol name defaults to
 .IR smtp ,
 and may be followed by command-line arguments for that module.
+The line is parsed according to standard shell quoting rules.
 For example, to connect to port 2525 on your SMTP smart host,
 which also requires SMTP authentication, use:
 
 .EX
-    smarthost.dom smtp --port=2525 --user=user --pass=pass
+    smarthost.dom smtp --port=2525 --user=user --pass='my pass phrase'
 .EE
 
 If your smarthost requires LOGIN authentication instead of the default

@@ -31,6 +31,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "ac/time.h"
+#include "argparse.h"
 #include "configio.h"
 #include "defines.h"
 #include "errcodes.h"
@@ -105,26 +106,6 @@ void remote::exec(int pfd[2], int fd)
 
 typedef list<remote> rlist;
 
-unsigned ws_split(const mystring& str, slist& lst)
-{
-  lst.empty();
-  const char* ptr = str.c_str();
-  const char* end = ptr + str.length();
-  unsigned count = 0;
-  for(;;) {
-    while(ptr < end && isspace(*ptr))
-      ++ptr;
-    const char* start = ptr;
-    while(ptr < end && !isspace(*ptr))
-      ++ptr;
-    if(ptr == start)
-      break;
-    lst.append(mystring(start, ptr-start));
-    ++count;
-  }
-  return count;
-}
-
 static rlist remotes;
 static int minpause = 60;
 static int pausetime = minpause;
@@ -139,8 +120,8 @@ bool load_remotes()
   for(slist::const_iter r(rtmp); r; r++) {
     if((*r)[0] == '#')
       continue;
-    slist parts;
-    if(!ws_split(*r, parts))
+    arglist parts;
+    if (!parse_args(parts, *r))
       continue;
     remotes.append(remote(parts));
   }
