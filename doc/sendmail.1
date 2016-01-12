@@ -11,13 +11,19 @@ sendmail \- sendmail emulator interface for nullmailer
 .I message
 .SH DESCRIPTION
 This program is a front end program for
-.BR nullmailer-inject .
+.B nullmailer-inject
+and
+.BR nullmailer-smtpd .
 It is used by programs that expect a
 .I sendmail
 interface for sending email.
-After parsing the command-line arguments, this program executes
+After parsing the command-line arguments, this program executes either
 .B nullmailer-inject
-directly.
+or
+.B nullmailer-smtpd
+depending on the presence of the
+.I \-bs
+option on the command-line.
 See the documentation for
 .B nullmailer-inject
 for details on how messages are reformatted and queued.
@@ -77,9 +83,10 @@ Sets the full name of the sender.
 Sets the envelope sender address.
 .TP
 .B \-r ADDRESS
-An alternate and obsolete form of the -f flag.
+An alternate and obsolete form of the \-f flag.
 .TP
 .B \-t
 Read message for recipients and ignore the command-line arguments.
 .SH SEE ALSO
-nullmailer-inject(1)
+nullmailer-inject(1),
+nullmailer-smtpd(1)
