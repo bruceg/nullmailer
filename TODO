@@ -23,8 +23,8 @@
     configurable time.
   - Queue bounce from <> to sender
   - Queue double bounce from <#@[]> to doublebounceto or adminaddr
-  - Optionally move bounces to a seperate directory
-  - Move triple bounces to a seperate directory
+  - Optionally move bounces to a separate directory
+  - Move triple bounces to a separate directory
 
 - For version 2: three-state queueing
   - Queue message partially (tmp -> holding)

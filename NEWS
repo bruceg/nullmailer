@@ -284,7 +284,7 @@ Changes in version 0.37
   path to nullmailer-queue.
 
 - Added a configure test for libinet, libsocket, and libxnet libraries
-  for systems that have their networking code seperate from the main C
+  for systems that have their networking code separate from the main C
   library (such as Solaris).
 -------------------------------------------------------------------------------
 Changes in version 0.36
