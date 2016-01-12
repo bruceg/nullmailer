@@ -13,6 +13,8 @@ Changes in version 1.14
 
 - Added protocol option to set a separate TLS client private key file.
 
+- Fixed nullmailer-inject to report errors to stderr.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------

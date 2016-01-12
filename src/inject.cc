@@ -71,9 +71,9 @@ cli_option cli_options[] = {
   {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
 
-#define fail(MSG) do{ fout << "nullmailer-inject: " << MSG << endl; return false; }while(0)
-#define fail_sys(MSG) do{ fout << "nullmailer-inject: " << MSG << ": " << strerror(errno) << endl; return false; }while(0)
-#define bad_hdr(LINE,MSG) do{ header_has_errors = true; fout << "nullmailer-inject: Invalid header line:\n  " << LINE << "\n  " MSG << endl; }while(0)
+#define fail(MSG) do{ ferr << "nullmailer-inject: " << MSG << endl; return false; }while(0)
+#define fail_sys(MSG) do{ ferr << "nullmailer-inject: " << MSG << ": " << strerror(errno) << endl; return false; }while(0)
+#define bad_hdr(LINE,MSG) do{ header_has_errors = true; ferr << "nullmailer-inject: Invalid header line:\n  " << LINE << "\n  " MSG << endl; }while(0)
 
 typedef list<mystring> slist;
 // static bool do_debug = false;
@@ -431,7 +431,7 @@ static pid_t pid = 0;
 void exec_queue()
 {
   execl(nqueue.c_str(), nqueue.c_str(), NULL);
-  fout << "nullmailer-inject: Could not exec " << nqueue << ": "
+  ferr << "nullmailer-inject: Could not exec " << nqueue << ": "
        << strerror(errno) << endl;
   exit(1);
 }
@@ -552,7 +552,7 @@ bool parse_args(int argc, char* argv[])
     mystring tmp(o_from);
     if(!parse_addresses(tmp, list) ||
        !parse_sender(list)) {
-      fout << "nullmailer-inject: Invalid sender address: " << o_from << endl;
+      ferr << "nullmailer-inject: Invalid sender address: " << o_from << endl;
       return false;
     }
   }
@@ -564,7 +564,7 @@ bool parse_args(int argc, char* argv[])
   bool result = true;
   for(int i = 0; i < argc; i++) {
     if(!parse_recip_arg(argv[i])) {
-      fout << "Invalid recipient: " << argv[i] << endl;
+      ferr << "Invalid recipient: " << argv[i] << endl;
       result = false;
     }
   }
@@ -579,7 +579,7 @@ int cli_main(int argc, char* argv[])
      !fix_header())
     return 1;
   if(recipients.count() == 0) {
-    fout << "No recipients were listed." << endl;
+    ferr << "No recipients were listed." << endl;
     return 1;
   }
   if(!send_message())
