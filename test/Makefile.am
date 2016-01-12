@@ -1,5 +1,7 @@
 noinst_PROGRAMS = address-test argparse-test clitest0 clitest1
-EXTRA_DIST = address-trace.cc argparse.cc clitest.cc clitest.sh
+EXTRA_DIST = address-trace.cc argparse.cc clitest.cc clitest.sh runtests.in
+noinst_SCRIPTS = runtests
+CLEANFILES = runtests
 
 INCLUDES = -I../lib
 
@@ -17,6 +19,10 @@ clitest1_CPPFLAGS = -DCLI_ONLY_LONG=true
 clitest1_SOURCES = clitest.cc
 clitest1_LDADD = ../lib/libnullmailer.a ../lib/cli++/libcli++.a
 
+runtests: runtests.in Makefile
+	sed -e 's,[@]SYSCONFDIR[@],$(sysconfdir),g' < $< > $@
+	chmod +x $@
+
 # The following makes sure that we can't produce a package without the
 # tests executing properly
 dist-hook: test
@@ -26,11 +32,4 @@ test: all
 	./address-test
 	./argparse-test
 	sh clitest.sh
-	@failed=0; \
-	for test in `find tests -type f -not -name '.*.swp'`; do \
-		echo Running test $$test...; \
-		if env - SYSCONFDIR=$(sysconfdir)/nullmailer bash $$test; \
-			then echo 'Done.'; \
-			else echo '******************************Failed!******************************'; failed=1; \
-		fi; \
-	done 2>&1; exit $$failed
+	./runtests `find tests -type f -not -name '.*.swp'`

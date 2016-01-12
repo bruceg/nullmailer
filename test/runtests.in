@@ -1,0 +1,14 @@
+#!/bin/sh
+failed=0
+for test in "$@"
+do
+	echo Running test $test...
+	if env - SYSCONFDIR=@SYSCONFDIR@/nullmailer bash $test
+	then
+		echo 'Done.'
+	else
+		echo '******************************Failed!******************************'
+		failed=1
+	fi
+done 2>&1
+exit $failed
