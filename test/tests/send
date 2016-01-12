@@ -2,8 +2,10 @@
 
 cat <<EOF >$tmpdir/libexec/nullmailer/dummy
 #!/bin/sh
+set -e
 read host
 read code
+echo "\$host" | grep -q '^host='
 exit \$code
 EOF
 chmod +x $tmpdir/libexec/nullmailer/dummy
