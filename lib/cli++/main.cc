@@ -306,7 +306,6 @@ static int parse_either(int argc, char* argv[])
 
 int cli_parse_args(int argc, char* argv[])
 {
-  build_options();
   int i;
   for(i = 1; i < argc; i++) {
     const char* arg = argv[i];
@@ -357,6 +356,7 @@ int main(int argc, char* argv[])
   srandom(tv.tv_usec ^ tv.tv_sec);
   
   set_argv0(argv[0]);
+  build_options();
   int lastarg = cli_parse_args(argc, argv);
 
   if(do_show_usage)
