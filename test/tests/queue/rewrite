@@ -3,8 +3,8 @@
 que() {
 	set -e
 	../src/nullmailer-queue && \
-	cat /tmp/nm/var/nullmailer/queue/* && \
-	rm -f /tmp/nm/var/nullmailer/queue/*
+	cat $tmpdir/var/nullmailer/queue/* && \
+	rm -f $tmpdir/var/nullmailer/queue/*
 }
 que-recip() {
 	set -e
@@ -15,7 +15,7 @@ que-sender() {
 	que | head -n 1 | grep -q "$@"
 }
 
-echo admin@remote >/tmp/nm/etc/nullmailer/adminaddr
+echo admin@remote >$tmpdir/etc/nullmailer/adminaddr
 
 echo "Checking that queue rewrites user@localhost to adminaddr."
 que-recip '^admin@remote$' <<EOF
@@ -47,7 +47,7 @@ header
 data
 EOF
 
-echo admin1@remote1,admin2@remote2 >/tmp/nm/etc/nullmailer/adminaddr
+echo admin1@remote1,admin2@remote2 >$tmpdir/etc/nullmailer/adminaddr
 
 echo "Checking that queue rewrites to multiple adminaddr."
 que-recip '^admin2@remote2$' <<EOF
@@ -70,7 +70,7 @@ data
 EOF
 
 echo "Checking that queue rewrites sender with allmailfrom."
-echo sender@remote3 >/tmp/nm/etc/nullmailer/allmailfrom
+echo sender@remote3 >$tmpdir/etc/nullmailer/allmailfrom
 que-sender '^sender@remote3$' <<EOF
 bruceg@qcc.sk.ca
 user@localhost
@@ -79,4 +79,4 @@ header
 
 data
 EOF
-rm -f /tmp/nm/etc/nullmailer/allmailfrom
+rm -f $tmpdir/etc/nullmailer/allmailfrom

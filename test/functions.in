@@ -1,4 +1,5 @@
-tmpdir=/tmp/nm
+tmpdir=@TMPDIR@
+SYSCONFDIR=@TMPDIR@/etc/nullmailer
 rm -rf $tmpdir
 mkdir -p \
     $tmpdir/var/nullmailer/{queue,tmp} \
