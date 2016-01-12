@@ -103,8 +103,11 @@ static void parse_option(mystring line)
 {
   if (line[0] != '-')
     line = "--" + line;
-  const char* args[2] = { line.c_str(), NULL };
-  if (cli_parse_args(1, (char**)args) != 1)
+  const char* arg = strdup(line.c_str());
+  if (arg == NULL)
+    exit(ERR_CONFIG);
+  const char* args[3] = { argv0, arg, NULL };
+  if (cli_parse_args(2, (char**)args) != 2)
     exit(ERR_CONFIG);
 }
 

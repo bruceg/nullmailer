@@ -13,30 +13,52 @@ Subject: Nullmailer automated test message
 Just testing, please ignore
 EOF
 
+start server "tcpserver 0 24680 sh -c 'echo 250 OK; echo 250 OK; echo 250 OK; echo 250 OK; echo 351 OK; echo 220 OK; sleep 1'"
+sleep 1
+
+echo "Testing protocol success with smtp (command-line)"
+protocol smtp --host=localhost --port=24680 3<testmail
+
+echo "Testing protocol success with smtp (stdin)"
+protocol smtp -- host=localhost port=24680 3<testmail
+
+stop server
+
+start server "tcpserver 0 24680 sh -c 'echo 3:KOK,'"
+sleep 1
+
+echo "Testing protocol success with qmqp (command-line)"
+protocol qmqp --host=localhost --port=24680 3<testmail
+
+echo "Testing protocol success with qmqp (stdin)"
+protocol qmqp -- host=localhost port=24680 3<testmail
+
+stop server
+
 for p in smtp qmqp
 do
 	echo "Testing host not found error with $p."
-	error 2 protocol $p --host=this.host.can.not.exist </dev/null 3<testmail
+	error 2 protocol $p --host=this.host.can.not.exist 3<testmail
 
 	echo "Testing connection refused error with $p."
-	error 7 protocol $p -p 24680 --host=localhost </dev/null 3<testmail
+	error 7 protocol $p -p 24680 --host=localhost 3<testmail
 	
 	echo "Testing usage error with $p (zero args)."
-	error 1 protocol $p </dev/null 3<testmail
+	error 1 protocol $p 3<testmail
 	
 	echo "Testing usage error with $p (two args)."
-	error 1 protocol $p --host=localhost foobar </dev/null 3<testmail
+	error 1 protocol $p --host=localhost foobar 3<testmail
 	
 	echo "Testing usage error with $p (unknown option)."
-	error 1 protocol $p -x --host=localhost </dev/null 3<testmail
+	error 1 protocol $p -x --host=localhost 3<testmail
 	
 	echo "Testing usage error with $p (invalid integer)."
-	error 1 protocol $p -p foo --host=localhost </dev/null 3<testmail
+	error 1 protocol $p -p foo --host=localhost 3<testmail
 
 	start server tcpserver 0 24680 date
 	sleep 1
 	echo "Testing protocol failure with $p."
-	error 11 protocol $p -p 24680 --host=localhost </dev/null 3<testmail
+	error 11 protocol $p -p 24680 --host=localhost 3<testmail
 	stop server
 done
 

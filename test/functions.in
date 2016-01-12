@@ -61,7 +61,22 @@ injectfield() {
   shift
   injectlines "$@" | grep -i "^$field:" | cut -d: -f2-
 }
-protocol() { local p=$1; shift; ../protocols/$p "$@" >/dev/null 2>&1; }
+protocol() {
+    local p=$1
+    local opts=""
+    shift
+    while [ $# -gt 0 -a x"$1" != x-- ]
+    do
+        opts="$opts $1"
+        shift
+    done
+    shift || :
+    for line in "$@"
+    do
+        echo "$line"
+    done > $tmpdir/protocol-in
+    ../protocols/$p $opts < $tmpdir/protocol-in > $tmpdir/protocol-log 2>&1
+}
 
 PATH=/bin:/usr/bin:/usr/local/bin
 NULLMAILER_QUEUE=$PWD/../src/nullmailer-queue
