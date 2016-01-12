@@ -218,6 +218,37 @@ bool catchsender(pid_t pid)
   }
 }
 
+bool log_msg(mystring& filename, remote& remote, int fd)
+{
+  fout << "Starting delivery:"
+       << " host: " << remote.host
+       << " protocol: " << remote.proto
+       << " file: " << filename << endl;
+  fdibuf in(fd);
+  mystring line;
+  mystring msg;
+  if (in.getline(line, '\n')) {
+    msg = "From: <";
+    msg += line;
+    msg += '>';
+    bool has_to = false;
+    while (in.getline(line, '\n')) {
+      if (!line) {
+        lseek(fd, 0, SEEK_SET);
+        fout << msg << endl;
+        return true;
+      }
+      msg += has_to ? ", " : " to: ";
+      has_to = true;
+      msg += '<';
+      msg += line;
+      msg += '>';
+    }
+  }
+  fout << endl << "Can't read message" << endl;
+  return false;
+}
+
 bool send_one(mystring filename, remote& remote)
 {
   int pfd[2];
@@ -232,9 +263,8 @@ bool send_one(mystring filename, remote& remote)
     return false;
   }
   const mystring program = PROTOCOL_DIR + remote.proto;
-  fout << "Starting delivery: protocol: " << remote.proto
-       << " host: " << remote.host
-       << " file: " << filename << endl;
+  if (!log_msg(filename, remote, fd))
+    return false;
   pid_t pid = fork();
   switch(pid) {
   case -1:

@@ -39,3 +39,8 @@ echo 'Testing sending with a succeeding protocol'
 send_message 0 2.0.0
 echo 'Testing sending with a failing protocol'
 not send_message 1 5.2.2
+
+echo 'Checking log outputs'
+grep -q '^Starting delivery: host: 127.0.0.1 protocol: dummy file:' log
+grep -qx 'From: <me@nowhere> to: <me@nowhere>' log
+grep -qx 'Sending failed: Unspecified temporary error' log
