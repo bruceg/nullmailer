@@ -80,7 +80,7 @@ void trigger()
 bool validate_addr(mystring& addr, bool recipient)
 {
   int i = addr.find_last('@');
-  if(i < 0)
+  if(i <= 0)
     return false;
   mystring hostname = addr.right(i+1);
   if (recipient && !!adminaddr && (hostname == me || hostname == "localhost"))
