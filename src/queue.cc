@@ -95,9 +95,9 @@ bool validate_addr(mystring& addr, bool recipient)
 bool copyenv(fdobuf& out)
 {
   mystring str;
-  if(!fin.getline(str) || !str)
+  if(!fin.getline(str))
     fail("Could not read envelope sender.");
-  if(!validate_addr(str, false))
+  if(!!str && !validate_addr(str, false))
     fail("Envelope sender address is invalid.");
   if(!(out << str << endl))
     fail("Could not write envelope sender.");
