@@ -122,7 +122,7 @@ void tls_send(fdibuf& in, int fd)
 {
   int r;
 
-  gnutls_transport_set_ptr(tls_session, (gnutls_transport_ptr_t)fd);
+  gnutls_transport_set_ptr(tls_session, (gnutls_transport_ptr_t)(long)fd);
 
   do {
     r = gnutls_handshake(tls_session);
