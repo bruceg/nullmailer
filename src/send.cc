@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include "ac/time.h"
 #include "argparse.h"
+#include "autoclose.h"
 #include "configio.h"
 #include "defines.h"
 #include "errcodes.h"
@@ -250,14 +251,13 @@ tristate catchsender(pid_t pid)
 tristate send_one(mystring filename, remote& remote)
 {
   int pfd[2];
-  int fd = open(filename.c_str(), O_RDONLY);
-  if(fd == -1) {
+  autoclose fd = open(filename.c_str(), O_RDONLY);
+  if(fd < 0) {
     fout << "Can't open file '" << filename << "'" << endl;
     return tempfail;
   }
   if (pipe(pfd) == -1) {
     fout << "Can't create pipe" << endl;
-    close(fd);
     return tempfail;
   }
   const mystring program = PROTOCOL_DIR + remote.proto;
@@ -277,7 +277,6 @@ tristate send_one(mystring filename, remote& remote)
       fout << "Warning: Writing options to protocol failed" << endl;
     close(pfd[0]);
     close(pfd[1]);
-    close(fd);
     return catchsender(pid);
   }
 }

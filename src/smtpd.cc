@@ -23,6 +23,7 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "autoclose.h"
 #include "lib/defines.h"
 #include "fdbuf/fdbuf.h"
 #include "mystring/mystring.h"
@@ -112,7 +113,6 @@ static pid_t qpid;
 static int start_queue()
 {
   int pfd[2];
-  int fdnull;
   const char* args[2] = { 0 };
   mystring nqueue = getenv("NULLMAILER_QUEUE");
   if (!nqueue) {
@@ -121,28 +121,29 @@ static int start_queue()
   }
   args[0] = nqueue.c_str();
 
-  if ((fdnull = open("/dev/null", O_WRONLY)) >= 0) {
-    if (pipe(pfd) == 0) {
-      if ((qpid = fork()) >= 0) {
+  autoclose fdnull = open("/dev/null", O_WRONLY);
+  if (fdnull < 0)
+    return -1;
 
-	if (qpid == 0) {
-	  dup2(pfd[0], 0);
-	  dup2(fdnull, 1);
-	  dup2(fdnull, 2);
-	  close(pfd[0]);
-	  close(pfd[1]);
-	  close(fdnull);
-	  execv(args[0], (char**)args);
-	  _exit(111);
-	}
+  if (pipe(pfd) == 0) {
+    if ((qpid = fork()) >= 0) {
 
-	close(pfd[0]);
-	return pfd[1];
+      if (qpid == 0) {
+        dup2(pfd[0], 0);
+        dup2(fdnull, 1);
+        dup2(fdnull, 2);
+        close(pfd[0]);
+        close(pfd[1]);
+        fdnull.close();
+        execv(args[0], (char**)args);
+        _exit(111);
       }
+
       close(pfd[0]);
-      close(pfd[1]);
+      return pfd[1];
     }
-    close(fdnull);
+    close(pfd[0]);
+    close(pfd[1]);
   }
   return -1;
 }

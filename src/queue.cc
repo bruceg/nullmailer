@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+#include "autoclose.h"
 #include "itoa.h"
 #include "defines.h"
 #include "mystring/mystring.h"
@@ -57,24 +58,22 @@ bool is_exist(const char* path)
 
 int fsyncdir(const char* path)
 {
-  int fd = open(path, O_RDONLY);
+  autoclose fd = open(path, O_RDONLY);
   if(fd == -1)
     return 0;
   int result = fsync(fd);
   if(result == -1 && errno != EIO)
     result = 0;
-  close(fd);
   return result;
 }
 
 void trigger()
 {
-  int fd = open(QUEUE_TRIGGER, O_WRONLY|O_NONBLOCK, 0666);
+  autoclose fd = open(QUEUE_TRIGGER, O_WRONLY|O_NONBLOCK, 0666);
   if(fd == -1)
     return;
   char x = 0;
   write(fd, &x, 1);
-  close(fd);
 }
 
 bool validate_addr(mystring& addr, bool recipient)
