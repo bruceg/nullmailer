@@ -48,7 +48,7 @@ static time_t opt_retry_until = 0;
 static const char* opt_envelope_id = 0;
 static const char* opt_status = 0;
 static const char* opt_remote = 0;
-static const char* opt_smtp_diagnostic = 0;
+static const char* opt_diagnostic_code = 0;
 static int opt_ddn = 0;
 
 const char* cli_program = "nullmailer-dsn";
@@ -62,20 +62,20 @@ const char* cli_args_usage = "status-code < message";
 const int cli_args_min = 1;
 const int cli_args_max = 1;
 cli_option cli_options[] = {
-  { 0, "orig-timestamp", cli_option::uinteger, 0, &opt_timestamp,
-    "UNIX timestamp on the original message",
-    "ctime on the input message" },
+  { 0, "diagnostic-code", cli_option::string, 0, &opt_diagnostic_code,
+    "Diagnostic code message", 0 },
+  { 0, "envelope-id", cli_option::string, 0, &opt_envelope_id,
+    "Original envelope ID", 0 },
   { 0, "last-attempt", cli_option::uinteger, 0, &opt_last_attempt,
     "UNIX timestamp of the last attempt",
     "access time on the input message" },
-  { 0, "retry-until", cli_option::uinteger, 0, &opt_retry_until,
-    "UNIX timestamp of the (future) final attempt", 0 },
-  { 0, "envelope-id", cli_option::string, 0, &opt_envelope_id,
-    "Original envelope ID", 0 },
+  { 0, "orig-timestamp", cli_option::uinteger, 0, &opt_timestamp,
+    "UNIX timestamp on the original message",
+    "ctime on the input message" },
   { 0, "remote", cli_option::string, 0, &opt_remote,
     "Name of remote server", 0 },
-  { 0, "smtp-diagnostic", cli_option::string, 0, &opt_smtp_diagnostic,
-    "SMTP error message", 0 },
+  { 0, "retry-until", cli_option::uinteger, 0, &opt_retry_until,
+    "UNIX timestamp of the (future) final attempt", 0 },
   {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
 
@@ -186,8 +186,8 @@ int cli_main(int, char* argv[])
       "Last-Attempt-Date: " << make_date(opt_last_attempt) << '\n';
     if (opt_remote != 0)
       fout << "Remote-MTA: dns; " << opt_remote << '\n';
-    if (opt_smtp_diagnostic != 0)
-      fout << "Diagnostic-Code: SMTP; " << opt_smtp_diagnostic << '\n';
+    if (opt_diagnostic_code != 0)
+      fout << "Diagnostic-Code: " << opt_diagnostic_code << '\n';
     if (opt_ddn and opt_retry_until > 0)
       fout << "Will-Retry-Until: " << make_date(opt_retry_until) << '\n';
   }
