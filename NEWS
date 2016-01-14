@@ -2,6 +2,8 @@ This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
 Changes in version 1.14
 
+- Added support for IPv6.
+
 - Added an "allmailfrom" control file to nullmailer-queue, causing all
   messages to share a hard-coded envelope sender.
 
