@@ -14,7 +14,6 @@ echo 127.0.0.1 smtp >$SYSCONFDIR/remotes
 
 # Start up the servers
 start send $PWD/../src/nullmailer-send
-start server tcpserver 0 24680 date
 
 make_message() {
   msgid=$(date +%s).$$.me

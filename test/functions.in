@@ -23,13 +23,12 @@ start() {
 	echo exec "$@"
     } >$tmpdir/service/$name/run
     chmod +x $tmpdir/service/$name/run
-    supervise $tmpdir/service/$name </dev/null >log 2>&1 &
+    supervise $tmpdir/service/$name </dev/null >$tmpdir/service/${name}-log 2>&1 &
 }
 stop() {
     for name in $*; do
 	svc -dx $tmpdir/service/$name >/dev/null 2>&1
     done
-    cat log
 }
 trap 'svc -dx $tmpdir/service/* >/dev/null 2>&1' EXIT
 
