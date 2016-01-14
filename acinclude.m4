@@ -32,7 +32,7 @@ dnl TRY_STRUCT_TM_MEMBER(MEMBER,FLAGNAME)
 AC_DEFUN([TRY_STRUCT_TM_MEMBER],
 [ AC_CACHE_CHECK(whether struct tm contains [$1],
 	[$2],
-	AC_COMPILE_IFELSE([
+	AC_COMPILE_IFELSE([AC_LANG_SOURCE([
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
@@ -44,7 +44,7 @@ AC_DEFUN([TRY_STRUCT_TM_MEMBER],
 # endif
 #endif
 int main() { struct tm* foo; foo->[$1]; }
-],
+])],
 	[$2]=yes,
 	[$2]=no))
 ])
@@ -70,10 +70,10 @@ dnl TRY_STRUCT_UTSNAME_MEMBER(MEMBER,FLAGNAME)
 AC_DEFUN([TRY_STRUCT_UTSNAME_MEMBER],
 [ AC_CACHE_CHECK(whether struct utsname contains [$1],
 	[$2],
-	AC_COMPILE_IFELSE([
+	AC_COMPILE_IFELSE([AC_LANG_SOURCE([
 #include <sys/utsname.h>
 int main() { struct utsname* foo; foo->[$1]; }
-],
+])],
 	[$2]=yes,
 	[$2]=no))
 ])

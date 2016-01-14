@@ -1,5 +1,5 @@
 // nullmailer -- a simple relay-only MTA
-// Copyright (C) 2007  Bruce Guenter <bruce@untroubled.org>
+// Copyright (C) 2012  Bruce Guenter <bruce@untroubled.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,13 +33,15 @@
 #include "configio.h"
 #include "hostname.h"
 
+const char* cli_program = "nullmailer-queue";
+
 #define fail(MSG) do{ fout << "nullmailer-queue: " << MSG << endl; return false; }while(0)
 
 pid_t pid = getpid();
 uid_t uid = getuid();
 time_t timesecs = time(0);
 mystring adminaddr;
-bool remapadmin = false;
+mystring allmailfrom;
 
 bool is_dir(const char* path)
 {
@@ -75,16 +77,16 @@ void trigger()
   close(fd);
 }
 
-bool validate_addr(mystring& addr, bool doremap)
+bool validate_addr(mystring& addr, bool recipient)
 {
   int i = addr.find_last('@');
-  if(i < 0)
+  if(i <= 0)
     return false;
   mystring hostname = addr.right(i+1);
-  if(doremap && remapadmin) {
-    if(hostname == me || hostname == "localhost")
-      addr = adminaddr;
-  }
+  if (recipient && !!adminaddr && (hostname == me || hostname == "localhost"))
+    addr = adminaddr;
+  else if (!recipient && !!allmailfrom)
+    addr = allmailfrom;
   else if(hostname.find_first('.') < 0)
     return false;
   return true;
@@ -93,9 +95,9 @@ bool validate_addr(mystring& addr, bool doremap)
 bool copyenv(fdobuf& out)
 {
   mystring str;
-  if(!fin.getline(str) || !str)
+  if(!fin.getline(str))
     fail("Could not read envelope sender.");
-  if(!validate_addr(str, false))
+  if(!!str && !validate_addr(str, false))
     fail("Envelope sender address is invalid.");
   if(!(out << str << endl))
     fail("Could not write envelope sender.");
@@ -139,7 +141,7 @@ bool dump(int fd)
     return false;
   if(!fdbuf_copy(fin, out))
     fail("Error copying the message to the queue file.");
-  if(!out.flush())
+  if(!out.sync())
     fail("Error flushing the output file.");
   if(!out.close())
     fail("Error closing the output file.");
@@ -183,9 +185,10 @@ int main(int, char*[])
 {
   umask(077);
   if(config_read("adminaddr", adminaddr) && !!adminaddr) {
-    remapadmin = true;
+    adminaddr = adminaddr.subst(',', '\n');
     read_hostnames();
   }
+  config_read("allmailfrom", allmailfrom);
   
   if(!deliver())
     return 1;

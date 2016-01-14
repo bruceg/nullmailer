@@ -1,0 +1,56 @@
+#!/bin/bash
+. functions
+
+queuedir=$QUEUEDIR/queue
+queue-test() {
+    rm -f $queuedir/*
+    echo "Testing queue from <$1> to <$2>"
+    queue "$@"
+}
+
+queue-good() {
+    if ! queue-test "$@"
+    then
+        fail "nullmailer-queue failed to accept good envelope"
+    fi
+    qc=$( find $queuedir -type f | wc -l )
+    if [ $qc -eq 0 ]
+    then
+        fail "nullmailer-queue did not queue a message despite succeeding"
+    fi
+    if [ $qc -gt 1 ]
+    then
+        fail "nullmailer-queue queued multiple messages ?!?"
+    fi
+    qm=$queuedir/*
+    sed -e '1,/^$/d' $qm | grep -q '^Subject:' || fail "queued message did not contain body"
+}
+
+check-sender() {
+    qm=$queuedir/*
+    head -n 1 $qm | grep -q "^$1$" || fail "queued message contained wrong sender"
+}
+
+check-recipient() {
+    qm=$queuedir/*
+    sed -e '1d;q' $qm | grep -q "^$1$" || fail "queued message contained wrong sender"
+}
+
+queue-bad() {
+    if queue-test "$@"
+    then
+        fail "nullmailer-queue failed to reject bad envelope"
+    fi
+    qc=$( find $queuedir -type f | wc -l )
+    if [ $qc -ne 0 ]
+    then
+        fail "nullmailer-queue queued a message after rejecting it"
+    fi
+}
+
+queue-good "a@b.c" "d@e.f"
+queue-bad "@b.c" "d@e.f"
+queue-bad "a@b.c" "@e.f"
+queue-bad "a@b" "d@e.f"
+queue-bad "a@b.c" "d@e"
+queue-good "" "d@e.f"

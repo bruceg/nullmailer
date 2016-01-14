@@ -1,6 +1,7 @@
-AC_INIT
+AC_INIT([nullmailer], [1.14])
+AC_LANG([C++])
 AC_CONFIG_SRCDIR([lib/defines.h])
-AM_INIT_AUTOMAKE(nullmailer, 1.05)
+AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 AC_PROG_MAKE_SET
 
@@ -47,8 +48,40 @@ dnl Checks for library functions.
 dnl AC_CHECK_FUNCS(gettimeofday mkdir putenv rmdir socket)
 AC_CHECK_FUNCS(setenv srandom)
 
+AC_MSG_CHECKING(for getaddrinfo)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <stddef.h>
+]], [[
+getaddrinfo(NULL, NULL, NULL, NULL)
+]])], [has_getaddrinfo=yes], [has_getaddrinfo=no])
+if test "$has_getaddrinfo" = yes; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_GETADDRINFO,,[getaddrinfo code enabled])
+else
+  AC_MSG_RESULT(no)
+  AC_MSG_RESULT(disabled: getaddrinfo missing)
+fi
+AC_SUBST(HAVE_GETADDRINFO)
+
 AC_DEFINE(BUFSIZE, 4096, [Generic buffer size])
 AM_CONDITIONAL(FDBUF_NO_MYSTRING, false)
+
+AC_ARG_ENABLE(tls,
+ [  --enable-tls      Enable SSL/TLS support],
+ [case "${enableval}" in
+   yes) tls=true; AC_DEFINE(HAVE_TLS, 1, [Build in support for TLS]) ;;
+   no)  tls=false ;;
+   *) AC_MSG_ERROR(bad value ${enableval} for --enable-tls) ;;
+ esac],[tls=false])
+AM_CONDITIONAL(TLS, $tls)
+
+if $tls; then
+  AC_CHECK_LIB(gnutls, gnutls_certificate_set_verify_function,
+   [AC_DEFINE(HAVE_GNUTLS_SET_VERIFY_FUNCTION, 1, [libgnutls has gnutls_certificate_set_verify_function])])
+fi
 
 AC_CONFIG_FILES([Makefile doc/Makefile lib/Makefile lib/cli++/Makefile lib/fdbuf/Makefile lib/mystring/Makefile protocols/Makefile src/Makefile test/Makefile])
 AC_OUTPUT

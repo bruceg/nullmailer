@@ -23,6 +23,11 @@ writing a single byte to it, which causes this program to be awakened
 This procedure is done by
 .B nullmailer-queue
 to ensure that messages are delivered immediately.
+You can start delivery by hand from the command line like this:
+
+.EX
+    echo 1 > trigger
+.EE
 .P
 Delivery of messages consists of reading the list of remote servers and
 then trying to deliver the messages to these servers as follows.
@@ -30,7 +35,7 @@ For each remote in the list, the named protocol handler is executed once
 for each message remaining in the queue.
 If the protocol handler succeeds, the message is removed from the queue
 and processing continues with the next message.
-If it fails, the remote is skipped and processing of the remaing
+If any messages remain in the queue, processing of the remaing
 messages continues with the next remote.
 When all the remotes have been tried,
 .B nullmailer-send
@@ -50,10 +55,19 @@ command.  Defaults to the value of the
 .B me
 configuration file.
 .TP
+.B maxpause
+The maximum number of seconds to pause between successive queue runs
+(defaults to
+.IR 86400 ).
+.TP
 .B pausetime
-The number of seconds to pause between successive queue runs when
-there are messages in the queue (defaults to
+The minimum number of seconds to pause between successive queue runs
+when there are messages in the queue (defaults to
 .IR 60 ).
+Each time this timeout is reached, the timeout is doubled to a maximum
+of
+.BR maxpause .
+After new messages are injected, the timeout is reset.
 If this is set to
 .IR 0 ,
 nullmailer-send will exit immediately after going through the queue once
@@ -66,22 +80,21 @@ Each line of this file contains a remote host name or address followed
 by an optional protocol string, separated by white space.
 The protocol name defaults to
 .IR smtp ,
-and may be followed by command-line arguments for that module.
+and may be followed by additional options for that module.
+See the "PROTOCOL OPTIONS" section for a list of the available options.
+The options may optionally be prefixed by
+.I --
+but this is not required.
+The line is parsed according to standard shell quoting rules.
 For example, to connect to port 2525 on your SMTP smart host,
-which also requires SMTP authentication, use:
+which also requires SMTP authentication, and initiate TLS with
+STARTTLS, use:
 
 .EX
-    smarthost.dom smtp --port=2525 --user=user --pass=pass
+    smarthost.dom smtp port=2525 starttls user=user pass='my pass phrase'
 .EE
 
-If your smarthost requires LOGIN authentication instead of the default
-PLAIN method, use:
-
-.EX
-    smarthost.dom smtp --port=2525 --auth-login --user=user --pass=pass
-.EE
-
-Blank lines and lines starting with a pound are ignored.
+Blank lines and lines starting with a pound (\fI#\fR) are ignored.
 .TP
 .B sendtimeout
 The number of seconds to wait for a remote module listed above to
@@ -92,6 +105,58 @@ If this is set to
 .IR 0 ,
 .B nullmailer-send
 will wait forever for messages to complete sending.
+.SH "PROTOCOL OPTIONS"
+.TP
+.B port=\fIPORT
+Set an alternate port number to connect to on the remote host. For example, SMTP may use
+.I port=587
+for the alternate SMTP "submission" port.
+.TP
+.B user=\fIUSERNAME
+Set the SMTP authentication user name.
+.TP
+.B pass=\fIPASSWORD
+Set the SMTP authentication password.
+.TP
+.B auth-login
+Force SMTP "AUTH LOGIN" mode instead of auto-detecting.
+.TP
+.B tls
+Connect using TLS.
+This will automatically switch the port to
+.IR 465 .
+.TP
+.B ssl
+Alias for the
+.B tls
+option for compatibility.
+.TP
+.B starttls
+Use the
+.I STARTTLS
+command to initiate a TLS session.
+.TP
+.B x509certfile=\fIFILENAME
+Set the filename for a TLS client certificate to send to the server.
+.TP
+.B x509keyfile=\fIFILENAME
+Set the filename for the private key for a TLS client certificate.
+Defaults to the same file name as
+.BR x509certfile .
+.TP
+.B x509cafile=\fIFILENAME
+Set the TLS certificate authority trust filename. Defaults to
+.IR /etc/ssl/certs/ca-certificates.crt .
+.TP
+.B x509crlfile=\fIFILENAME
+Set the TLS certificate revocation list filename.
+.TP
+.B x509fmtder
+Specify that TLS X.509 files above are in DER format instead of PEM.
+.TP
+.B insecure
+Don't abort a TLS connection if the server certificate fails validation.
+Use this only if you know the server uses an invalid certificate.
 .SH FILES
 .TP
 .B /var/nullmailer/queue

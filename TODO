@@ -1,9 +1,5 @@
 - Add support for SMTP AUTH CRAM-MD5
 
-- Add support for SMTPS
-
-- Add support for SMTP STARTTLS
-
 - Convert all proto modules to use timedout reads.
 
 - Add patterns to the remotes file, to allow messages to be delivered to
@@ -23,8 +19,8 @@
     configurable time.
   - Queue bounce from <> to sender
   - Queue double bounce from <#@[]> to doublebounceto or adminaddr
-  - Optionally move bounces to a seperate directory
-  - Move triple bounces to a seperate directory
+  - Optionally move bounces to a separate directory
+  - Move triple bounces to a separate directory
 
 - For version 2: three-state queueing
   - Queue message partially (tmp -> holding)

@@ -1,5 +1,5 @@
 // nullmailer -- a simple relay-only MTA
-// Copyright (C) 2007  Bruce Guenter <bruce@untroubled.org>
+// Copyright (C) 2012  Bruce Guenter <bruce@untroubled.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,21 +26,68 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <unistd.h>
 #include "errcodes.h"
+#include "itoa.h"
 #include "connect.h"
+
+static int err_return(int errn, int dflt)
+{
+  switch(errn) {
+  case HOST_NOT_FOUND: return -ERR_HOST_NOT_FOUND;
+  case NO_ADDRESS: return -ERR_NO_ADDRESS;
+  case NO_RECOVERY: return -ERR_GHBN_FATAL;
+  case TRY_AGAIN: return -ERR_GHBN_TEMP;
+  case EAI_AGAIN: return -ERR_GHBN_TEMP;
+  case EAI_NONAME: return -ERR_HOST_NOT_FOUND;
+  case EAI_FAIL: return -ERR_GHBN_FATAL;
+  case ECONNREFUSED: return -ERR_CONN_REFUSED;
+  case ETIMEDOUT: return -ERR_CONN_TIMEDOUT;
+  case ENETUNREACH: return -ERR_CONN_UNREACHABLE;
+  default: return -dflt;
+  }
+}
+
+#ifdef HAVE_GETADDRINFO
+
+int tcpconnect(const mystring& hostname, int port)
+{
+  struct addrinfo req, *res, *orig_res;
+  const char *service = itoa(port, 6);
+
+  memset(&req, 0, sizeof(req));
+  req.ai_flags = AI_NUMERICSERV;
+  req.ai_socktype = SOCK_STREAM;
+  int e = getaddrinfo(hostname.c_str(), service, &req, &res);
+  if(e)
+    return err_return(e, ERR_GHBN_TEMP);
+  int s = -1;
+  orig_res = res;
+
+  for (; res; res = res->ai_next ) {
+    s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    if(s > 0) {
+      if(connect(s, res->ai_addr, res->ai_addrlen) == 0)
+        break;
+      close(s);
+      s = -1;
+    }
+  }
+
+  freeaddrinfo(orig_res);
+
+  if(s < 0)
+    return err_return(errno, ERR_CONN_FAILED);
+  return s;
+}
+
+#else
 
 static int sethostbyname(const mystring& hostname, struct sockaddr_in& sa)
 {
   struct hostent *he = gethostbyname(hostname.c_str());
-  if(!he) {
-    switch(h_errno) {
-    case HOST_NOT_FOUND: return -ERR_HOST_NOT_FOUND;
-    case NO_ADDRESS: return -ERR_NO_ADDRESS;
-    case NO_RECOVERY: return -ERR_GHBN_FATAL;
-    case TRY_AGAIN: return -ERR_GHBN_TEMP;
-    default: return -ERR_GHBN_TEMP;
-    }
-  }
+  if(!he)
+    return err_return(h_errno, ERR_GHBN_TEMP);
   memcpy(&sa.sin_addr, he->h_addr, he->h_length);
   return 0;
 }
@@ -57,12 +104,10 @@ int tcpconnect(const mystring& hostname, int port)
   if(s == -1)
     return -ERR_SOCKET;
   if(connect(s, (sockaddr*)&sa, sizeof(sa)) != 0) {
-    switch(errno) {
-    case ECONNREFUSED: return -ERR_CONN_REFUSED;
-    case ETIMEDOUT: return -ERR_CONN_TIMEDOUT;
-    case ENETUNREACH: return -ERR_CONN_UNREACHABLE;
-    default: return -ERR_CONN_FAILED;
-    }
+    close(s);
+    return err_return(errno, ERR_CONN_FAILED);
   }
   return s;
 }
+
+#endif

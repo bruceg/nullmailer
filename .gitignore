@@ -7,6 +7,7 @@ Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
+compile
 config.h
 config.h.in
 config.log
@@ -24,7 +25,15 @@ src/nullmailer-dsn
 src/nullmailer-inject
 src/nullmailer-queue
 src/nullmailer-send
+src/nullmailer-smtpd
 src/sendmail
 stamp-h.in
 stamp-h1
 test/address-test
+test/argparse-test
+test/clitest0
+test/clitest1
+test/functions
+test/log
+test/runtests
+test/tmp

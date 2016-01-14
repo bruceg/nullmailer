@@ -8,8 +8,8 @@ LISTURL='http://lists.untroubled.org/?list=nullmailer'
 # subscription.
 LISTSUB=nullmailer-subscribe@lists.untroubled.org
 
-# Set MAKERPM to non-empty if the tarball is to be built into a RPM.
-MAKERPM=true
+# Set MAKERPM to true if the tarball is to be built into a RPM.
+MAKERPM=false
 NOARCH=false
 
 # Set DOCS to the list of files that should go into the "docs" directory
@@ -18,7 +18,7 @@ DOCS=
 
 # Set EXTRAS to a list of any other extra files that should go into the
 # base directory in the destination site.
-EXTRAS="ChangeLog ChangeLog.old HOWTO NEWS README TODO YEAR2000"
+EXTRAS="ChangeLog ChangeLog.old HOWTO NEWS README TODO"
 
 # Set EXTRAS_VER to a list of any other extra files that should go into
 # the version-numbered directory in the destination site.

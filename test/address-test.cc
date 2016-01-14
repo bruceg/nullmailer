@@ -202,7 +202,14 @@ int main()
   TEST("Mr . and T <c@d.e>",
        "Mr . and T <c@d.e>",
        "c@d.e\n");
-  
+  // Whitespace in the quoted string
+  TEST("\"\n f\n \" <a@b.c>",
+       "f <a@b.c>",
+       "a@b.c\n");
+  TEST("\" a.b\" <c@d.e>",
+       "\"a.b\" <c@d.e>",
+       "c@d.e\n");
+
   fout << itoa(count) << " tests run, ";
   fout << itoa(failed) << " failed." << endl;
   return failed;

@@ -16,16 +16,21 @@ The process of sending queued messages is described in
 .P
 The following table lists all the control files used by
 .BR nullmailer .
+.P
 .RS
 .nf
 .ta 5c
 control file	used by
 .I adminaddr	\fBnullmailer-queue
+.I allmailfrom	\fBnullmailer-queue
 .I defaultdomain	\fBnullmailer-inject
 .I defaulthost	\fBnullmailer-inject
+.I helohost	\fBnullmailer-send
 .I idhost	\fBnullmailer-inject
+.I maxpause	\fBnullmailer-send
 .I me		\fBnullmailer-inject
 .I pausetime	\fBnullmailer-send
 .I remotes	\fBnullmailer-send
+.I sendtimeout	\fBnullmailer-send
 .fi
 .RE

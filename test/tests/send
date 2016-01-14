@@ -2,9 +2,10 @@
 
 cat <<EOF >$tmpdir/libexec/nullmailer/dummy
 #!/bin/sh
-code=\$1
-shift
-echo "\$@" >&2
+set -e
+read host
+read code
+echo "\$host" | grep -q '^host='
 exit \$code
 EOF
 chmod +x $tmpdir/libexec/nullmailer/dummy
@@ -13,7 +14,6 @@ echo 127.0.0.1 smtp >$SYSCONFDIR/remotes
 
 # Start up the servers
 start send $PWD/../src/nullmailer-send
-start server tcpserver 0 24680 date
 
 make_message() {
   msgid=$(date +%s).$$.me
@@ -30,7 +30,7 @@ send_message() {
   echo 127.0.0.1 dummy $@ >$SYSCONFDIR/remotes
   make_message
   svc -a $tmpdir/service/send
-  sleep 1
+  sleep 2
   not test -e $tmpdir/var/nullmailer/queue/$msgid
 }
 

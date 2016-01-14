@@ -1,5 +1,5 @@
 // nullmailer -- a simple relay-only MTA
-// Copyright (C) 2007  Bruce Guenter <bruce@untroubled.org>
+// Copyright (C) 2012  Bruce Guenter <bruce@untroubled.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,7 +31,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "ac/systime.h"
+#include "ac/time.h"
+#include "argparse.h"
 #include "configio.h"
 #include "defines.h"
 #include "errcodes.h"
@@ -41,6 +42,8 @@
 #include "list.h"
 #include "selfpipe.h"
 #include "setenv.h"
+
+const char* cli_program = "nullmailer-send";
 
 selfpipe selfpipe;
 
@@ -69,9 +72,11 @@ struct remote
   
   mystring host;
   mystring proto;
-  slist options;
+  mystring program;
+  mystring options;
   remote(const slist& list);
   ~remote();
+  void exec(int pfd[2], int fd);
 };
 
 const mystring remote::default_proto = "smtp";
@@ -80,83 +85,88 @@ remote::remote(const slist& lst)
 {
   slist::const_iter iter = lst;
   host = *iter;
+  options = "host=" + host + "\n";
   ++iter;
   if(!iter)
     proto = default_proto;
   else {
     proto = *iter;
-    for(++iter; iter; ++iter)
-      options.append(*iter);
+    for(++iter; iter; ++iter) {
+      mystring option = *iter;
+      // Strip prefix "--"
+      if (option[0] == '-' && option[1] == '-')
+	option = option.right(2);
+      options += option;
+      options += '\n';
+    }
   }
+  options += '\n';
+  program = PROTOCOL_DIR + proto;
 }
 
 remote::~remote() { }
 
-typedef list<remote> rlist;
-
-unsigned ws_split(const mystring& str, slist& lst)
+void remote::exec(int pfd[2], int fd)
 {
-  lst.empty();
-  const char* ptr = str.c_str();
-  const char* end = ptr + str.length();
-  unsigned count = 0;
-  for(;;) {
-    while(ptr < end && isspace(*ptr))
-      ++ptr;
-    const char* start = ptr;
-    while(ptr < end && !isspace(*ptr))
-      ++ptr;
-    if(ptr == start)
-      break;
-    lst.append(mystring(start, ptr-start));
-    ++count;
-  }
-  return count;
+  if (dup2(pfd[0], 0) == -1
+      || close(pfd[0]) == -1
+      || close(pfd[1]) == -1
+      || dup2(fd, 3) == -1
+      || close(fd) == -1)
+    return;
+  const char* args[2] = { program.c_str(), NULL };
+  execv(args[0], (char**)args);
 }
 
+typedef list<remote> rlist;
+
 static rlist remotes;
-static int pausetime = 60;
+static int minpause = 60;
+static int pausetime = minpause;
+static int maxpause = 24*60*60;
 static int sendtimeout = 60*60;
 static int queuelifetime = 7*24*60*60;
 
 bool load_remotes()
 {
   slist rtmp;
-  if(!config_readlist("remotes", rtmp) ||
-     rtmp.count() == 0)
-    return false;
+  config_readlist("remotes", rtmp);
   remotes.empty();
   for(slist::const_iter r(rtmp); r; r++) {
     if((*r)[0] == '#')
       continue;
-    slist parts;
-    if(!ws_split(*r, parts))
+    arglist parts;
+    if (!parse_args(parts, *r))
       continue;
     remotes.append(remote(parts));
   }
-  return remotes.count() > 0;
+  if (remotes.count() == 0)
+    fail("No remote hosts listed for delivery");
+  return true;
 }
 
 bool load_config()
 {
   mystring hh;
-  bool result = true;
 
   if (!config_read("helohost", hh))
     hh = me;
   setenv("HELOHOST", hh.c_str(), 1);
 
-  if(!load_remotes())
-    result = false;
-  
-  if(!config_readint("pausetime", pausetime))
-    pausetime = 60;
+  int oldminpause = minpause;
+  if(!config_readint("pausetime", minpause))
+    minpause = 60;
+  if(!config_readint("maxpause", maxpause))
+    maxpause = 24*60*60;
   if(!config_readint("sendtimeout", sendtimeout))
     sendtimeout = 60*60;
   if(!config_readint("queuelifetime", queuelifetime))
     queuelifetime = 7*24*60*60;
 
-  return result;
+  if (minpause != oldminpause)
+    pausetime = minpause;
+
+  return load_remotes();
 }
 
 static msglist messages;
@@ -191,21 +201,6 @@ bool load_messages()
   return true;
 }
 
-void exec_protocol(int fd, remote& remote)
-{
-  if(close(0) == -1 || dup2(fd, 0) == -1 || close(fd) == -1)
-    return;
-  mystring program = PROTOCOL_DIR + remote.proto;
-  const char* args[3+remote.options.count()];
-  unsigned i = 0;
-  args[i++] = program.c_str();
-  for(slist::const_iter opt(remote.options); opt; opt++)
-    args[i++] = strdup((*opt).c_str());
-  args[i++] = remote.host.c_str();
-  args[i++] = 0;
-  execv(args[0], (char**)args);
-}
-
 tristate catchsender(pid_t pid)
 {
   int status;
@@ -215,7 +210,7 @@ tristate catchsender(pid_t pid)
     case 0:			// timeout
       kill(pid, SIGTERM);
       fout << "Sending timed out, killing protocol" << endl;
-      waitpid(pid, &status, 0);
+      selfpipe.waitsig();	// catch the signal from killing the child
       return tempfail;
     case -1:
       msg1sys("Error waiting for the child signal: ");
@@ -254,11 +249,18 @@ tristate catchsender(pid_t pid)
 
 tristate send_one(mystring filename, remote& remote)
 {
+  int pfd[2];
   int fd = open(filename.c_str(), O_RDONLY);
   if(fd == -1) {
     fout << "Can't open file '" << filename << "'" << endl;
     return tempfail;
   }
+  if (pipe(pfd) == -1) {
+    fout << "Can't create pipe" << endl;
+    close(fd);
+    return tempfail;
+  }
+  const mystring program = PROTOCOL_DIR + remote.proto;
   fout << "Starting delivery: protocol: " << remote.proto
        << " host: " << remote.host
        << " file: " << filename << endl;
@@ -268,9 +270,13 @@ tristate send_one(mystring filename, remote& remote)
     msg1sys("Fork failed: ");
     return tempfail;
   case 0:
-    exec_protocol(fd, remote);
+    remote.exec(pfd, fd);
     exit(ERR_EXEC_FAILED);
   default:
+    if (write(pfd[1], remote.options.c_str(), remote.options.length()) != (ssize_t)remote.options.length())
+      fout << "Warning: Writing options to protocol failed" << endl;
+    close(pfd[0]);
+    close(pfd[1]);
     close(fd);
     return catchsender(pid);
   }
@@ -370,14 +376,22 @@ bool do_select()
   FD_ZERO(&readfds);
   FD_SET(trigger, &readfds);
   struct timeval timeout;
+
+  if (messages.count() == 0)
+    pausetime = maxpause;
   timeout.tv_sec = pausetime;
   timeout.tv_usec = 0;
-  int s = select(trigger+1, &readfds, 0, 0,
-		 (messages.count() == 0) ? 0 : &timeout);
+
+  pausetime *= 2;
+  if (pausetime > maxpause)
+    pausetime = maxpause;
+
+  int s = select(trigger+1, &readfds, 0, 0, &timeout);
   if(s == 1) {
     fout << "Trigger pulled." << endl;
     read_trigger();
     reload_messages = true;
+    pausetime = minpause;
   }
   else if(s == -1 && errno != EINTR)
     fail1sys("Internal error in select: ");
@@ -411,7 +425,7 @@ int main(int, char*[])
   load_messages();
   for(;;) {
     send_all();
-    if (pausetime == 0) break;
+    if (minpause == 0) break;
     do_select();
   }
   return 0;

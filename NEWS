@@ -1,5 +1,84 @@
 This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
+Changes in version 1.14
+
+- Added support for IPv6.
+
+- Added an "allmailfrom" control file to nullmailer-queue, causing all
+  messages to share a hard-coded envelope sender.
+
+- Improved handling of system errors when reading config files.
+
+- Secured handling of password options for protocol modules.
+
+- Support standard shell quoting for options in the "remotes" file.
+
+- Added protocol option to set a separate TLS client private key file.
+
+- Fixed nullmailer-inject to report errors to stderr.
+
+- Fixed gnutls cast to pointer from integer of different size warning.
+
+Development of this version has been sponsored by FutureQuest, Inc.
+ossi@FutureQuest.net  http://www.FutureQuest.net/
+-------------------------------------------------------------------------------
+Changes in version 1.13
+
+- Fixed growing recipient list when using sendmail -bs to send multiple
+  messages.
+
+Development of this version has been sponsored by FutureQuest, Inc.
+ossi@FutureQuest.net  http://www.FutureQuest.net/
+-------------------------------------------------------------------------------
+Changes in version 1.12
+
+- Added a quadratic backoff for resend times.
+
+- Added support for multiple admin addresses in nullmailer-queue.
+
+- SMTP sender now sends a QUIT on success too.
+
+- Fixed sendmail -bs mode to properly strip leading periods.
+
+- Fixed duplicated final header line when message has no body.
+
+Development of this version has been sponsored by FutureQuest, Inc.
+ossi@FutureQuest.net  http://www.FutureQuest.net/
+-------------------------------------------------------------------------------
+Changes in version 1.11
+
+- Simplify (and expand) handling of ignored sendmail options.
+
+- Fixed command-line interpretation of short options with values.
+
+- Added support for SSL/TLS client certificates.
+
+Development of this version has been sponsored by FutureQuest, Inc.
+ossi@FutureQuest.net  http://www.FutureQuest.net/
+-------------------------------------------------------------------------------
+Changes in version 1.10
+
+- Added support for SMTPS (SMTP over SSL/TLS) and STARTTLS.
+
+- Added support for auto-detection of login method in SMTP protocol.
+
+- Added support for -bp (mailq) and -bs (SMTP) mode in the sendmail wrapper.
+
+Development of this version has been sponsored by FutureQuest, Inc.
+ossi@FutureQuest.net  http://www.FutureQuest.net/
+-------------------------------------------------------------------------------
+Changes in version 1.06
+
+- Made nullmailer-queue sync and not just flush queued files to protect
+  against crashes during sensitive operations.
+
+- Fixed handling of whitespace in quoted strings in headers.
+
+- Fixed handling of timeouts when sending.
+
+Development of this version has been sponsored by FutureQuest, Inc.
+ossi@FutureQuest.net  http://www.FutureQuest.net/
+-------------------------------------------------------------------------------
 Changes in version 1.05
 
 - Fixed compilation of src/selfpipe.cc on Solaris and other OSes.
@@ -209,7 +288,7 @@ Changes in version 0.37
   path to nullmailer-queue.
 
 - Added a configure test for libinet, libsocket, and libxnet libraries
-  for systems that have their networking code seperate from the main C
+  for systems that have their networking code separate from the main C
   library (such as Solaris).
 -------------------------------------------------------------------------------
 Changes in version 0.36

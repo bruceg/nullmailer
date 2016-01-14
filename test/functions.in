@@ -1,22 +1,29 @@
-tmpdir=/tmp/nm
+srcdir=@SRCDIR@
+tmpdir=@TMPDIR@
+SYSCONFDIR=@TMPDIR@/etc/nullmailer
+QUEUEDIR=@TMPDIR@/var/nullmailer
 rm -rf $tmpdir
 mkdir -p \
-    $tmpdir/var/nullmailer/{failed,queue,tmp} \
+    $QUEUEDIR/{failed,queue,tmp} \
     $tmpdir/libexec/nullmailer \
-    $tmpdir/etc/nullmailer
-mknod $tmpdir/var/nullmailer/trigger p
+    $SYSCONFDIR
+mknod $QUEUEDIR/trigger p
 ln -s $PWD/../src $tmpdir/sbin
 
+fail() {
+    echo "$*"
+    exit 1
+}
 start() {
     local name=$1
     shift
     mkdir -p $tmpdir/service/$name
     {
 	echo '#!/bin/sh'
-	echo exec "$@" '>log 2>err'
+	echo exec "$@"
     } >$tmpdir/service/$name/run
     chmod +x $tmpdir/service/$name/run
-    supervise $tmpdir/service/$name </dev/null >/dev/null 2>&1 &
+    supervise $tmpdir/service/$name </dev/null >$tmpdir/service/${name}-log 2>&1 &
 }
 stop() {
     for name in $*; do
@@ -47,6 +54,20 @@ error() {
 
 inject() { ../src/nullmailer-inject "$@"; }
 mailq() { ../src/mailq "$@"; }
+smtpd() { ../src/nullmailer-smtpd "$@"; }
+queue() {
+    (
+        echo "$1"
+        shift
+        while [ x"$1" != x ]
+        do
+            echo "$1"
+            shift
+        done
+        echo
+        echo "Subject: test"
+    ) | ../src/nullmailer-queue > $tmpdir/queue-out 2> $tmpdir/queue-err
+}
 injectlines() {
   for line in "$@"; do
     echo "$line"
@@ -58,7 +79,22 @@ injectfield() {
   shift
   injectlines "$@" | grep -i "^$field:" | cut -d: -f2-
 }
-protocol() { local p=$1; shift; ../protocols/$p "$@" >/dev/null 2>&1; }
+protocol() {
+    local p=$1
+    local opts=""
+    shift
+    while [ $# -gt 0 -a x"$1" != x-- ]
+    do
+        opts="$opts $1"
+        shift
+    done
+    shift || :
+    for line in "$@"
+    do
+        echo "$line"
+    done > $tmpdir/protocol-in
+    ../protocols/$p $opts < $tmpdir/protocol-in > $tmpdir/protocol-log 2>&1
+}
 
 PATH=/bin:/usr/bin:/usr/local/bin
 NULLMAILER_QUEUE=$PWD/../src/nullmailer-queue
