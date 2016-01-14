@@ -32,4 +32,4 @@ test: all
 	./address-test
 	./argparse-test
 	sh clitest.sh
-	./runtests `find tests -type f -not -name '.*.swp'`
+	./runtests `find tests -type f -not -name '.*'`
