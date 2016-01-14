@@ -20,7 +20,7 @@ clitest1_SOURCES = clitest.cc
 clitest1_LDADD = ../lib/libnullmailer.a ../lib/cli++/libcli++.a
 
 runtests: runtests.in Makefile
-	sed -e 's,[@]PREFIX[@],$(prefix),g' < $< > $@
+	sed -e 's,[@]PREFIX[@],$(prefix),g; s,[@]SRCDIR[@],$(abs_top_srcdir),g;' < $< > $@
 	chmod +x $@
 
 # The following makes sure that we can't produce a package without the

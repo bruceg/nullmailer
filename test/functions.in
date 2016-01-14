@@ -1,3 +1,4 @@
+srcdir=@SRCDIR@
 tmpdir=@TMPDIR@
 SYSCONFDIR=@TMPDIR@/etc/nullmailer
 QUEUEDIR=@TMPDIR@/var/nullmailer
