@@ -3,7 +3,7 @@ EXTRA_DIST = address-trace.cc argparse.cc clitest.cc clitest.sh runtests.in
 noinst_SCRIPTS = runtests
 CLEANFILES = runtests
 
-INCLUDES = -I../lib
+AM_CPPFLAGS = -I../lib
 
 address_test_SOURCES = address-test.cc # address-trace.cc
 address_test_LDADD = ../lib/libnullmailer.a
@@ -11,11 +11,11 @@ address_test_LDADD = ../lib/libnullmailer.a
 argparse_test_SOURCES = argparse-test.cc
 argparse_test_LDADD = ../lib/libnullmailer.a
 
-clitest0_CPPFLAGS = -DCLI_ONLY_LONG=false
+clitest0_CPPFLAGS = $(AM_CPPFLAGS) -DCLI_ONLY_LONG=false
 clitest0_SOURCES = clitest.cc
 clitest0_LDADD = ../lib/libnullmailer.a ../lib/cli++/libcli++.a
 
-clitest1_CPPFLAGS = -DCLI_ONLY_LONG=true
+clitest1_CPPFLAGS = $(AM_CPPFLAGS) -DCLI_ONLY_LONG=true
 clitest1_SOURCES = clitest.cc
 clitest1_LDADD = ../lib/libnullmailer.a ../lib/cli++/libcli++.a
 
