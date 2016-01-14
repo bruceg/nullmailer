@@ -1,6 +1,6 @@
 . functions
 
-inj() { inject -n -v a </dev/null 2>/dev/null | head -n 1; }
+inj() { inject -n -v "$@" a </dev/null 2>/dev/null | head -n 1; }
 testvar() {
 	set -e
 	echo "Checking that inject obeys $1."
@@ -20,6 +20,14 @@ testhdr() {
 }
 testign() { testhdr ignores "$@"; }
 testset() { testhdr uses "$@"; }
+testfrom() {
+	echo "Checking that inject honors -f '$1'"
+	inj -f "$1" | grep -qx "$2"
+}
+testfrom2() {
+	testfrom "$1" "$2"
+	testfrom "<$1>" "$2"
+}
 
 echo "Checking that inject obeys me"
 rm -f $SYSCONFDIR/default*
@@ -72,3 +80,7 @@ testign Sender a@b.c '^name4@test3'
 testset Return-Path name0@host0.org '^name0@host0.org$'
 export NULLMAILER_FLAGS=s
 testign Return-Path name0@host0.org '^name4@test3'
+
+testfrom2 '' ''
+testfrom2 'a@b.c' 'a@b.c'
+testfrom2 'a@b' 'a@b.domain.org'

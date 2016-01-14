@@ -552,8 +552,10 @@ bool parse_args(int argc, char* argv[])
   if(o_from) {
     mystring list;
     mystring tmp(o_from);
-    if(!parse_addresses(tmp, list) ||
-       !parse_sender(list)) {
+    if(tmp == "" || tmp == "<>")
+      sender = "";
+    else if(!parse_addresses(tmp, list) ||
+            !parse_sender(list)) {
       ferr << "nullmailer-inject: Invalid sender address: " << o_from << endl;
       return false;
     }
