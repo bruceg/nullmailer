@@ -48,6 +48,24 @@ dnl Checks for library functions.
 dnl AC_CHECK_FUNCS(gettimeofday mkdir putenv rmdir socket)
 AC_CHECK_FUNCS(setenv srandom)
 
+AC_MSG_CHECKING(for getaddrinfo)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <stddef.h>
+]], [[
+getaddrinfo(NULL, NULL, NULL, NULL)
+]])], [has_getaddrinfo=yes], [has_getaddrinfo=no])
+if test "$has_getaddrinfo" = yes; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_GETADDRINFO,,[getaddrinfo code enabled])
+else
+  AC_MSG_RESULT(no)
+  AC_MSG_RESULT(disabled: getaddrinfo missing)
+fi
+AC_SUBST(HAVE_GETADDRINFO)
+
 AC_DEFINE(BUFSIZE, 4096, [Generic buffer size])
 AM_CONDITIONAL(FDBUF_NO_MYSTRING, false)
 
