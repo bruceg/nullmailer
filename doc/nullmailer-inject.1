@@ -221,15 +221,15 @@ of all leading and trailing whitespace characters.
 .B defaultdomain
 The content of this file is appended to any host name that does not
 contain a period (except
-.IR localhost ),
+.BR localhost ),
 including
-.BR defaulthost
+.I defaulthost
 and
-.BR idhost .
+.IR idhost .
 Defaults to the value of the
-.I me
+.B me
 control file, if it exists, otherwise the literal name
-.IR defauldomain .
+.BR defauldomain .
 .TP
 .B defaulthost
 The content of this file is appended to any address that is missing a
@@ -237,18 +237,18 @@ host name.
 Defaults to the value of the
 .I me
 control file, if it exists, otherwise the literal name
-.IR defaulthost .
+.BR defaulthost .
 .TP
 .B idhost
 The content of this file is used when building the message-id string
 for the message.
 Defaults to the canonicalized value of
-.BR defaulthost .
+.IR defaulthost .
 .TP
 .B me
 The fully-qualifiled host name of the computer running nullmailer.
 Defaults to the literal name
-.IR me .
+.BR me .
 .SH SEE ALSO
 nullmailer-queue(8)
 .SH NOTES

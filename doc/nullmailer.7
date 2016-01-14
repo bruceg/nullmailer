@@ -21,14 +21,15 @@ The following table lists all the control files used by
 .nf
 .ta 5c
 control file	used by
-.I adminaddr	\fBnullmailer-queue
+.I adminaddr	\fBnullmailer-dsn\fR, \fBnullmailer-queue
 .I allmailfrom	\fBnullmailer-queue
-.I defaultdomain	\fBnullmailer-inject
-.I defaulthost	\fBnullmailer-inject
+.I defaultdomain	\fBnullmailer-dsn\fR, \fBnullmailer-inject
+.I defaulthost	\fBnullmailer-dsn\fR, \fBnullmailer-inject
+.I doublebounceto	\fBnullmailer-dsn
 .I helohost	\fBnullmailer-send
-.I idhost	\fBnullmailer-inject
+.I idhost	\fBnullmailer-dsn\fR, \fBnullmailer-inject
 .I maxpause	\fBnullmailer-send
-.I me		\fBnullmailer-inject
+.I me		\fBnullmailer-dsn\fR, \fBnullmailer-inject
 .I pausetime	\fBnullmailer-send
 .I remotes	\fBnullmailer-send
 .I sendtimeout	\fBnullmailer-send

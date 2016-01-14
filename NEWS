@@ -7,6 +7,8 @@ Changes in version 2.0
 
 - Added support for IPv6.
 
+- Added program to generate bounce/delay messages.
+
 - Added an "allmailfrom" control file to nullmailer-queue, causing all
   messages to share a hard-coded envelope sender.
 
