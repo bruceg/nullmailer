@@ -102,31 +102,31 @@ If an address is missing a fqdn,
 adds one.
 .SH OPTIONS
 .TP
-.I -a
+.I \-a
 Use only the command line arguments as recipient addresses.
 Ignore the header recipient lines.
 .TP
-.I -b
+.I \-b
 Use both the command line arguments and data from the message header
 as recipient addresses.
 .TP
-.I -e
+.I \-e
 Use either the command line arguments (if there are any) or data from
 the message header (if there are no arguments) as the recipient
 addresses.
 .TP
-.I -f sender
+.I \-f sender
 Set the envelope sender address to
-.I sender .
+.IR sender .
 .TP
-.I -h
+.I \-h
 Use only data from the message header as the recipient addresses.
 .TP
-.I -n
+.I \-n
 Do not queue the message, but print the reformatted contents to
 standard output.
 .TP
-.I -v
+.I \-v
 Print out the envelope (sender and recipient addresses) preceding the
 message when printing the message to standard output.
 .SH RETURN VALUE
