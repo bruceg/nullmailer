@@ -21,6 +21,8 @@ RCPT
 RCPT TO:<r@example.com>
 RSET
 RCPT TO:<r@example.com>
+MAIL FROM:<>
+RSET
 MAIL FROM:<f0@example.com>
 RCPT TO:<r0@example.com>
 mail from f@example.com
@@ -54,6 +56,8 @@ diff -u - $out <<EOF
 250 2.1.5 Recipient accepted^M
 250 2.3.0 OK^M
 503 5.5.1 You must send a valid sender first^M
+250 2.1.0 Sender accepted^M
+250 2.3.0 OK^M
 250 2.1.0 Sender accepted^M
 250 2.1.5 Recipient accepted^M
 250 2.1.0 Sender accepted^M
