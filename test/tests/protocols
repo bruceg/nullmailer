@@ -13,33 +13,22 @@ Subject: Nullmailer automated test message
 Just testing, please ignore
 EOF
 
-start server "tcpserver ::0 24680 sh -c 'echo 250 OK; echo 250 OK; echo 250 OK; echo 250 OK; echo 351 OK; echo 220 OK; sleep 1'"
-sleep 1
-
-echo "Testing protocol success with smtp (command-line)"
-protocol smtp --host=localhost --port=24680 3<testmail
-
-echo "Testing protocol success with smtp (stdin)"
-protocol smtp -- host=localhost port=24680 3<testmail
-
-echo "Testing protocol success with smtp (stdin, IPv6)"
-protocol smtp -- host=::1 port=24680 3<testmail
-
-stop server
-
-start server "tcpserver 0 24680 sh -c 'echo 3:KOK,'"
-sleep 1
-
-echo "Testing protocol success with qmqp (command-line)"
-protocol qmqp --host=localhost --port=24680 3<testmail
-
-echo "Testing protocol success with qmqp (stdin)"
-protocol qmqp -- host=localhost port=24680 3<testmail
-
-stop server
-
 for p in smtp qmqp
 do
+	start server "tcpserver ::0 24680 sh $srcdir/test/accept-$p.sh"
+	sleep 1
+
+	echo "Testing protocol success with $p (command-line)"
+	protocol $p --host=localhost --port=24680 3<testmail
+
+	echo "Testing protocol success with $p (stdin)"
+	protocol $p -- host=localhost port=24680 3<testmail
+
+	echo "Testing protocol success with $p (stdin, IPv6)"
+	protocol $p -- host=::1 port=24680 3<testmail
+
+	stop server
+
 	echo "Testing host not found error with $p."
 	error 2 protocol $p --host=this.host.can.not.exist 3<testmail
 
