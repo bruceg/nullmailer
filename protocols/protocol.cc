@@ -25,6 +25,7 @@
 #include "connect.h"
 #include "errcodes.h"
 #include "list.h"
+#include "mystring/mystring.h"
 #include "protocol.h"
 #include "cli++.h"
 

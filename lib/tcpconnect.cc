@@ -50,7 +50,7 @@ static int err_return(int errn, int dflt)
 
 #ifdef HAVE_GETADDRINFO
 
-int tcpconnect(const mystring& hostname, int port)
+int tcpconnect(const char* hostname, int port)
 {
   struct addrinfo req, *res, *orig_res;
   const char *service = itoa(port, 6);
@@ -58,7 +58,7 @@ int tcpconnect(const mystring& hostname, int port)
   memset(&req, 0, sizeof(req));
   req.ai_flags = AI_NUMERICSERV;
   req.ai_socktype = SOCK_STREAM;
-  int e = getaddrinfo(hostname.c_str(), service, &req, &res);
+  int e = getaddrinfo(hostname, service, &req, &res);
   if(e)
     return err_return(e, ERR_GHBN_TEMP);
   int s = -1;
@@ -83,16 +83,16 @@ int tcpconnect(const mystring& hostname, int port)
 
 #else
 
-static int sethostbyname(const mystring& hostname, struct sockaddr_in& sa)
+static int sethostbyname(const char* hostname, struct sockaddr_in& sa)
 {
-  struct hostent *he = gethostbyname(hostname.c_str());
+  struct hostent *he = gethostbyname(hostname);
   if(!he)
     return err_return(h_errno, ERR_GHBN_TEMP);
   memcpy(&sa.sin_addr, he->h_addr, he->h_length);
   return 0;
 }
 
-int tcpconnect(const mystring& hostname, int port)
+int tcpconnect(const char* hostname, int port)
 {
   struct sockaddr_in sa;
   memset(&sa, 0, sizeof(sa));
