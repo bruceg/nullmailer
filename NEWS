@@ -19,6 +19,9 @@ Changes in version 1.14
 
 - Fixed gnutls cast to pointer from integer of different size warning.
 
+- Fixed nullmailer-inject and -queue to handle the null (empty) sender
+  address. Needed for RFC 3798 (Message Disposition Notification).
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
