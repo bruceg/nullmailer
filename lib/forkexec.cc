@@ -94,14 +94,25 @@ void fork_exec::close()
   wfd.close();
 }
 
-bool fork_exec::wait()
+int fork_exec::wait_status()
 {
   if (pid > 0) {
     close();
     int status;
-    if (waitpid(pid, &status, 0) < 0)
+    if (waitpid(pid, &status, 0) == pid) {
+      pid = -1;
+      return status;
+    }
+  }
+  return -1;
+}
+
+bool fork_exec::wait()
+{
+  if (pid > 0) {
+    int status = wait_status();
+    if (status < 0)
       FAIL("Error catching the return value from " << name);
-    pid = -1;
     if (WIFEXITED(status)) {
       status = WEXITSTATUS(status);
       if (status) {

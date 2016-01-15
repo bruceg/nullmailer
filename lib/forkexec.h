@@ -2,6 +2,7 @@
 #define NULLMAILER__FORK_EXEC__H
 
 #include <sys/types.h>
+#include <sys/wait.h>
 #include "autoclose.h"
 
 class fork_exec
@@ -20,6 +21,8 @@ class fork_exec
   bool start(const char* program, int redir_from = -1, int redir_to = -1);
   void close();
   bool wait();
+  int wait_status();
+  inline void kill(int sig) { ::kill(pid, sig); }
 };
 
 class queue_pipe : public fork_exec

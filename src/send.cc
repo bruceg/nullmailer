@@ -78,7 +78,6 @@ struct remote
   mystring options;
   remote(const slist& list);
   ~remote();
-  void exec(int pfd[2], int fd);
 };
 
 const mystring remote::default_proto = "smtp";
@@ -107,18 +106,6 @@ remote::remote(const slist& lst)
 }
 
 remote::~remote() { }
-
-void remote::exec(int pfd[2], int fd)
-{
-  if (dup2(pfd[0], 0) == -1
-      || close(pfd[0]) == -1
-      || close(pfd[1]) == -1
-      || dup2(fd, 3) == -1
-      || close(fd) == -1)
-    return;
-  const char* args[2] = { program.c_str(), NULL };
-  execv(args[0], (char**)args);
-}
 
 typedef list<remote> rlist;
 
@@ -203,15 +190,13 @@ bool load_messages()
   return true;
 }
 
-tristate catchsender(pid_t pid)
+tristate catchsender(fork_exec& fp)
 {
-  int status;
-
   for (;;) {
     switch (selfpipe.waitsig(sendtimeout)) {
     case 0:			// timeout
-      kill(pid, SIGTERM);
       fout << "Sending timed out, killing protocol" << endl;
+      fp.kill(SIGTERM);
       selfpipe.waitsig();	// catch the signal from killing the child
       return tempfail;
     case -1:
@@ -225,7 +210,8 @@ tristate catchsender(pid_t pid)
     break;
   }
 
-  if(waitpid(pid, &status, 0) == -1) {
+  int status = fp.wait_status();
+  if(status < 0) {
     fout << "Error catching the child process return value: "
 	 << strerror(errno) << endl;
     return tempfail;
@@ -251,35 +237,25 @@ tristate catchsender(pid_t pid)
 
 tristate send_one(mystring filename, remote& remote)
 {
-  int pfd[2];
+  fout << "Starting delivery: protocol: " << remote.proto
+       << " host: " << remote.host
+       << " file: " << filename << endl;
+
   autoclose fd = open(filename.c_str(), O_RDONLY);
   if(fd < 0) {
     fout << "Can't open file '" << filename << "'" << endl;
     return tempfail;
   }
-  if (pipe(pfd) == -1) {
-    fout << "Can't create pipe" << endl;
+
+  fork_exec fp(remote.proto.c_str());
+  if (!fp.start(remote.program.c_str(), fd, 3))
     return tempfail;
-  }
-  const mystring program = PROTOCOL_DIR + remote.proto;
-  fout << "Starting delivery: protocol: " << remote.proto
-       << " host: " << remote.host
-       << " file: " << filename << endl;
-  pid_t pid = fork();
-  switch(pid) {
-  case -1:
-    msg1sys("Fork failed: ");
-    return tempfail;
-  case 0:
-    remote.exec(pfd, fd);
-    exit(ERR_EXEC_FAILED);
-  default:
-    if (write(pfd[1], remote.options.c_str(), remote.options.length()) != (ssize_t)remote.options.length())
-      fout << "Warning: Writing options to protocol failed" << endl;
-    close(pfd[0]);
-    close(pfd[1]);
-    return catchsender(pid);
-  }
+
+  if (write(fp.fd_to(), remote.options.c_str(), remote.options.length()) != (ssize_t)remote.options.length())
+    fout << "Warning: Writing options to protocol failed" << endl;
+  fp.close();
+
+  return catchsender(fp);
 }
 
 bool bounce_msg(struct message& msg)
