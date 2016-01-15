@@ -43,6 +43,7 @@ const char* errorstr(int code)
   case ERR_CONFIG: return "Could not read config files";
   case ERR_MSG_REFUSED: return "Server refused the message";
   case ERR_MSG_PERMFAIL: return "Permanent error in sending the message";
+  case ERR_BIND_FAILED: return "Failed to bind source address";
   }
   return (code & ERR_PERMANENT_FLAG)
     ? "Unspecified permanent error"

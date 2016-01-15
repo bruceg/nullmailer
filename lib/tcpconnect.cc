@@ -61,29 +61,63 @@ static int getaddr(const char* hostname, int port, struct addrinfo** result)
   return e ? err_return(e, ERR_GHBN_TEMP) : 0;
 }
 
-int tcpconnect(const char* hostname, int port)
+static bool canbind(int family, const struct addrinfo* ai)
+{
+  for (; ai; ai = ai->ai_next)
+    if (ai->ai_family == family)
+      return true;
+  return false;
+}
+
+static bool bindit(int fd, int family, const struct addrinfo* ai)
+{
+  for (; ai; ai = ai->ai_next)
+    if (ai->ai_family == family)
+      if (bind(fd, ai->ai_addr, ai->ai_addrlen) == 0)
+        return true;
+  return false;
+}
+
+int tcpconnect(const char* hostname, int port, const char* source)
 {
   struct addrinfo* res;
   int err = getaddr(hostname, port, &res);
   if (err)
     return err;
+  struct addrinfo* source_addr = NULL;
+  if (source) {
+    err = getaddr(source, 0, &source_addr);
+    if (err)
+      return err;
+  }
   int s = -1;
+  err = ERR_CONN_FAILED;
   struct addrinfo* orig_res = res;
 
   for (; res; res = res->ai_next ) {
-    s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-    if(s > 0) {
-      if(connect(s, res->ai_addr, res->ai_addrlen) == 0)
-        break;
-      close(s);
-      s = -1;
+    if (!source_addr || canbind(res->ai_family, source_addr)) {
+      s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+      if(s > 0) {
+        if(source_addr && !bindit(s, res->ai_family, source_addr)) {
+          close(s);
+          err = ERR_BIND_FAILED;
+          s = -1;
+          break;
+        }
+        if(connect(s, res->ai_addr, res->ai_addrlen) == 0)
+          break;
+        close(s);
+        s = -1;
+      }
     }
   }
 
   freeaddrinfo(orig_res);
+  if (source_addr)
+    freeaddrinfo(source_addr);
 
   if(s < 0)
-    return err_return(errno, ERR_CONN_FAILED);
+    return err_return(errno, err);
   return s;
 }
 
@@ -98,17 +132,27 @@ static int sethostbyname(const char* hostname, struct sockaddr_in& sa)
   return 0;
 }
 
-int tcpconnect(const char* hostname, int port)
+int tcpconnect(const char* hostname, int port, const char* source)
 {
   struct sockaddr_in sa;
   memset(&sa, 0, sizeof(sa));
   int e = sethostbyname(hostname, sa);
   if(e) return e;
+  struct sockaddr_in source_sa;
+  memset(&source_sa, 0, sizeof source_sa);
+  if(source) {
+    e = sethostbyname(source, source_sa);
+    if(e) return e;
+  }
   sa.sin_family = AF_INET;
   sa.sin_port = htons(port);
   int s = socket(PF_INET, SOCK_STREAM, 0);
   if(s == -1)
     return -ERR_SOCKET;
+  if(source && bind(s, (sockaddr*)&source_sa, sizeof source_sa) != 0) {
+    close(s);
+    return err_return(errno, ERR_BIND_FAILED);
+  }
   if(connect(s, (sockaddr*)&sa, sizeof(sa)) != 0) {
     close(s);
     return err_return(errno, ERR_CONN_FAILED);

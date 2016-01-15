@@ -19,6 +19,7 @@
 #define ERR_MSG_TEMPFAIL 16	// server temporarily failed to receive
 #define ERR_UNKNOWN 17		// Arbitrary error code
 #define ERR_CONFIG 18		// Error reading a config file
+#define ERR_BIND_FAILED 19      // Failed to bind source address
 
 // Permanent errors
 #define ERR_GHBN_FATAL 33	// gethostbyname failed with NO_RECOVERY
