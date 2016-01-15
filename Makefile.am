@@ -26,3 +26,6 @@ dist-hook:
 	sed -e s/@VERSION\@/@VERSION@/ \
 		<spec >$(distdir)/nullmailer-@VERSION@.spec
 	find $(distdir)/scripts -name '*~' | xargs -r rm
+
+tests: all
+	$(MAKE) -C test test
