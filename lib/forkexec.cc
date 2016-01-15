@@ -50,7 +50,7 @@ bool fork_exec::operator!() const
   return pid < 0;
 }
 
-bool fork_exec::start(const char* program)
+bool fork_exec::start(const char* program, int redir_from, int redir_to)
 {
   int pipe1[2];
   autoclose fdnull;
@@ -74,6 +74,11 @@ bool fork_exec::start(const char* program)
     dup2(fdnull, 1);
     dup2(fdnull, 2);
     fdnull.close();
+    if (redir_from > 0) {
+      dup2(redir_from, redir_to);
+      if (redir_from != redir_to)
+        ::close(redir_from);
+    }
     const char* argv[] = { program, NULL };
     execv(argv[0], (char**)argv);
     ERR("Could not exec " << name);

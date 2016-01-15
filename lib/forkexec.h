@@ -17,7 +17,7 @@ class fork_exec
   bool operator!() const;
   inline int fd_to() const { return wfd; }
 
-  bool start(const char*);
+  bool start(const char* program, int redir_from = -1, int redir_to = -1);
   void close();
   bool wait();
 };
