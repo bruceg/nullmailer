@@ -38,6 +38,7 @@
 #include "defines.h"
 #include "errcodes.h"
 #include "fdbuf/fdbuf.h"
+#include "forkexec.h"
 #include "hostname.h"
 #include "itoa.h"
 #include "list.h"

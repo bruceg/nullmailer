@@ -10,9 +10,14 @@ class autoclose
   int fd;
 
   public:
-  inline autoclose(int f) : fd(f) { }
+  inline autoclose(int f = -1) : fd(f) { }
   inline ~autoclose() { close(); }
   inline operator int() const { return fd; }
+  inline int operator =(int f)
+  {
+    close();
+    return fd = f;
+  }
   inline void close()
   {
     if (fd >= 0) {

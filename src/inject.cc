@@ -38,6 +38,7 @@
 #include "configio.h"
 #include "cli++/cli++.h"
 #include "makefield.h"
+#include "forkexec.h"
 
 enum {
   use_args, use_both, use_either, use_header
@@ -79,7 +80,6 @@ typedef list<mystring> slist;
 // static bool do_debug = false;
 
 static mystring cur_line;
-static mystring nqueue;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Configuration
@@ -90,19 +90,12 @@ extern void canonicalize(mystring& domain);
 
 void read_config()
 {
-  const char* env;
   mystring tmp;
   read_hostnames();
   if(!config_read("idhost", idhost))
     idhost = me;
   else
     canonicalize(idhost);
-  if ((env = getenv("NULLMAILER_QUEUE")) != 0)
-    nqueue = env;
-  else {
-    nqueue = SBIN_DIR;
-    nqueue += "/nullmailer-queue";
-  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -425,101 +418,60 @@ bool fix_header()
 ///////////////////////////////////////////////////////////////////////////////
 // Message sending
 ///////////////////////////////////////////////////////////////////////////////
-static fdobuf* nqpipe = 0;
-static pid_t pid = 0;
-
-void exec_queue()
+bool send_env(fdobuf& out)
 {
-  execl(nqueue.c_str(), nqueue.c_str(), NULL);
-  ferr << "nullmailer-inject: Could not exec " << nqueue << ": "
-       << strerror(errno) << endl;
-  exit(1);
-}
-
-bool start_queue()
-{
-  int pipe1[2];
-  if(pipe(pipe1) == -1)
-    fail_sys("Could not create pipe to nullmailer-queue");
-  fout.flush();
-  pid = fork();
-  if(pid == -1)
-    fail_sys("Could not fork");
-  if(pid == 0) {
-    close(pipe1[1]);
-    close(0);
-    dup2(pipe1[0], 0);
-    exec_queue();
-  }
-  else {
-    close(pipe1[0]);
-    nqpipe = new fdobuf(pipe1[1], true);
-  }
-  return true;
-}
-
-bool send_env()
-{
-  if(!(*nqpipe << sender << "\n"))
+  if(!(out << sender << "\n"))
     fail("Error sending sender to nullmailer-queue.");
   for(slist::iter iter(recipients); iter; iter++)
-    if(!(*nqpipe << *iter << "\n"))
+    if(!(out << *iter << "\n"))
       fail("Error sending recipients to nullmailer-queue.");
-  if(!(*nqpipe << endl))
+  if(!(out << endl))
     fail("Error sending recipients to nullmailer-queue.");
   return true;
 }
 
-bool send_header()
+bool send_header(fdobuf& out)
 {
   for(slist::iter iter(headers); iter; iter++)
-    if(!(*nqpipe << *iter << "\n"))
+    if(!(out << *iter << "\n"))
       fail("Error sending header to nullmailer-queue.");
-  if(!(*nqpipe << endl))
+  if(!(out << endl))
     fail("Error sending header to nullmailer-queue.");
   return true;
 }
 
-bool send_body()
+bool send_body(fdobuf& out)
 {
-  if(!(*nqpipe << cur_line) ||
-     !fdbuf_copy(fin, *nqpipe))
+  if(!(out << cur_line) ||
+     !fdbuf_copy(fin, out))
     fail("Error sending message body to nullmailer-queue.");
   return true;
 }
 
-bool wait_queue()
+bool send_message_stdout()
 {
-  if(!nqpipe->close())
-    fail("Error closing pipe to nullmailer-queue.");
-  int status;
-  if(waitpid(pid, &status, 0) == -1)
-    fail("Error catching the return value from nullmailer-queue.");
-  if(WIFEXITED(status)) {
-    status = WEXITSTATUS(status);
-    if(status)
-      fail("nullmailer-queue failed.");
-    else
-      return true;
-  }
-  else
-    fail("nullmailer-queue crashed or was killed.");
+  if(show_envelope)
+    send_env(fout);
+  send_header(fout);
+  send_body(fout);
+  return true;
+}
+
+bool send_message_nqueue()
+{
+  queue_pipe nq;
+  if (!nq.start())
+    return false;
+  fdobuf nqout(nq.fd_to());
+  if (!send_env(nqout) || !send_header(nqout) || !send_body(nqout))
+    return false;
+  nqout.flush();
+  return nq.wait();
 }
 
 bool send_message()
 {
-  if(show_message) {
-    nqpipe = &fout;
-    if(show_envelope)
-      send_env();
-    send_header();
-    send_body();
-    return true;
-  }
-  else
-    return start_queue() &&
-      send_env() && send_header() && send_body() &&
-      wait_queue();
+  return show_message ? send_message_stdout() : send_message_nqueue();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
