@@ -50,19 +50,25 @@ static int err_return(int errn, int dflt)
 
 #ifdef HAVE_GETADDRINFO
 
-int tcpconnect(const char* hostname, int port)
+static int getaddr(const char* hostname, int port, struct addrinfo** result)
 {
-  struct addrinfo req, *res, *orig_res;
   const char *service = itoa(port, 6);
-
+  struct addrinfo req;
   memset(&req, 0, sizeof(req));
   req.ai_flags = AI_NUMERICSERV;
   req.ai_socktype = SOCK_STREAM;
-  int e = getaddrinfo(hostname, service, &req, &res);
-  if(e)
-    return err_return(e, ERR_GHBN_TEMP);
+  int e = getaddrinfo(hostname, service, &req, result);
+  return e ? err_return(e, ERR_GHBN_TEMP) : 0;
+}
+
+int tcpconnect(const char* hostname, int port)
+{
+  struct addrinfo* res;
+  int err = getaddr(hostname, port, &res);
+  if (err)
+    return err;
   int s = -1;
-  orig_res = res;
+  struct addrinfo* orig_res = res;
 
   for (; res; res = res->ai_next ) {
     s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
