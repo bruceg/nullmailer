@@ -25,6 +25,7 @@
 #include "connect.h"
 #include "errcodes.h"
 #include "list.h"
+#include "mystring/mystring.h"
 #include "protocol.h"
 #include "cli++.h"
 
@@ -35,6 +36,7 @@ int auth_method = AUTH_DETECT;
 int use_tls = 0;
 int use_starttls = 0;
 const char* remote = 0;
+const char* source = 0;
 const char* cli_help_suffix = "";
 const char* cli_args_usage = "< options 3< mail-file";
 const int cli_args_min = 0;
@@ -50,6 +52,8 @@ cli_option cli_options[] = {
     "Set the password for authentication", 0 },
   { 0, "auth-login", cli_option::flag, AUTH_LOGIN, &auth_method,
     "Use AUTH LOGIN instead of auto-detecting in SMTP", 0 },
+  { 0, "source", cli_option::string, 0, &source,
+    "Source address for connections", 0 },
 #ifdef HAVE_TLS
   { 0, "tls", cli_option::flag, 1, &use_tls,
     "Connect using TLS (on an alternate port by default)", 0 },
@@ -136,7 +140,7 @@ int cli_main(int, char*[])
     tls_init(remote);
   fdibuf in(3, true);
   protocol_prep(in);
-  int fd = tcpconnect(remote, port);
+  int fd = tcpconnect(remote, port, source);
   if(fd < 0)
     protocol_fail(-fd, "Connect failed");
   if (use_tls)
