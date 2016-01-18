@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include "fdbuf/fdbuf.h"
 #include "defines.h"
+#include "forkexec.h"
 #include "setenv.h"
 #include "cli++/cli++.h"
 
@@ -100,13 +101,10 @@ bool setenvelope(char* str)
 
 int do_exec(const char* program, const char* xarg1, int argc, char* argv[])
 {
-  if(chdir(BIN_DIR) == -1) {
-    ferr << "sendmail: Could not change directory to " << BIN_DIR << endl;
-    return 1;
-  }
+  mystring path = program_path(BIN_DIR, program, NULL);
 
   const char* newargv[argc+3];
-  newargv[0] = program;
+  newargv[0] = path.c_str();
   int j = 1;
   if (xarg1)
     newargv[j++] = xarg1;
