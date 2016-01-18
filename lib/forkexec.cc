@@ -35,8 +35,10 @@
 #define ERR(MSG) do{ ferr << cli_program << ": " << MSG << ": " << strerror(errno) << endl; } while(0)
 #define FAIL(MSG) do{ ERR(MSG); return false; }while(0)
 
+static int fdnull = -1;
+
 fork_exec::fork_exec(const char* p)
-  : wfd(-1), pid(-1), name(p)
+  : pid(-1), name(p)
 {
 }
 
@@ -50,54 +52,57 @@ bool fork_exec::operator!() const
   return pid < 0;
 }
 
-bool fork_exec::start(const char* program, int redir_from, int redir_to)
+bool fork_exec::start(const char* program, int redirn, int redirs[])
 {
-  int pipe1[2];
-  autoclose fdnull;
-  if (pipe(pipe1) < 0)
-    FAIL("Could not create pipe");
-  if ((fdnull = open("/dev/null", O_RDWR)) < 0) {
-    ::close(pipe1[0]);
-    ::close(pipe1[1]);
-    FAIL("Could not open \"/dev/null\"");
+  autoclose_pipe pipes[redirn];
+  for (int i = 0; i < redirn; i++) {
+    if (redirs[i] == REDIRECT_PIPE_TO || redirs[i] == REDIRECT_PIPE_FROM)
+      if (!pipes[i].open())
+        FAIL("Could not create pipe");
+    if (redirs[i] == REDIRECT_NULL)
+      if (fdnull < 0)
+        if ((fdnull = open("/dev/null", O_RDWR)) < 0)
+          FAIL("Could not open \"/dev/null\"");
   }
-  if ((pid = fork()) < 0) {
-    ::close(pipe1[0]);
-    ::close(pipe1[1]);
+  if ((pid = fork()) < 0)
     FAIL("Could not fork");
-  }
   if (pid == 0) {
     // Child process, exec program
-    dup2(pipe1[0], 0);
-    ::close(pipe1[0]);
-    ::close(pipe1[1]);
-    dup2(fdnull, 1);
-    dup2(fdnull, 2);
-    fdnull.close();
-    if (redir_from > 0) {
-      dup2(redir_from, redir_to);
-      if (redir_from != redir_to)
-        ::close(redir_from);
+    for (int i = 0; i < redirn; i++) {
+      int r = redirs[i];
+      if (r == REDIRECT_NULL)
+        dup2(fdnull, i);
+      else if (r == REDIRECT_PIPE_FROM) {
+        dup2(pipes[i][1], i);
+        pipes[i].close();
+      }
+      else if (r == REDIRECT_PIPE_TO) {
+        dup2(pipes[i][0], i);
+        pipes[i].close();
+      }
+      else if (r > 0) {
+        dup2(r, i);
+        if (r >= redirn)
+          close(r);
+      }
     }
     const char* argv[] = { program, NULL };
     execv(argv[0], (char**)argv);
     ERR("Could not exec " << name);
     _exit(ERR_EXEC_FAILED);
   }
-  wfd = pipe1[1];
-  ::close(pipe1[0]);
+  for (int i = 0; i < redirn; i++) {
+    if (redirs[i] == REDIRECT_PIPE_TO)
+      redirs[i] = pipes[i].extract(1);
+    else if (redirs[i] == REDIRECT_PIPE_FROM)
+      redirs[i] = pipes[i].extract(0);
+  }
   return true;
-}
-
-void fork_exec::close()
-{
-  wfd.close();
 }
 
 int fork_exec::wait_status()
 {
   if (pid > 0) {
-    close();
     int status;
     if (waitpid(pid, &status, 0) == pid) {
       pid = -1;
@@ -146,7 +151,10 @@ queue_pipe::queue_pipe()
 {
 }
 
-bool queue_pipe::start()
+int queue_pipe::start()
 {
-  return fork_exec::start(nqpath());
+  int redirs[] = { REDIRECT_PIPE_TO, REDIRECT_NULL, REDIRECT_NULL };
+  if (!fork_exec::start(nqpath(), 3, redirs))
+    return -1;
+  return redirs[0];
 }

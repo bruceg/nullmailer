@@ -134,11 +134,12 @@ static bool DATA(mystring& param)
     return respond(resp_no_rcpt);
 
   queue_pipe nq;
-  if (!nq.start())
+  autoclose wfd = nq.start();
+  if (wfd < 0)
     return respond(resp_no_queue);
-  if (!qwrite(nq.fd_to(), sender.c_str(), sender.length())
-      || !qwrite(nq.fd_to(), recipients.c_str(), recipients.length())
-      || !qwrite(nq.fd_to(), "\n", 1))
+  if (!qwrite(wfd, sender.c_str(), sender.length())
+      || !qwrite(wfd, recipients.c_str(), recipients.length())
+      || !qwrite(wfd, "\n", 1))
     return respond(resp_qwrite_err);
 
   if (!respond(resp_data_ok))
@@ -150,10 +151,10 @@ static bool DATA(mystring& param)
     if (line.length() > 1 && line[0] == '.')
       line = line.sub(1, line.length() - 1);
     line += '\n';
-    if (!qwrite(nq.fd_to(), line.c_str(), line.length()))
+    if (!qwrite(wfd, line.c_str(), line.length()))
       return respond(resp_qwrite_err);
   }
-  nq.close();
+  wfd.close();
 
   return respond(nq.wait() ? resp_queue_ok : resp_queue_exiterr);
 }

@@ -248,12 +248,13 @@ tristate send_one(mystring filename, remote& remote)
   }
 
   fork_exec fp(remote.proto.c_str());
-  if (!fp.start(remote.program.c_str(), fd, 3))
+  int redirs[] = { REDIRECT_PIPE_TO, REDIRECT_NULL, REDIRECT_NULL, fd };
+  if (!fp.start(remote.program.c_str(), 4, redirs))
     return tempfail;
 
-  if (write(fp.fd_to(), remote.options.c_str(), remote.options.length()) != (ssize_t)remote.options.length())
+  if (write(redirs[0], remote.options.c_str(), remote.options.length()) != (ssize_t)remote.options.length())
     fout << "Warning: Writing options to protocol failed" << endl;
-  fp.close();
+  close(redirs[0]);
 
   return catchsender(fp);
 }

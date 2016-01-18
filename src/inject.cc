@@ -460,12 +460,14 @@ bool send_message_stdout()
 bool send_message_nqueue()
 {
   queue_pipe nq;
-  if (!nq.start())
+  autoclose wfd = nq.start();
+  if (wfd < 0)
     return false;
-  fdobuf nqout(nq.fd_to());
+  fdobuf nqout(wfd);
   if (!send_env(nqout) || !send_header(nqout) || !send_body(nqout))
     return false;
   nqout.flush();
+  wfd.close();
   return nq.wait();
 }
 
