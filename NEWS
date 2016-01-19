@@ -7,6 +7,8 @@ Changes in version 1.14
 - Added an "allmailfrom" control file to nullmailer-queue, causing all
   messages to share a hard-coded envelope sender.
 
+- Added logging the message sender/recipient in nullmailer-send.
+
 - Improved handling of system errors when reading config files.
 
 - Secured handling of password options for protocol modules.
