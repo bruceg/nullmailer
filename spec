@@ -78,7 +78,7 @@ fi
 
 %files
 %defattr(-,nullmail,nullmail)
-%doc AUTHORS BUGS ChangeLog COPYING INSTALL NEWS README TODO
+%doc AUTHORS BUGS ChangeLog COPYING INSTALL NEWS README TODO doc/DIAGRAM
 %dir /etc/nullmailer
 %attr(04711,nullmail,nullmail) /usr/bin/mailq
 /usr/bin/nullmailer-inject
