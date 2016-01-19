@@ -52,7 +52,7 @@ bool fork_exec::operator!() const
   return pid < 0;
 }
 
-bool fork_exec::start(const char* program, int redirn, int redirs[])
+bool fork_exec::start(const char* args[], int redirn, int redirs[])
 {
   autoclose_pipe pipes[redirn];
   for (int i = 0; i < redirn; i++) {
@@ -86,8 +86,7 @@ bool fork_exec::start(const char* program, int redirn, int redirs[])
           close(r);
       }
     }
-    const char* argv[] = { program, NULL };
-    execv(argv[0], (char**)argv);
+    execv(args[0], (char**)args);
     ERR("Could not exec " << name);
     _exit(ERR_EXEC_FAILED);
   }
@@ -98,6 +97,12 @@ bool fork_exec::start(const char* program, int redirn, int redirs[])
       redirs[i] = pipes[i].extract(0);
   }
   return true;
+}
+
+bool fork_exec::start(const char* program, int redirn, int redirs[])
+{
+  const char* args[2] = { program, NULL };
+  return start(args, redirn, redirs);
 }
 
 int fork_exec::wait_status()

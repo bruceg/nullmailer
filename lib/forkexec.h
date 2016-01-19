@@ -23,6 +23,7 @@ class fork_exec
   ~fork_exec();
   bool operator!() const;
 
+  bool start(const char* args[], int redirn, int redirs[]);
   bool start(const char* program, int redirn, int redirs[]);
   bool wait();
   int wait_status();

@@ -3,7 +3,7 @@ This file lists all the major user-visible changes to nullmailer.
 Changes in version 2.0
 
 - Added support to nullmailer-send to move permanently failing messages
-  out of the queue.
+  out of the queue, and to generate bounce messages.
 
 - Added support for IPv6.
 

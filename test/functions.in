@@ -8,7 +8,8 @@ mkdir -p \
     $tmpdir/libexec/nullmailer \
     $SYSCONFDIR
 mknod $QUEUEDIR/trigger p
-ln -s $PWD/../src $tmpdir/sbin
+ln -s $srcdir/src $tmpdir/bin
+ln -s $srcdir/src $tmpdir/sbin
 
 fail() {
     echo "$*"

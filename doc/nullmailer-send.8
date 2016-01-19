@@ -40,7 +40,8 @@ or the message has been in the queue longer than
 .IR queuelifetime ,
 the message is moved into the
 .B failed
-queue.
+queue and a bounce message is generated with
+.BR nullmailer-dsn .
 If any messages remain in the queue, processing of the remaing
 messages continues with the next remote.
 When all the remotes have been tried,
@@ -186,6 +187,7 @@ The configuration directory.
 .B /usr/local/libexec/nullmailer
 The protocol program directory.
 .SH SEE ALSO
-nullmailer-queue(8),
+nullmailer-dsn(1),
 nullmailer-inject(1),
+nullmailer-queue(8),
 mailq(1)

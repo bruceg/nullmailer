@@ -17,13 +17,13 @@ start send $PWD/../src/nullmailer-send
 
 make_message() {
   msgid=$(date +%s).$$.me
-  cat <<EOF >$tmpdir/var/nullmailer/tmp/$msgid
-me@nowhere
-me@nowhere
+  cat <<EOF >$QUEUEDIR/tmp/$msgid
+me@example.com
+me@example.net
 
 Subject: test
 EOF
-  mv -f $tmpdir/var/nullmailer/tmp/$msgid $tmpdir/var/nullmailer/queue/$msgid
+  mv -f $QUEUEDIR/tmp/$msgid $QUEUEDIR/queue/$msgid
 }
 
 send_message() {
@@ -31,13 +31,38 @@ send_message() {
   make_message
   svc -a $tmpdir/service/send
   sleep 2
-  not test -e $tmpdir/var/nullmailer/queue/$msgid
+  not test -e $QUEUEDIR/queue/$msgid
 }
 
 echo 'Testing sending with a succeeding protocol'
 send_message 0 2.0.0
+
 echo 'Testing sending with a failing protocol'
 not send_message 1 5.2.2
+rm -f $QUEUEDIR/queue/$msgid
+
 echo 'Testing handling of a permanent failure'
 send_message 33 5.2.2
-test -e $tmpdir/var/nullmailer/failed/$msgid
+
+echo 'Checking failed message was moved out of the queue'
+test -e $QUEUEDIR/failed/$msgid
+rm -f $QUEUEDIR/failed/$msgid
+
+echo 'Checking for a generated bounce message'
+# It will also bounce, so look at failed messages
+msgid2=$( ls $QUEUEDIR/failed )
+test $( wc -w <<< $msgid2 ) = 1
+fn=$QUEUEDIR/failed/$msgid2
+
+echo 'Checking bounce sender'
+head -n 1 $fn | grep -qx ''
+
+echo 'Checking bounce recipient'
+sed -e '1d;q' $fn | grep -qx 'me@example.com'
+sed -e '1,2d;q' $fn | grep -qx ''
+
+echo 'Checking bounce contents'
+sed -e '1,3d; /^$/q' $fn | grep -qx 'To: <me@example.com>'
+sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Reporting-MTA: x-local-hostname; f.q.d.n'
+sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Final-Recipient: rfc822; me@example.net'
+sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Action: failed'

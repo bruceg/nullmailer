@@ -259,7 +259,7 @@ tristate send_one(mystring filename, remote& remote)
   return catchsender(fp);
 }
 
-bool bounce_msg(struct message& msg)
+bool bounce_msg(const message& msg, const remote& remote)
 {
   mystring failed = "../failed/";
   failed += msg.filename;
@@ -267,6 +267,25 @@ bool bounce_msg(struct message& msg)
   if (rename(msg.filename.c_str(), failed.c_str()) == -1) {
     fout << "Can't rename file: " << strerror(errno) << endl;
     return false;
+  }
+  autoclose fd = open(failed.c_str(), O_RDONLY);
+  if (fd < 0)
+    fout << "Can't open file '" << failed << "' to create bounce message" << endl;
+  else {
+    fout << "Generating bounce for '" << msg.filename << "'" << endl;
+    queue_pipe qp;
+    autoclose pfd = qp.start();
+    if (pfd > 0) {
+      mystring program = program_path(BIN_DIR, "nullmailer-dsn", NULL);
+      fork_exec dsn("nullmailer-dsn");
+      int redirs[] = { fd, pfd };
+      const char* args[] = { program.c_str(),
+                             "--last-attempt", itoa(time(NULL)),
+                             "--remote", remote.host.c_str(),
+                             "5.0.0", NULL };
+      dsn.start(args, 2, redirs);
+      // Everything else cleans up itself
+    }
   }
   return true;
 }
@@ -291,7 +310,7 @@ void send_all()
       switch (send_one((*msg).filename, *remote)) {
       case tempfail:
 	if (time(0) - (*msg).timestamp > queuelifetime) {
-	  if (bounce_msg(*msg)) {
+	  if (bounce_msg(*msg, *remote)) {
 	    messages.remove(msg);
 	    continue;
 	  }
@@ -299,7 +318,7 @@ void send_all()
 	msg++;
 	break;
       case permfail:
-	if (bounce_msg(*msg))
+	if (bounce_msg(*msg, *remote))
 	  messages.remove(msg);
 	else
 	  msg++;
