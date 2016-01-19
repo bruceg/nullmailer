@@ -1,5 +1,6 @@
 # info_TEXINFOS = nullmailer.texi
 man_MANS = \
+	nullmailer-dsn.1 \
 	nullmailer-inject.1 \
 	sendmail.1 \
 	nullmailer.7 \
