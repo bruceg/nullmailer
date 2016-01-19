@@ -233,17 +233,23 @@ bool log_msg(mystring& filename, remote& remote, int fd)
     msg += '>';
     bool has_to = false;
     while (in.getline(line, '\n')) {
-      if (!line) {
-        lseek(fd, 0, SEEK_SET);
-        fout << msg << endl;
-        return true;
-      }
+      if (!line)
+        break;
       msg += has_to ? ", " : " to: ";
       has_to = true;
       msg += '<';
       msg += line;
       msg += '>';
     }
+    fout << msg << endl;
+    while (in.getline(line, '\n')) {
+      if (!line)
+        break;
+      if (line.left(11).lower() == "message-id:")
+        fout << line << endl;
+    }
+    lseek(fd, 0, SEEK_SET);
+    return true;
   }
   fout << endl << "Can't read message" << endl;
   return false;

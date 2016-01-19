@@ -23,6 +23,7 @@ me@nowhere
 me@nowhere
 
 Subject: test
+Message-Id: <$msgid>
 EOF
   mv -f $tmpdir/var/nullmailer/tmp/$msgid $tmpdir/var/nullmailer/queue/$msgid
 }
@@ -44,3 +45,4 @@ echo 'Checking log outputs'
 grep -q '^Starting delivery: host: 127.0.0.1 protocol: dummy file:' log
 grep -qx 'From: <me@nowhere> to: <me@nowhere>' log
 grep -qx 'Sending failed: Unspecified temporary error' log
+grep -qx "Message-Id: <$msgid>" log
