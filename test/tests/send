@@ -3,9 +3,10 @@
 cat <<EOF >$tmpdir/libexec/nullmailer/dummy
 #!/bin/sh
 set -e
-read host
+read opts
 read code
-echo "\$host" | grep -q '^host='
+echo "\$opts" | grep -q '^host='
+echo "code=\$code (#5.2.1) \$opts"
 exit \$code
 EOF
 chmod +x $tmpdir/libexec/nullmailer/dummy
@@ -22,6 +23,8 @@ me@example.com
 me@example.net
 
 Subject: test
+
+This is just a test.
 EOF
   mv -f $QUEUEDIR/tmp/$msgid $QUEUEDIR/queue/$msgid
 }
@@ -62,7 +65,12 @@ sed -e '1d;q' $fn | grep -qx 'me@example.com'
 sed -e '1,2d;q' $fn | grep -qx ''
 
 echo 'Checking bounce contents'
+cat $fn
 sed -e '1,3d; /^$/q' $fn | grep -qx 'To: <me@example.com>'
 sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Reporting-MTA: x-local-hostname; f.q.d.n'
 sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Final-Recipient: rfc822; me@example.net'
 sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Action: failed'
+sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Status: 5.2.1'
+sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Diagnostic-Code: DUMMY; code=33 (#5.2.1) host=127.0.0.1'
+sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Subject: test'
+sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'This is just a test.'

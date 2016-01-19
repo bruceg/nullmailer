@@ -8,6 +8,7 @@
 
 mystring program_path(const char* basedir, const char* name, const char* envvar);
 
+#define REDIRECT_NONE -1
 #define REDIRECT_NULL -2
 #define REDIRECT_PIPE_FROM -3
 #define REDIRECT_PIPE_TO -4

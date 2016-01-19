@@ -237,7 +237,17 @@ tristate catchsender(fork_exec& fp)
   }
 }
 
-tristate send_one(mystring filename, remote& remote)
+static bool copy_output(int fd, mystring& output)
+{
+  output = "";
+  char buf[256];
+  ssize_t rd;
+  while ((rd = read(fd, buf, sizeof buf)) > 0)
+    output += mystring(buf, rd);
+  return rd == 0;
+}
+
+tristate send_one(mystring filename, remote& remote, mystring& output)
 {
   fout << "Starting delivery: protocol: " << remote.proto
        << " host: " << remote.host
@@ -250,7 +260,7 @@ tristate send_one(mystring filename, remote& remote)
   }
 
   fork_exec fp(remote.proto.c_str());
-  int redirs[] = { REDIRECT_PIPE_TO, REDIRECT_NULL, REDIRECT_NULL, fd };
+  int redirs[] = { REDIRECT_PIPE_TO, REDIRECT_PIPE_FROM, REDIRECT_NONE, fd };
   if (!fp.start(remote.program.c_str(), 4, redirs))
     return tempfail;
 
@@ -258,10 +268,32 @@ tristate send_one(mystring filename, remote& remote)
     fout << "Warning: Writing options to protocol failed" << endl;
   close(redirs[0]);
 
-  return catchsender(fp);
+  tristate result = catchsender(fp);
+  if (!copy_output(redirs[1], output))
+    fout << "Warning: Could not read output from protocol" << endl;
+  close(redirs[1]);
+  return result;
 }
 
-bool bounce_msg(const message& msg, const remote& remote)
+static void parse_output(const mystring& output, const remote& remote, mystring& status, mystring& diag)
+{
+  diag = remote.proto.upper();
+  diag += "; ";
+  diag += output.strip();
+  diag.subst('\n', '/');
+  status = "5.0.0";
+  for (unsigned i = 0; i < output.length()-5; i++)
+    if (isdigit(output[i])
+        && output[i+1] == '.'
+        && isdigit(output[i+2])
+        && output[i+3] == '.'
+        && isdigit(output[i+4])) {
+      status = output.sub(i, 5);
+      break;
+    }
+}
+
+bool bounce_msg(const message& msg, const remote& remote, const mystring& output)
 {
   mystring failed = "../failed/";
   failed += msg.filename;
@@ -281,10 +313,13 @@ bool bounce_msg(const message& msg, const remote& remote)
       mystring program = program_path(BIN_DIR, "nullmailer-dsn", NULL);
       fork_exec dsn("nullmailer-dsn");
       int redirs[] = { fd, pfd };
+      mystring status_code, diag_code;
+      parse_output(output, remote, status_code, diag_code);
       const char* args[] = { program.c_str(),
                              "--last-attempt", itoa(time(NULL)),
                              "--remote", remote.host.c_str(),
-                             "5.0.0", NULL };
+                             "--diagnostic-code", diag_code.c_str(),
+                             status_code.c_str(), NULL };
       dsn.start(args, 2, redirs);
       // Everything else cleans up itself
     }
@@ -306,13 +341,14 @@ void send_all()
     return;
   fout << "Starting delivery, "
        << itoa(messages.count()) << " message(s) in queue." << endl;
+  mystring output;
   for(rlist::iter remote(remotes); remote; remote++) {
     msglist::iter msg(messages);
     while(msg) {
-      switch (send_one((*msg).filename, *remote)) {
+      switch (send_one((*msg).filename, *remote, output)) {
       case tempfail:
 	if (time(0) - (*msg).timestamp > queuelifetime) {
-	  if (bounce_msg(*msg, *remote)) {
+	  if (bounce_msg(*msg, *remote, output)) {
 	    messages.remove(msg);
 	    continue;
 	  }
@@ -320,7 +356,7 @@ void send_all()
 	msg++;
 	break;
       case permfail:
-	if (bounce_msg(*msg, *remote))
+	if (bounce_msg(*msg, *remote, output))
 	  messages.remove(msg);
 	else
 	  msg++;
