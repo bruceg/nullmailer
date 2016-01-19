@@ -178,6 +178,8 @@ bool load_messages()
   struct dirent* entry;
   while((entry = readdir(dir)) != 0) {
     const char* name = entry->d_name;
+    if (name[0] == '.')
+      continue;
     struct stat st;
     if (stat(name, &st) < 0) {
       fout << "Could not stat " << name << ", skipping." << endl;
