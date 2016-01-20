@@ -1,8 +1,13 @@
 This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
-Changes in version 1.14
+Changes in version 2.0
+
+- Added support to nullmailer-send to move permanently failing messages
+  out of the queue, and to generate bounce messages.
 
 - Added support for IPv6.
+
+- Added program to generate bounce/delay messages.
 
 - Added an "allmailfrom" control file to nullmailer-queue, causing all
   messages to share a hard-coded envelope sender.

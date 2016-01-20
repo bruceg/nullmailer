@@ -1,0 +1,107 @@
+.TH nullmailer-dsn 1
+.SH NAME
+nullmailer-inject \- Reformat a queued message into a delivery status notification (DSN)
+.SH SYNOPSIS
+.B nullmailer-dsn
+[
+.B options
+]
+.I status-code
+<
+.I message
+.SH DESCRIPTION
+This program reads a nullmailer queue message from standard input,
+transforms it into a delivery status notification, and writes the result
+to standard output. The output is formatted to be fed into
+.BR nullmailer-queue .
+.P
+All times in the options are expressed as seconds since midnight GMT January 1, 1970 (the UNIX epoch).
+.SH OPTIONS
+.TP
+.BI \-\-diagnostic\-code= STRING
+Sets the actual diagnostic code issued by the mail transport. Must be in the form of
+"\fItype\fR; \fItext\fR", where
+.I type
+would typically be the protocol name, such as
+.BR SMTP .
+This adds a
+.B Diagnostic-Code
+header for each recipient.
+.TP
+.BI \-\-envelope\-id= STRING
+Original envelope ID. Setting this adds a
+.B Original-Envelope-Id
+header to the delivery status section.
+.TP
+.BI \-\-last\-attempt= TIME
+Sets the time of the last attempted delivery. Defaults to the access time of the input message.
+This sets the date in the
+.B Last-Attempt-Date
+header for each recipient.
+.TP
+.BI \-\-orig\-timestamp= TIME
+Sets the time of the original message. Defaults to the change time of
+the input message. This sets the date in the
+.B Arrival-Date
+header in the delivery status section.
+.TP
+.BI \-\-remote= STRING
+Sets the name of the remote MTA server.
+This adds a
+.B Remote-MTA
+header for each recipient.
+.TP
+.BI \-\-retry\-until= TIME
+Sets the time of the (future) final delivery attempt. No default. This adds a
+.B Will-Retry-Until
+header for each recipient.
+.SH RETURN VALUE
+Exits 0 if it was successful, otherwise it prints a diagnostic message
+to standard error and exits 1.
+.SH CONTROL FILES
+.TP
+.B adminaddr
+If
+.B doublebounceto
+is empty, double bounces are delivered to this address instead.
+If no address is configured, double bounces are not generated.
+.TP
+.B defaultdomain
+The content of this file is appended to any host name that does not
+contain a period (except
+.BR localhost ),
+including
+.I defaulthost
+and
+.IR idhost .
+Defaults to the value of the
+.B me
+control file, if it exists, otherwise the literal name
+.BR defauldomain .
+.TP
+.B defaulthost
+The content of this file is appended to any address that is missing a
+host name.
+Defaults to the value of the
+.I me
+control file, if it exists, otherwise the literal name
+.BR defaulthost .
+.TP
+.B doublebounceto
+If the original sender was empty (the original message was a delivery
+status or disposition notification), the double bounce is sent to the
+address in this file.
+.TP
+.B idhost
+The content of this file is used when building the message-id string
+for the message.
+Defaults to the canonicalized value of
+.IR defaulthost .
+.TP
+.B me
+The fully-qualifiled host name of the computer running nullmailer.
+Defaults to the literal name
+.BR me .
+.SH SEE ALSO
+nullmailer-queue(8),
+nullmailer-send(8)

@@ -21,6 +21,7 @@ mkinstalldirs
 protocols/qmqp
 protocols/smtp
 src/mailq
+src/nullmailer-dsn
 src/nullmailer-inject
 src/nullmailer-queue
 src/nullmailer-send

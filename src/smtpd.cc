@@ -23,9 +23,11 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "autoclose.h"
 #include "lib/defines.h"
 #include "fdbuf/fdbuf.h"
 #include "mystring/mystring.h"
+#include "forkexec.h"
 
 static const char resp_data_ok[] = "354 End your message with a period on a line by itself";
 static const char resp_goodbye[] = "221 2.0.0 Good bye";
@@ -49,6 +51,8 @@ static const char resp_unimp[] = "500 5.5.1 Not implemented";
 static mystring line;
 static mystring sender;
 static mystring recipients;
+
+extern const char cli_program[] = "nullmailer-smtpd";
 
 static int readline()
 {
@@ -107,46 +111,6 @@ static bool respond(const char* msg)
   return fout;
 }
 
-static pid_t qpid;
-
-static int start_queue()
-{
-  int pfd[2];
-  int fdnull;
-  const char* args[2] = { 0 };
-  mystring nqueue = getenv("NULLMAILER_QUEUE");
-  if (!nqueue) {
-    nqueue = SBIN_DIR;
-    nqueue += "/nullmailer-queue";
-  }
-  args[0] = nqueue.c_str();
-
-  if ((fdnull = open("/dev/null", O_WRONLY)) >= 0) {
-    if (pipe(pfd) == 0) {
-      if ((qpid = fork()) >= 0) {
-
-	if (qpid == 0) {
-	  dup2(pfd[0], 0);
-	  dup2(fdnull, 1);
-	  dup2(fdnull, 2);
-	  close(pfd[0]);
-	  close(pfd[1]);
-	  close(fdnull);
-	  execv(args[0], (char**)args);
-	  _exit(111);
-	}
-
-	close(pfd[0]);
-	return pfd[1];
-      }
-      close(pfd[0]);
-      close(pfd[1]);
-    }
-    close(fdnull);
-  }
-  return -1;
-}
-
 static bool qwrite(int qfd, const char* data, size_t len)
 {
   ssize_t wr;
@@ -169,12 +133,13 @@ static bool DATA(mystring& param)
   if (!recipients)
     return respond(resp_no_rcpt);
 
-  int qfd;
-  if ((qfd = start_queue()) < 0)
+  queue_pipe nq;
+  autoclose wfd = nq.start();
+  if (wfd < 0)
     return respond(resp_no_queue);
-  if (!qwrite(qfd, sender.c_str(), sender.length())
-      || !qwrite(qfd, recipients.c_str(), recipients.length())
-      || !qwrite(qfd, "\n", 1))
+  if (!qwrite(wfd, sender.c_str(), sender.length())
+      || !qwrite(wfd, recipients.c_str(), recipients.length())
+      || !qwrite(wfd, "\n", 1))
     return respond(resp_qwrite_err);
 
   if (!respond(resp_data_ok))
@@ -186,16 +151,12 @@ static bool DATA(mystring& param)
     if (line.length() > 1 && line[0] == '.')
       line = line.sub(1, line.length() - 1);
     line += '\n';
-    if (!qwrite(qfd, line.c_str(), line.length()))
+    if (!qwrite(wfd, line.c_str(), line.length()))
       return respond(resp_qwrite_err);
   }
-  close(qfd);
+  wfd.close();
 
-  int status;
-  if (waitpid(qpid, &status, 0) != qpid)
-    return respond(resp_queue_waiterr);
-
-  return respond(status ? resp_queue_exiterr : resp_queue_ok);
+  return respond(nq.wait() ? resp_queue_ok : resp_queue_exiterr);
 }
 
 static bool HELO(mystring& param)

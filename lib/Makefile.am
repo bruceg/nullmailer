@@ -17,6 +17,7 @@ libmisc_a_SOURCES = \
 	itoa.h itoa.cc \
 	makefield.cc makefield.h \
 	netstring.h netstring.cc \
+	forkexec.cc forkexec.h \
 	selfpipe.cc selfpipe.h \
 	setenv.cc setenv.h
 

@@ -1,5 +1,6 @@
 bin_PROGRAMS = \
 	mailq \
+	nullmailer-dsn \
 	nullmailer-inject \
 	nullmailer-smtpd
 sbin_PROGRAMS = \
@@ -13,6 +14,9 @@ AM_CPPFLAGS = -I../lib -I../lib/cli++
 
 mailq_SOURCES = mailq.cc
 mailq_LDADD = ../lib/libnullmailer.a
+
+nullmailer_dsn_SOURCES = dsn.cc
+nullmailer_dsn_LDADD = ../lib/libnullmailer.a ../lib/cli++/libcli++.a
 
 nullmailer_inject_SOURCES = inject.cc
 nullmailer_inject_LDADD = ../lib/libnullmailer.a ../lib/cli++/libcli++.a

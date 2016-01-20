@@ -26,10 +26,11 @@
 #include "itoa.h"
 #include "mystring/mystring.h"
 
-mystring make_date()
+mystring make_date(time_t t)
 {
   char buf[256];
-  time_t t = time(0);
+  if (t == 0)
+    t = time(0);
   struct tm* l = localtime(&t);
   strftime(buf, 256, "%a, %d %b %Y %H:%M:%S ", l);
 #ifdef TM_HAS_GMTOFF
@@ -72,5 +73,17 @@ mystring make_messageid(const mystring& idhost)
   tmp += ".nullmailer@";
   tmp += idhost;
   tmp += '>';
+  return tmp;
+}
+
+mystring make_boundary()
+{
+  struct timeval tv;
+  gettimeofday(&tv, 0);
+  mystring tmp = itoa(tv.tv_sec);
+  tmp += '.';
+  tmp += itoa(tv.tv_usec, 6);
+  tmp += '.';
+  tmp += itoa(getpid());
   return tmp;
 }

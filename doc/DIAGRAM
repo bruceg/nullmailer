@@ -1,0 +1,25 @@
+              sendmail --------------- mailq
+             /        \
+            /          \
+           /            \
+nullmailer-inject  nullmailer-smtpd
+           \            /
+            \          /
+             \        /
+          nullmailer-inject
+                  |
+                  |
+                  |
+          nullmailer-queue
+                  |
+                  |
+                  |
+              QUEUE/tmp -> QUEUE/queue -> QUEUE/failed
+                               |
+                               |
+                               |
+                        nullmailer-send ---- nullmailer-dsn
+                               |
+                               |
+                               |
+                          BIN/PROTOCOL

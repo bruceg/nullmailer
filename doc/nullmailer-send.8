@@ -35,6 +35,13 @@ For each remote in the list, the named protocol handler is executed once
 for each message remaining in the queue.
 If the protocol handler succeeds, the message is removed from the queue
 and processing continues with the next message.
+If the protocol handler reports a permanent failure
+or the message has been in the queue longer than
+.IR queuelifetime ,
+the message is moved into the
+.B failed
+queue and a bounce message is generated with
+.BR nullmailer-dsn .
 If any messages remain in the queue, processing of the remaing
 messages continues with the next remote.
 When all the remotes have been tried,
@@ -56,22 +63,28 @@ command.  Defaults to the value of the
 configuration file.
 .TP
 .B maxpause
-The maximum number of seconds to pause between successive queue runs
-(defaults to
-.IR 86400 ).
+The maximum time to pause between successive queue runs, in seconds.
+Defaults to 24 hours
+.RB ( 86400 ).
 .TP
 .B pausetime
-The minimum number of seconds to pause between successive queue runs
-when there are messages in the queue (defaults to
-.IR 60 ).
+The minimum time to pause between successive queue runs
+when there are messages in the queue, in seconds.
+Defaults to 1 minute
+.RB ( 60 ).
 Each time this timeout is reached, the timeout is doubled to a maximum
 of
 .BR maxpause .
 After new messages are injected, the timeout is reset.
 If this is set to
-.IR 0 ,
+.BR 0 ,
 nullmailer-send will exit immediately after going through the queue once
 (one-shot mode).
+.TP
+.B queuelifetime
+The maximum time a message is allowed to live in the queue before being
+considered permanently failed, in seconds. Defaults to 7 days
+.RB ( 604800 ).
 .TP
 .B remotes
 This file contains a list of remote servers to which to send each
@@ -79,7 +92,7 @@ message.
 Each line of this file contains a remote host name or address followed
 by an optional protocol string, separated by white space.
 The protocol name defaults to
-.IR smtp ,
+.BR smtp ,
 and may be followed by additional options for that module.
 See the "PROTOCOL OPTIONS" section for a list of the available options.
 The options may optionally be prefixed by
@@ -97,19 +110,19 @@ STARTTLS, use:
 Blank lines and lines starting with a pound (\fI#\fR) are ignored.
 .TP
 .B sendtimeout
-The number of seconds to wait for a remote module listed above to
-complete sending a message before killing it and trying again (defaults
-to
-.IR 3600 ).
+The time to wait for a remote module listed above to complete sending a
+message before killing it and trying again, in seconds.
+Defaults to 1 hour
+.RB ( 3600 ).
 If this is set to
-.IR 0 ,
+.BR 0 ,
 .B nullmailer-send
 will wait forever for messages to complete sending.
 .SH "PROTOCOL OPTIONS"
 .TP
 .B port=\fIPORT
 Set an alternate port number to connect to on the remote host. For example, SMTP may use
-.I port=587
+.B port=587
 for the alternate SMTP "submission" port.
 .TP
 .B user=\fIUSERNAME
@@ -126,8 +139,8 @@ Force SMTP "AUTH LOGIN" mode instead of auto-detecting.
 .TP
 .B tls
 Connect using TLS.
-This will automatically switch the port to
-.IR 465 .
+This will automatically switch the default port to
+.BR 465 .
 .TP
 .B ssl
 Alias for the
@@ -136,7 +149,7 @@ option for compatibility.
 .TP
 .B starttls
 Use the
-.I STARTTLS
+.B STARTTLS
 command to initiate a TLS session.
 .TP
 .B x509certfile=\fIFILENAME
@@ -149,7 +162,7 @@ Defaults to the same file name as
 .TP
 .B x509cafile=\fIFILENAME
 Set the TLS certificate authority trust filename. Defaults to
-.IR /etc/ssl/certs/ca-certificates.crt .
+.BR /etc/ssl/certs/ca-certificates.crt .
 .TP
 .B x509crlfile=\fIFILENAME
 Set the TLS certificate revocation list filename.
@@ -162,8 +175,11 @@ Don't abort a TLS connection if the server certificate fails validation.
 Use this only if you know the server uses an invalid certificate.
 .SH FILES
 .TP
+.B /var/nullmailer/failed
+The failed message queue.
+.TP
 .B /var/nullmailer/queue
-The message queue.
+The outgoing message queue.
 .TP
 .B /var/nullmailer/trigger
 A trigger file to cause immediate delivery.
@@ -174,6 +190,7 @@ The configuration directory.
 .B /usr/local/libexec/nullmailer
 The protocol program directory.
 .SH SEE ALSO
-nullmailer-queue(8),
+nullmailer-dsn(1),
 nullmailer-inject(1),
+nullmailer-queue(8),
 mailq(1)
