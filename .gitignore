@@ -36,4 +36,4 @@ test/clitest1
 test/functions
 test/log
 test/runtests
-test/tmp
+test-tmp

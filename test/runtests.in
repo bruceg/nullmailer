@@ -3,10 +3,10 @@ PREFIX="@PREFIX@"
 SRCDIR="@SRCDIR@"
 
 cd "$(dirname "$0")" || exit 1
-if [ x"$PREFIX" != x"$SRCDIR/test/tmp" ]
+if [ x"$PREFIX" != x"$SRCDIR/test-tmp" ]
 then
 	echo "configure prefix was not set properly for testing"
-	echo "Re-run configure with --prefix='$(pwd)/tmp'"
+	echo "Re-run configure with --prefix='$SRCDIR/test-tmp'"
 	exit 1
 fi
 
