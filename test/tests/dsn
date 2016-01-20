@@ -1,0 +1,83 @@
+. functions
+
+msgid=message.id.$$.$RANDOM@f.q.d.n
+dsn() {
+	$srcdir/src/nullmailer-dsn "$@" << EOF
+sender@example.com
+recip1@example.net
+recip2@example.org
+
+Subject: test message
+Message-Id: <$msgid>
+From: <sender@example.com>
+To: <recip1@example.net>
+Cc: <recip2@example.org>
+
+This is a test.
+EOF
+}
+
+fn=$tmpdir/dsn-tmp
+dsn 5.2.9 | splitblank $fn
+
+echo -n Testing envelope: sender
+not test -x $fn.1
+echo -n , recipient
+grep -qx sender@example.com $fn.2
+echo -n , end
+test $( wc -l < $fn.2 ) = 1
+echo
+
+date='..., [ 0-9][0-9] ... [0-9]{4} [0-9][0-9]:[0-9][0-9]:[0-9][0-9] [+-][0-9]{4}'
+echo -n Testing header: from
+grep -qx 'From: Message Delivery Subsystem <MAILER-DAEMON@f.q.d.n>' $fn.3
+echo -n , to
+grep -qx 'To: <sender@example.com>' $fn.3
+echo -n , subject
+grep -qx 'Subject: Returned mail: Could not send message' $fn.3
+echo -n , date
+egrep -q "^Date: $date$" $fn.3
+echo -n , message-id
+grep -q '^Message-Id: <.*.nullmailer@f.q.d.n>$' $fn.3
+echo -n , mime
+grep -qx 'MIME-Version: 1.0' $fn.3
+echo -n , content-type
+grep -q '^Content-Type: multipart/report; report-type=delivery-status;' $fn.3
+echo
+
+echo -n Testing report header: reporting-mta
+grep -qx "Reporting-MTA: x-local-hostname; f.q.d.n" $fn.8
+echo -n , date
+egrep -q "^Arrival-Date: $date$" $fn.8
+echo
+
+echo -n Testing recipient report 1: final-recipient
+grep -qx 'Final-Recipient: rfc822; recip1@example.net' $fn.9
+echo -n , action
+grep -qx 'Action: failed' $fn.9
+echo -n , status
+grep -qx 'Status: 5.2.9' $fn.9
+echo -n , date
+egrep -q "^Last-Attempt-Date: $date$" $fn.9
+echo
+
+echo -n Testing recipient report 2: final-recipient
+grep -qx 'Final-Recipient: rfc822; recip2@example.org' $fn.10
+echo -n , action
+grep -qx 'Action: failed' $fn.10
+echo -n , status
+grep -qx 'Status: 5.2.9' $fn.10
+echo -n , date
+egrep -q "^Last-Attempt-Date: $date$" $fn.10
+echo
+
+echo Testing quoted message pre-header
+grep -qx 'Content-Type: message/rfc822' $fn.11
+
+echo Testing quoted message header
+grep -qx "Message-Id: <$msgid>" $fn.12
+
+echo Testing quoted message body
+grep -qx "This is a test." $fn.13
+
+rm -f $fn.*

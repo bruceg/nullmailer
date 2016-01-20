@@ -97,6 +97,21 @@ protocol() {
     ../protocols/$p $opts < $tmpdir/protocol-in > $tmpdir/protocol-log 2>&1
 }
 
+# Split an input on blank lines
+splitblank() {
+  local fn=$1
+  local n=1
+  while read line
+  do
+    if [ x"$line" = x ]
+    then
+      n=$(( $n + 1 ))
+    else
+      echo "$line" >> ${fn}.$n
+    fi
+  done
+}
+
 PATH=/bin:/usr/bin:/usr/local/bin
 NULLMAILER_QUEUE=$PWD/../src/nullmailer-queue
 export NULLMAILER_QUEUE PATH

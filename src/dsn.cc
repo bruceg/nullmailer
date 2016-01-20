@@ -143,7 +143,7 @@ int cli_main(int, char* argv[])
     "Date: " << make_date() << "\n"
     "Message-Id: " << make_messageid(idhost) << "\n"
     "MIME-Version: 1.0\n"
-    "Content-Type: multipart/report; report-type=delivery-status\n"
+    "Content-Type: multipart/report; report-type=delivery-status;\n"
     "\tboundary=\"" << boundary << "\"\n";
 
   /* Human readable text portion */
