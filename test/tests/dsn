@@ -80,4 +80,9 @@ grep -qx "Message-Id: <$msgid>" $fn.12
 echo Testing quoted message body
 grep -qx "This is a test." $fn.13
 
-rm -f $fn.*
+echo Testing fixed bounce address
+echo admin@example.com > $SYSCONFDIR/bounceto
+dsn 5.2.9 | splitblank $fn
+grep -qx admin@example.com $fn.2
+
+rm -f $fn.* $SYSCONFDIR/bounceto

@@ -1,6 +1,6 @@
 .TH nullmailer-dsn 1
 .SH NAME
-nullmailer-inject \- Reformat a queued message into a delivery status notification (DSN)
+nullmailer-dsn \- Reformat a queued message into a delivery status notification (DSN)
 .SH SYNOPSIS
 .B nullmailer-dsn
 [
@@ -65,6 +65,10 @@ If
 .B doublebounceto
 is empty, double bounces are delivered to this address instead.
 If no address is configured, double bounces are not generated.
+.TP
+.B bounceto
+The address to which all bounces should be sent.
+If it is empty, the original sender address is used.
 .TP
 .B defaultdomain
 The content of this file is appended to any host name that does not

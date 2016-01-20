@@ -83,6 +83,7 @@ cli_option cli_options[] = {
 #define die1(MSG) do{ fout << "nullmailer-dsn: " << MSG << endl; exit(111); }while(0)
 
 static mystring sender;
+static mystring bounceto;
 static mystring doublebounceto;
 static mystring line;
 static slist recipients;
@@ -117,6 +118,7 @@ int cli_main(int, char* argv[])
     idhost = me;
   else
     canonicalize(idhost);
+  config_read("bounceto", bounceto);
 
   if (!fin.getline(sender))
     die1sys("Could not read sender address from message: ");
@@ -131,7 +133,8 @@ int cli_main(int, char* argv[])
     die1("No recipients were read from message");
 
   if (!!sender)
-    fout << '\n' << sender;
+    // Bounces either go to the sender or bounceto, if configured
+    fout << '\n' << (!!bounceto ? bounceto : sender);
   else
     fout << "#@[]\n" << doublebounceto;
 
