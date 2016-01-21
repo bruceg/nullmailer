@@ -68,6 +68,9 @@ typedef list<struct message> msglist;
 #define fail1sys(MSG) do{ msg1sys(MSG); return false; }while(0)
 #define tempfail1sys(MSG) do{ msg1sys(MSG); return tempfail; }while(0)
 
+static mystring trigger_path;
+static mystring msg_dir;
+
 struct remote
 {
   static const mystring default_proto;
@@ -102,7 +105,7 @@ remote::remote(const slist& lst)
     }
   }
   options += '\n';
-  program = PROTOCOL_DIR + proto;
+  program = CONFIG_PATH(PROTOCOLS, NULL, proto.c_str());
 }
 
 remote::~remote() { }
@@ -344,7 +347,7 @@ bool bounce_msg(const message& msg, const remote& remote, const mystring& output
     queue_pipe qp;
     autoclose pfd = qp.start();
     if (pfd > 0) {
-      mystring program = program_path(BIN_DIR, "nullmailer-dsn", NULL);
+      mystring program = program_path("nullmailer-dsn");
       fork_exec dsn("nullmailer-dsn");
       int redirs[] = { fd, pfd };
       mystring status_code, diag_code;
@@ -416,9 +419,9 @@ static int trigger2;
 
 bool open_trigger()
 {
-  trigger = open(QUEUE_TRIGGER, O_RDONLY|O_NONBLOCK);
+  trigger = open(trigger_path.c_str(), O_RDONLY|O_NONBLOCK);
 #ifdef NAMEDPIPEBUG
-  trigger2 = open(QUEUE_TRIGGER, O_WRONLY|O_NONBLOCK);
+  trigger2 = open(trigger_path.c_str(), O_WRONLY|O_NONBLOCK);
 #endif
   if(trigger == -1)
     fail1sys("Could not open trigger file: ");
@@ -472,6 +475,9 @@ bool do_select()
 
 int main(int, char*[])
 {
+  trigger_path = CONFIG_PATH(QUEUE, NULL, "trigger");
+  msg_dir = CONFIG_PATH(QUEUE, NULL, "queue");
+
   read_hostnames();
 
   if(!selfpipe) {
@@ -482,7 +488,7 @@ int main(int, char*[])
   
   if(!open_trigger())
     return 1;
-  if(chdir(QUEUE_MSG_DIR) == -1) {
+  if(chdir(msg_dir.c_str()) == -1) {
     fout << "Could not chdir to queue message directory." << endl;
     return 1;
   }

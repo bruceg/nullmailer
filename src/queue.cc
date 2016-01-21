@@ -27,6 +27,7 @@
 #include <time.h>
 #include <unistd.h>
 #include "autoclose.h"
+#include "configio.h"
 #include "itoa.h"
 #include "defines.h"
 #include "mystring/mystring.h"
@@ -43,6 +44,10 @@ uid_t uid = getuid();
 time_t timesecs = time(0);
 mystring adminaddr;
 mystring allmailfrom;
+
+static mystring trigger_path;
+static mystring msg_dir;
+static mystring tmp_dir;
 
 bool is_dir(const char* path)
 {
@@ -69,7 +74,7 @@ int fsyncdir(const char* path)
 
 void trigger()
 {
-  autoclose fd = open(QUEUE_TRIGGER, O_WRONLY|O_NONBLOCK, 0666);
+  autoclose fd = open(trigger_path.c_str(), O_WRONLY|O_NONBLOCK, 0666);
   if(fd == -1)
     return;
   char x = 0;
@@ -149,7 +154,7 @@ bool dump(int fd)
 
 bool deliver()
 {
-  if(!is_dir(QUEUE_MSG_DIR) || !is_dir(QUEUE_TMP_DIR))
+  if(!is_dir(msg_dir.c_str()) || !is_dir(tmp_dir.c_str()))
     fail("Installation error: queue directory is invalid.");
 
   // Notes:
@@ -160,9 +165,8 @@ bool deliver()
   //   the previous nullmailer-queue process crashed, and it can be
   //   safely overwritten
   const mystring pidstr = itoa(pid);
-  const mystring timestr = itoa(timesecs);
-  const mystring tmpfile = QUEUE_TMP_DIR + pidstr;
-  const mystring newfile = QUEUE_MSG_DIR + timestr + "." + pidstr;
+  const mystring tmpfile = tmp_dir + pidstr;
+  const mystring newfile = msg_dir + itoa(timesecs) + "." + pidstr;
 
   int out = open(tmpfile.c_str(), O_CREAT|O_WRONLY|O_TRUNC, 0600);
   if(out < 0)
@@ -173,7 +177,7 @@ bool deliver()
   }
   if(link(tmpfile.c_str(), newfile.c_str()))
     fail("Error linking the temp file to the new file.");
-  if(fsyncdir(QUEUE_MSG_DIR))
+  if(fsyncdir(msg_dir.c_str()))
     fail("Error syncing the new directory.");
   if(unlink(tmpfile.c_str()))
     fail("Error unlinking the temp file.");
@@ -182,6 +186,10 @@ bool deliver()
 
 int main(int, char*[])
 {
+  trigger_path = CONFIG_PATH(QUEUE, NULL, "trigger");
+  msg_dir = CONFIG_PATH(QUEUE, "queue", "");
+  tmp_dir = CONFIG_PATH(QUEUE, "tmp", "");
+
   umask(077);
   if(config_read("adminaddr", adminaddr) && !!adminaddr) {
     adminaddr = adminaddr.subst(',', '\n');

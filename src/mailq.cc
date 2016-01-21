@@ -20,15 +20,16 @@
 // <nullmailer-subscribe@lists.untroubled.org>.
 
 #include "config.h"
-#include "defines.h"
-#include "fdbuf/fdbuf.h"
-#include "itoa.h"
-#include "mystring/mystring.h"
 #include <dirent.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+#include "configio.h"
+#include "defines.h"
+#include "fdbuf/fdbuf.h"
+#include "itoa.h"
+#include "mystring/mystring.h"
 
 #define fail(X) do{ fout << X << endl; return 1; }while(0)
 
@@ -36,9 +37,10 @@ int main(int, char*[])
 {
   mystring line;
 
-  if(chdir(QUEUE_MSG_DIR))
+  mystring msg_dir = CONFIG_PATH(QUEUE, NULL, "queue");
+  if(chdir(msg_dir.c_str()))
     fail("Cannot change directory to queue.");
-  DIR* dir = opendir(QUEUE_MSG_DIR);
+  DIR* dir = opendir(".");
   if(!dir)
     fail("Cannot open queue directory.");
   struct dirent* entry;

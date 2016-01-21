@@ -1,16 +1,9 @@
 #!/bin/sh
-PREFIX="@PREFIX@"
 SRCDIR="@SRCDIR@"
 
 cd "$(dirname "$0")" || exit 1
-if [ x"$PREFIX" != x"$SRCDIR/test-tmp" ]
-then
-	echo "configure prefix was not set properly for testing"
-	echo "Re-run configure with --prefix='$SRCDIR/test-tmp'"
-	exit 1
-fi
 
-sed -e "s,[@]TMPDIR[@],$PREFIX,g; s,[@]SRCDIR[@],$SRCDIR,g;" < functions.in > functions
+sed -e "s,[@]SRCDIR[@],$SRCDIR,g;" < functions.in > functions
 
 failed=0
 for test in $*

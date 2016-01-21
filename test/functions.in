@@ -1,15 +1,16 @@
 srcdir=@SRCDIR@
-tmpdir=@TMPDIR@
-SYSCONFDIR=@TMPDIR@/etc/nullmailer
-QUEUEDIR=@TMPDIR@/var/spool/nullmailer
+tmpdir=$srcdir/test-tmp
+export NULLMAILER_TEST_PREFIX=$tmpdir
+SYSCONFDIR=$tmpdir/conf
+QUEUEDIR=$tmpdir/queue
 rm -rf $tmpdir
 mkdir -p \
     $QUEUEDIR/{failed,queue,tmp} \
-    $tmpdir/libexec/nullmailer \
     $SYSCONFDIR
 mknod $QUEUEDIR/trigger p
-ln -s $srcdir/src $tmpdir/bin
 ln -s $srcdir/src $tmpdir/sbin
+ln -s $srcdir/src $tmpdir/bin
+ln -s $srcdir/src $tmpdir/protocols
 
 fail() {
     echo "$*"
@@ -25,13 +26,13 @@ start() {
     } >$tmpdir/service/$name/run
     chmod +x $tmpdir/service/$name/run
     supervise $tmpdir/service/$name </dev/null >$tmpdir/service/${name}-log 2>&1 &
+    trap 'svc -dx $tmpdir/service/* >/dev/null 2>&1' EXIT
 }
 stop() {
     for name in $*; do
 	svc -dx $tmpdir/service/$name >/dev/null 2>&1
     done
 }
-trap 'svc -dx $tmpdir/service/* >/dev/null 2>&1' EXIT
 
 #not() { if "$@"; then return 1; else return 0; fi }
 not() { ! safe "$@"; }
@@ -112,9 +113,7 @@ splitblank() {
   done
 }
 
-PATH=/bin:/usr/bin:/usr/local/bin
-NULLMAILER_QUEUE=$srcdir/src/nullmailer-queue
-export NULLMAILER_QUEUE PATH
+export PATH=/bin:/usr/bin:/usr/local/bin
 rm -f $SYSCONFDIR/*
 echo f.q.d.n >$SYSCONFDIR/me
 echo q.d.n >$SYSCONFDIR/defaultdomain

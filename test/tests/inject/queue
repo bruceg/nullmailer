@@ -3,12 +3,13 @@
 echo 'Testing that inject queues messages properly.'
 
 echo 'To: nobody' | inject
-test $( ls $tmpdir/var/spool/nullmailer/queue | wc -l ) = 1
-egrep -i '^to: *nobody' $tmpdir/var/spool/nullmailer/queue/* >/dev/null
+test $( ls $QUEUEDIR/queue | wc -l ) = 1
+egrep -i '^to: *nobody' $QUEUEDIR/queue/* >/dev/null
 
 echo 'Testing that inject honors $NULLMAILER_QUEUE.'
 
-rm -f $tmpdir/var/spool/nullmailer/queue/*
-NULLMAILER_QUEUE=/bin/cat
+rm -f $QUEUEDIR/queue/*
+export NULLMAILER_QUEUE=/bin/cat
 echo 'To: nobody' | inject >/dev/null
 test $( ls $QUEUEDIR/queue | wc -l ) = 0
+unset NULLMAILER_QUEUE

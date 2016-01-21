@@ -136,24 +136,21 @@ bool fork_exec::wait()
   return true;
 }
 
-mystring program_path(const char* basedir, const char* program, const char* envvar)
+mystring program_path(const char* program)
 {
-  if (envvar) {
-    const char* env;
-    if ((env = getenv(envvar)) != NULL)
-      return env;
-  }
-  mystring path = basedir;
-  path += '/';
-  path += program;
-  return path;
+  return CONFIG_PATH(BIN, NULL, program);
 }
     
 static const char* nqpath()
 {
   static mystring cache;
-  if (!cache)
-    cache = program_path(SBIN_DIR, "nullmailer-queue", "NULLMAILER_QUEUE");
+  if (!cache) {
+    const char* env;
+    if ((env = getenv("NULLMAILER_QUEUE")) != NULL)
+      cache = env;
+    else
+      cache = CONFIG_PATH(SBIN, NULL, "nullmailer-queue");
+  }
   return cache.c_str();
 }
 

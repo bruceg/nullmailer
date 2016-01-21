@@ -19,10 +19,11 @@
 // available to discuss this package.  To subscribe, send an email to
 // <nullmailer-subscribe@lists.untroubled.org>.
 
-#include <config.h>
+#include "config.h"
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "configio.h"
 #include "fdbuf/fdbuf.h"
 #include "defines.h"
 #include "forkexec.h"
@@ -101,7 +102,7 @@ bool setenvelope(char* str)
 
 int do_exec(const char* program, const char* xarg1, int argc, char* argv[])
 {
-  mystring path = program_path(BIN_DIR, program, NULL);
+  mystring path = program_path(program);
 
   const char* newargv[argc+3];
   newargv[0] = path.c_str();

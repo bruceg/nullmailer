@@ -1,6 +1,6 @@
 . functions
 
-cat <<EOF >$tmpdir/libexec/nullmailer/dummy
+cat <<EOF >$tmpdir/protocols/dummy
 #!/bin/sh
 set -e
 read opts
@@ -9,7 +9,7 @@ echo "\$opts" | grep -q '^host='
 echo "code=\$code (#5.2.1) \$opts"
 exit \$code
 EOF
-chmod +x $tmpdir/libexec/nullmailer/dummy
+chmod +x $tmpdir/protocols/dummy
 
 echo 127.0.0.1 smtp >$SYSCONFDIR/remotes
 

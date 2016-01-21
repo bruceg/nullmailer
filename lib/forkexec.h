@@ -5,8 +5,9 @@
 #include <sys/wait.h>
 #include "mystring/mystring.h"
 #include "autoclose.h"
+#include "configio.h"
 
-mystring program_path(const char* basedir, const char* name, const char* envvar);
+mystring program_path(const char* program);
 
 #define REDIRECT_NONE -1
 #define REDIRECT_NULL -2
