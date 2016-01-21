@@ -39,6 +39,14 @@ This sets the date in the
 .B Last-Attempt-Date
 header for each recipient.
 .TP
+.BI \-\-max\-lines= COUNT
+Sets the maximum number of lines of the original message to copy into the generated message.
+A value of zero copies only the original header.
+Negative values copy the whole message.
+Defaults to
+.I bouncelines
+below, or the whole message if that is empty.
+.TP
 .BI \-\-orig\-timestamp= TIME
 Sets the time of the original message. Defaults to the change time of
 the input message. This sets the date in the
@@ -65,6 +73,12 @@ If
 .B doublebounceto
 is empty, double bounces are delivered to this address instead.
 If no address is configured, double bounces are not generated.
+.TP
+.B bouncelines
+Sets the maximum number of lines of the original message to copy.
+May be overridden by
+.B \-\-max\-lines
+as above.
 .TP
 .B bounceto
 The address to which all bounces should be sent.

@@ -49,7 +49,8 @@ static const char* opt_envelope_id = 0;
 static const char* opt_status = 0;
 static const char* opt_remote = 0;
 static const char* opt_diagnostic_code = 0;
-static int opt_ddn = 0;
+static int opt_lines = -1;
+static bool opt_ddn = false;
 
 const char* cli_program = "nullmailer-dsn";
 const char* cli_help_prefix =
@@ -76,6 +77,9 @@ cli_option cli_options[] = {
     "Name of remote server", 0 },
   { 0, "retry-until", cli_option::uinteger, 0, &opt_retry_until,
     "UNIX timestamp of the (future) final attempt", 0 },
+  { 0, "max-lines", cli_option::integer, 0, &opt_lines,
+    "Maximum number of lines of the original message to copy",
+    "the whole message" },
   {0, 0, cli_option::flag, 0, 0, 0, 0}
 };
 
@@ -109,6 +113,8 @@ int cli_main(int, char* argv[])
       || opt_status[5] != '\0')
     die1("Status must be in the format 4.#.# or 5.#.#");
   opt_ddn = opt_status[0] == '4';
+  if (opt_lines < 0)
+    config_readint("bouncelines", opt_lines);
 
   if (!config_read("doublebounceto", doublebounceto)
       || !doublebounceto)
@@ -195,13 +201,20 @@ int cli_main(int, char* argv[])
       fout << "Will-Retry-Until: " << make_date(opt_retry_until) << '\n';
   }
 
-  /* Copy the message */
+  // Copy the message
   fout << "\n"
     "--" << boundary << "\n"
     "Content-Type: message/rfc822\n"
     "\n";
-  while (fin.getline(line))
+  // Copy the header
+  while (fin.getline(line) && !!line)
     fout << line << '\n';
+  // Optionally copy the body
+  if (opt_lines) {
+    fout << '\n';
+    for (int i = 0; (opt_lines < 0 || i < opt_lines) && fin.getline(line); i++)
+      fout << line << '\n';
+  }
 
   fout << "\n"
     "--" << boundary << "--\n";

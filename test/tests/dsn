@@ -14,6 +14,9 @@ To: <recip1@example.net>
 Cc: <recip2@example.org>
 
 This is a test.
+line 2
+line 3
+line 4
 EOF
 }
 
@@ -85,4 +88,21 @@ echo admin@example.com > $SYSCONFDIR/bounceto
 dsn 5.2.9 | splitblank $fn
 grep -qx admin@example.com $fn.2
 
-rm -f $fn.* $SYSCONFDIR/bounceto
+echo -n Testing max-lines: 0
+dsn --max-lines=0 5.2.9 | not grep -qx "This is a test."
+echo -n , 1
+dsn --max-lines=1 5.2.9 | grep -qx "This is a test."
+dsn --max-lines=1 5.2.9 | not grep -qx "line 2"
+echo -n , 2
+dsn --max-lines=2 5.2.9 | grep -qx "line 2"
+dsn --max-lines=2 5.2.9 | not grep -qx "line 3"
+echo -n , bouncelines=1
+echo 1 > $SYSCONFDIR/bouncelines
+dsn 5.2.9 | grep -qx "This is a test."
+dsn 5.2.9 | not grep -qx "line 2"
+echo -n , override
+dsn --max-lines=2 5.2.9 | grep -qx "line 2"
+dsn --max-lines=2 5.2.9 | not grep -qx "line 3"
+echo
+
+rm -f $fn.* $SYSCONFDIR/bounceto $SYSCONFDIR/bouncelines
