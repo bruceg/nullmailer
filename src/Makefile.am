@@ -10,7 +10,7 @@ sbin_PROGRAMS = \
 
 #noinst_PROGRAMS = address
 
-AM_CPPFLAGS = -I../lib -I../lib/cli++
+AM_CPPFLAGS = -I$(top_srcdir)/lib
 
 mailq_SOURCES = mailq.cc
 mailq_LDADD = ../lib/libnullmailer.a

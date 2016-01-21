@@ -27,7 +27,7 @@
 #include "list.h"
 #include "mystring/mystring.h"
 #include "protocol.h"
-#include "cli++.h"
+#include "cli++/cli++.h"
 
 const char* user = 0;
 const char* pass = 0;

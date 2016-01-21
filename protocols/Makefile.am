@@ -1,7 +1,7 @@
 libexecdir = @libexecdir@/nullmailer
 
 libexec_PROGRAMS = smtp qmqp
-AM_CPPFLAGS = -I../lib -I../lib/cli++
+AM_CPPFLAGS = -I$(top_srcdir)/lib
 
 if TLS
 TLS_SOURCES = tls_gnutls.cc

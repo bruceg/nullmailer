@@ -1,9 +1,9 @@
 noinst_PROGRAMS = address-test argparse-test clitest0 clitest1
-EXTRA_DIST = address-trace.cc argparse.cc clitest.cc clitest.sh runtests.in
+EXTRA_DIST = address-trace.cc clitest.cc clitest.sh runtests.in
 noinst_SCRIPTS = runtests
 CLEANFILES = runtests
 
-AM_CPPFLAGS = -I../lib
+AM_CPPFLAGS = -I$(top_srcdir)/lib
 
 address_test_SOURCES = address-test.cc # address-trace.cc
 address_test_LDADD = ../lib/libnullmailer.a
@@ -25,8 +25,8 @@ runtests: runtests.in Makefile
 
 # The following makes sure that we can't produce a package without the
 # tests executing properly
-dist-hook: test
-	cp -r tests $(distdir)
+dist-hook:
+	cp -r $(srcdir)/tests $(distdir)
 
 test: all
 	./address-test

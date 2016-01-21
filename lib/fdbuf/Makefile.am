@@ -1,5 +1,5 @@
 noinst_LIBRARIES = libfdbuf.a
-AM_CPPFLAGS = -I..
+AM_CPPFLAGS = -I$(top_srcdir)/lib
 
 if FDBUF_NO_MYSTRING
 mystring_sources =

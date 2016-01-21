@@ -1,7 +1,9 @@
 localstatedir = @localstatedir@/nullmailer
 sysconfdir = @sysconfdir@/nullmailer
 
-EXTRA_DIST = BUGS HOWTO INSTALL TODO scripts/*
+EXTRA_DIST = BUGS HOWTO INSTALL TODO spec \
+	scripts/nullmailer.run scripts/nullmailer-log.run \
+	scripts/nullmailer.service
 SUBDIRS = doc lib protocols src test
 
 install-data-local:
@@ -26,8 +28,7 @@ install-root:
 
 dist-hook:
 	sed -e s/@VERSION\@/@VERSION@/ \
-		<spec >$(distdir)/nullmailer-@VERSION@.spec
-	find $(distdir)/scripts -name '*~' | xargs -r rm
+		<$(srcdir)/spec >$(distdir)/nullmailer-@VERSION@.spec
 
 tests: all
 	$(MAKE) -C test test

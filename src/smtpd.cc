@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "autoclose.h"
-#include "lib/defines.h"
+#include "defines.h"
 #include "fdbuf/fdbuf.h"
 #include "mystring/mystring.h"
 #include "forkexec.h"
