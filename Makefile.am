@@ -1,4 +1,4 @@
-localstatedir = @localstatedir@/nullmailer
+localstatedir = @localstatedir@/spool/nullmailer
 sysconfdir = @sysconfdir@/nullmailer
 
 EXTRA_DIST = BUGS HOWTO INSTALL TODO spec \

@@ -36,7 +36,7 @@ libnullmailer.a: mergelib.sh libmisc.a fdbuf/libfdbuf.a \
 defines.cc: Makefile make_defines.sh
 	@echo Creating defines.cc
 	@sh $(srcdir)/make_defines.sh \
-		@localstatedir@/nullmailer \
+		@localstatedir@/spool/nullmailer \
 		@sysconfdir@/nullmailer \
 		@libexecdir@/nullmailer \
 		@bindir@ \

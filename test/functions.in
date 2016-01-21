@@ -1,7 +1,7 @@
 srcdir=@SRCDIR@
 tmpdir=@TMPDIR@
 SYSCONFDIR=@TMPDIR@/etc/nullmailer
-QUEUEDIR=@TMPDIR@/var/nullmailer
+QUEUEDIR=@TMPDIR@/var/spool/nullmailer
 rm -rf $tmpdir
 mkdir -p \
     $QUEUEDIR/{failed,queue,tmp} \

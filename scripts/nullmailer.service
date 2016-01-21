@@ -2,12 +2,12 @@
 Description=Nullmailer relay-only MTA
 Requires=network.target
 After=local-fs.target
-ConditionPathExists=/var/nullmailer/queue
+ConditionPathExists=/var/spool/nullmailer/queue
 ConditionPathExists=/etc/nullmailer/defaultdomain
 ConditionPathExists=/etc/nullmailer/me
 
 [Service]
-WorkingDirectory=/var/nullmailer
+WorkingDirectory=/var/spool/nullmailer
 ExecStart=/usr/sbin/nullmailer-send
 User=nullmail
 Group=nullmail

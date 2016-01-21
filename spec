@@ -34,13 +34,13 @@ make
 rm -fr $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/etc
 mkdir -p $RPM_BUILD_ROOT/usr/lib
-mkdir -p $RPM_BUILD_ROOT/var/nullmailer/service/log
+mkdir -p $RPM_BUILD_ROOT/var/service/nullmailer/log
 mkdir -p $RPM_BUILD_ROOT/var/log/nullmailer
 
 make DESTDIR=$RPM_BUILD_ROOT install-strip
 ln -s ../sbin/sendmail $RPM_BUILD_ROOT/usr/lib/sendmail
-install scripts/nullmailer.run $RPM_BUILD_ROOT/var/nullmailer/service/run
-install scripts/nullmailer-log.run $RPM_BUILD_ROOT/var/nullmailer/service/log/run
+install scripts/nullmailer.run $RPM_BUILD_ROOT/var/service/nullmailer/run
+install scripts/nullmailer-log.run $RPM_BUILD_ROOT/var/service/nullmailer/log/run
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -55,7 +55,7 @@ fi
 
 %post
 if ! [ -L /service/nullmailer ]; then
-	svc-add /var/nullmailer/service nullmailer
+	svc-add /var/service/nullmailer
 fi
 if ! [ -s /etc/nullmailer/me ]; then
 	/bin/hostname --fqdn >/etc/nullmailer/me
@@ -91,4 +91,5 @@ fi
 /usr/sbin/nullmailer-send
 /usr/sbin/sendmail
 %dir /var/log/nullmailer
-/var/nullmailer
+/var/service/nullmailer
+/var/spool/nullmailer

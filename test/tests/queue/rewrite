@@ -3,8 +3,8 @@
 que() {
 	set -e
 	../src/nullmailer-queue && \
-	cat $tmpdir/var/nullmailer/queue/* && \
-	rm -f $tmpdir/var/nullmailer/queue/*
+	cat $QUEUEDIR/queue/* && \
+	rm -f $QUEUEDIR/queue/*
 }
 que-recip() {
 	set -e

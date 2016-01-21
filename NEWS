@@ -31,6 +31,8 @@ Changes in version 2.0
 - Fixed nullmailer-inject and -queue to handle the null (empty) sender
   address. Needed for RFC 3798 (Message Disposition Notification).
 
+- Moved spool directory to /var/spool/nullmailer like other MTAs.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------

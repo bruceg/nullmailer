@@ -69,7 +69,7 @@ diff -u - $out <<EOF
 EOF
 
 echo '  testing queued message envelope'
-qf=$tmpdir/var/nullmailer/queue/*
+qf=$QUEUEDIR/queue/*
 grep -q '^f@example.com$' $qf
 grep -q '^r@example.com$' $qf
 grep -q '^r2@example.com$' $qf
