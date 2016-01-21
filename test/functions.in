@@ -113,7 +113,7 @@ splitblank() {
 }
 
 PATH=/bin:/usr/bin:/usr/local/bin
-NULLMAILER_QUEUE=$PWD/../src/nullmailer-queue
+NULLMAILER_QUEUE=$srcdir/src/nullmailer-queue
 export NULLMAILER_QUEUE PATH
 rm -f $SYSCONFDIR/*
 echo f.q.d.n >$SYSCONFDIR/me
