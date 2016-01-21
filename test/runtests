@@ -1,9 +1,5 @@
 #!/bin/sh
-SRCDIR="@SRCDIR@"
-
-cd "$(dirname "$0")" || exit 1
-
-sed -e "s,[@]SRCDIR[@],$SRCDIR,g;" < functions.in > functions
+set -e
 
 failed=0
 for test in $*
@@ -14,7 +10,8 @@ do
 		echo 'Done.'
 	else
 		echo '******************************Failed!******************************'
-		failed=1
+		failed=$(( $failed + 1 ))
 	fi
 done 2>&1
+echo "$# tests run, $failed failed"
 exit $failed

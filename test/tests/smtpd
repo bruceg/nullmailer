@@ -3,7 +3,6 @@
 echo "Testing the nullmailer-smtpd program"
 
 out=$tmpdir/smtpd.out.$$
-trap 'rm -f $out' EXIT
 
 smtpd <<EOF 2>&1 | cat -v >$out
 HELO

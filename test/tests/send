@@ -14,7 +14,7 @@ chmod +x $tmpdir/protocols/dummy
 echo 127.0.0.1 smtp >$SYSCONFDIR/remotes
 
 # Start up the servers
-start send $srcdir/src/nullmailer-send
+start send $builddir/src/nullmailer-send
 
 make_message() {
   msgid=$(date +%s).$$.me

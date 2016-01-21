@@ -1,16 +1,29 @@
+#!/bin/bash
 srcdir=@SRCDIR@
-tmpdir=$srcdir/test-tmp
+builddir=@BUILDDIR@
+tmpdir=$builddir/test-tmp
 export NULLMAILER_TEST_PREFIX=$tmpdir
 SYSCONFDIR=$tmpdir/conf
 QUEUEDIR=$tmpdir/queue
 rm -rf $tmpdir
 mkdir -p \
+    $tmpdir/protocols \
     $QUEUEDIR/{failed,queue,tmp} \
     $SYSCONFDIR
 mknod $QUEUEDIR/trigger p
-ln -s $srcdir/src $tmpdir/sbin
-ln -s $srcdir/src $tmpdir/bin
-ln -s $srcdir/src $tmpdir/protocols
+ln -s $builddir/src $tmpdir/sbin
+ln -s $builddir/src $tmpdir/bin
+ln -s $builddir/protocols/* $tmpdir/protocols/
+
+exit_cleanup() {
+    svc -dx $tmpdir/service/* > /dev/null 2>&1 || :
+    # Remove all temporary files on success
+    if [ $? -eq 0 ]
+    then
+        rm -rf $tmpdir
+    fi
+}
+trap exit_cleanup EXIT
 
 fail() {
     echo "$*"
@@ -26,7 +39,6 @@ start() {
     } >$tmpdir/service/$name/run
     chmod +x $tmpdir/service/$name/run
     supervise $tmpdir/service/$name </dev/null >$tmpdir/service/${name}-log 2>&1 &
-    trap 'svc -dx $tmpdir/service/* >/dev/null 2>&1' EXIT
 }
 stop() {
     for name in $*; do

@@ -2,7 +2,7 @@
 
 msgid=message.id.$$.$RANDOM@f.q.d.n
 dsn() {
-	$srcdir/src/nullmailer-dsn "$@" << EOF
+	$builddir/src/nullmailer-dsn "$@" << EOF
 sender@example.com
 recip1@example.net
 recip2@example.org

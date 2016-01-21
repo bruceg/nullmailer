@@ -29,6 +29,3 @@ install-root:
 dist-hook:
 	sed -e s/@VERSION\@/@VERSION@/ \
 		<$(srcdir)/spec >$(distdir)/nullmailer-@VERSION@.spec
-
-tests: all
-	$(MAKE) -C test test
