@@ -1,5 +1,3 @@
-- Add support for SMTP AUTH CRAM-MD5
-
 - Convert all proto modules to use timedout reads.
 
 - Add patterns to the remotes file, to allow messages to be delivered to
@@ -12,17 +10,9 @@
     it must be matched exactly (before qualification).
   - PATTERN can be "@FQDN" which matches any user.
 
-- For version 1.5:
-  - Generate bounces for permanently failed messages.
-  - Generate DDNs for messages older than a configurable time.
-  - Generate bounces for temporarily failing messages after a
-    configurable time.
-  - Queue bounce from <> to sender
-  - Queue double bounce from <#@[]> to doublebounceto or adminaddr
-  - Optionally move bounces to a separate directory
-  - Move triple bounces to a separate directory
+- Generate DDNs for messages older than a configurable time.
 
-- For version 2: three-state queueing
+- For version 3: three-state queueing?
   - Queue message partially (tmp -> holding)
   - Send to smarthost immediately
   - Remove from holding if sending succeeds
