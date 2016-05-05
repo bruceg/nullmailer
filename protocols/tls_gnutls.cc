@@ -30,6 +30,7 @@
 #include "fdbuf/tlsobuf.h"
 
 int tls_insecure = false;
+int tls_anon_auth = false;
 const char* tls_x509certfile = NULL;
 const char* tls_x509keyfile = NULL;
 const char* tls_x509cafile = NULL;
@@ -76,7 +77,7 @@ static int cert_verify(gnutls_session_t session)
 
 static gnutls_session_t tls_session;
 
-void tls_init(const char* remote)
+void tls_cert_auth_init(const char* remote)
 {
   gnutls_certificate_credentials_t creds;
   gnutls_wrap(gnutls_global_init(),
@@ -85,7 +86,7 @@ void tls_init(const char* remote)
 	      "Error allocating TLS certificate");
   gnutls_wrap(gnutls_init(&tls_session, GNUTLS_CLIENT),
 	      "Error creating TLS session");
-#ifdef HAVE_GNUTLS_PRIORITY_FUNCS
+#ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
   gnutls_wrap(gnutls_priority_set_direct(tls_session, "NORMAL", NULL),
 	      "Error setting TLS options");
 #else
@@ -116,6 +117,44 @@ void tls_init(const char* remote)
   if (tls_x509crlfile != NULL)
     gnutls_wrap(gnutls_certificate_set_x509_crl_file(creds, tls_x509crlfile, x509fmt),
 		"Error loading SSL/TLS X.509 CRL file");
+}
+
+void tls_anon_auth_init(const char* remote)
+{
+  gnutls_anon_client_credentials_t anon_creds;
+
+  gnutls_wrap(gnutls_global_init(),
+	      "Error initializing TLS library");
+  gnutls_wrap(gnutls_anon_allocate_client_credentials(&anon_creds),
+	      "Error allocating TLS anonymous client credentials");
+  gnutls_wrap(gnutls_init(&tls_session, GNUTLS_CLIENT),
+	      "Error creating TLS session");
+
+#ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
+  gnutls_wrap(gnutls_priority_set_direct(tls_session, "NORMAL:+ANON-ECDH:+ANON-DH", NULL),
+	      "Error setting TLS options");
+#else
+  gnutls_wrap(gnutls_set_default_priority(tls_session),
+	      "Error setting TLS options");
+#endif
+  gnutls_wrap(gnutls_credentials_set(tls_session, GNUTLS_CRD_ANON, anon_creds),
+	      "Error setting TLS credentials");
+  gnutls_wrap(gnutls_server_name_set(tls_session, GNUTLS_NAME_DNS, remote, strlen(remote)),
+	      "Error setting TLS server name");
+  gnutls_session_set_ptr(tls_session, (void*)remote);
+}
+
+void tls_init(const char* remote)
+{
+  if ((tls_x509certfile || tls_x509keyfile || tls_x509cafile || tls_x509crlfile) && (tls_anon_auth)) {
+    protocol_fail(ERR_MSG_TEMPFAIL, "Error: TLS certificate and TLS anonymous auth options cannot both be specified");
+  }
+
+  if (tls_anon_auth && tls_insecure) {
+    tls_anon_auth_init(remote);
+  } else {
+    tls_cert_auth_init(remote);
+  }
 }
 
 void tls_send(fdibuf& in, int fd)

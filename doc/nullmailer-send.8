@@ -173,6 +173,13 @@ Specify that TLS X.509 files above are in DER format instead of PEM.
 .B insecure
 Don't abort a TLS connection if the server certificate fails validation.
 Use this only if you know the server uses an invalid certificate.
+.TP
+.B tls-anon-auth
+Use TLS anonymous authentication - replacing certificate authentication.
+This means no external certificates or passwords are needed to set up the connection.
+With this option your connection is vulnerable to man-in-the-middle (active or redirection) attacks.
+However, the data are integrity protected and encrypted from passive eavesdroppers.
+This option must be used with the insecure option - to acknowledge that you know what you are doing.
 .SH FILES
 .TP
 .B /var/spool/nullmailer/failed
@@ -194,3 +201,4 @@ nullmailer-dsn(1),
 nullmailer-inject(1),
 nullmailer-queue(8),
 mailq(1)
+http://www.postfix.org/TLS_README.html on how to setup a certificate-less Postfix SMTP server
