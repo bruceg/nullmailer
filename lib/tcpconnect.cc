@@ -33,19 +33,23 @@
 
 static int err_return(int errn, int dflt)
 {
-  switch(errn) {
-  case HOST_NOT_FOUND: return -ERR_HOST_NOT_FOUND;
-  case NO_ADDRESS: return -ERR_NO_ADDRESS;
-  case NO_RECOVERY: return -ERR_GHBN_FATAL;
-  case TRY_AGAIN: return -ERR_GHBN_TEMP;
-  case EAI_AGAIN: return -ERR_GHBN_TEMP;
-  case EAI_NONAME: return -ERR_HOST_NOT_FOUND;
-  case EAI_FAIL: return -ERR_GHBN_FATAL;
-  case ECONNREFUSED: return -ERR_CONN_REFUSED;
-  case ETIMEDOUT: return -ERR_CONN_TIMEDOUT;
-  case ENETUNREACH: return -ERR_CONN_UNREACHABLE;
-  default: return -dflt;
-  }
+  if (errn == HOST_NOT_FOUND)
+    return -ERR_HOST_NOT_FOUND;
+  if (errn == NO_ADDRESS)
+    return -ERR_NO_ADDRESS;
+  if (errn == NO_RECOVERY || errn == EAI_FAIL)
+    return -ERR_GHBN_FATAL;
+  if (errn == TRY_AGAIN || errn == EAI_AGAIN)
+    return -ERR_GHBN_TEMP;
+  if (errn == EAI_NONAME)
+    return -ERR_HOST_NOT_FOUND;
+  if (errn == ECONNREFUSED)
+    return -ERR_CONN_REFUSED;
+  if (errn == ETIMEDOUT)
+    return -ERR_CONN_TIMEDOUT;
+  if (errn == ENETUNREACH)
+    return -ERR_CONN_UNREACHABLE;
+  return -dflt;
 }
 
 #ifdef HAVE_GETADDRINFO
