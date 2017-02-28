@@ -18,6 +18,7 @@ libmystring_a_SOURCES = \
 	lstrip.cc \
 	mystring.cc \
 	rep.cc \
+	starts_with.cc \
 	rstrip.cc \
 	sub.cc \
 	subst.cc \

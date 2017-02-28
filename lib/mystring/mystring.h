@@ -75,6 +75,10 @@ public:
   mystring lower() const;
   mystring upper() const;
 
+  bool starts_with(const mystring&) const;
+  bool starts_with(const char*) const;
+  bool starts_with(const char*, size_t) const;
+
   int find_first(char, size_t = 0) const;
   int find_first_of(const mystring&, size_t = 0) const;
   int find_first_of(const char*, size_t = 0) const;
