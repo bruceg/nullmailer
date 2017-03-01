@@ -1,0 +1,10 @@
+. functions
+
+injectfrom() { injectlines "${1}From somebody" "Subject: test1" "To: nowhere"; }
+
+for lead in '' '>'
+do
+    echo "Checking that inject ignores a leading \"${lead}From \" line"
+    injectfrom "$lead" | egrep -qv '^>?From '
+    injectfrom "$lead" | head -n 1 | grep -q '^Subject:'
+done

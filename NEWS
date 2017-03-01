@@ -33,6 +33,8 @@ Changes in version 2.0
 
 - Moved spool directory to /var/spool/nullmailer like other MTAs.
 
+- Fixed nullmailer-inject handling of leading "From " lines.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
