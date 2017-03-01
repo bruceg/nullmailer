@@ -73,7 +73,7 @@ sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Action: failed'
 sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Status: 5.2.1'
 sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Diagnostic-Code: DUMMY; code=33 (#5.2.1) host=127.0.0.1'
 sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Subject: test'
-sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'This is just a test.'
+sed -e '1,3d; 1,/^$/d' $fn | not grep -qx 'This is just a test.'
 
 echo 'Checking log outputs'
 log=$tmpdir/service/send-log
