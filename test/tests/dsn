@@ -81,7 +81,7 @@ echo Testing quoted message header
 grep -qx "Message-Id: <$msgid>" $fn.12
 
 echo Testing quoted message body
-grep -qx "This is a test." $fn.13
+not grep -qx "This is a test." $fn.13
 
 echo Testing fixed bounce address
 echo admin@example.com > $SYSCONFDIR/bounceto
