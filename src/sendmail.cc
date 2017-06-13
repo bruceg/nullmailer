@@ -100,37 +100,45 @@ bool setenvelope(char* str)
   return true;
 }
 
-int do_exec(const char* program, const char* xarg1, int argc, char* argv[])
+int do_exec(const char* program, const char* args[])
 {
   mystring path = program_path(program);
-
-  const char* newargv[argc+3];
-  newargv[0] = path.c_str();
-  int j = 1;
-  if (xarg1)
-    newargv[j++] = xarg1;
-  for(int i = 0; i < argc; i++)
-    newargv[j++] = argv[i];
-  newargv[j] = 0;
-
-  execv(newargv[0], (char**)newargv);
+  args[0] = path.c_str();
+  execv(args[0], (char**)args);
   ferr << "sendmail: Could not exec " << program << '.' << endl;
   return 1;
 }
 
 int cli_main(int argc, char* argv[])
 {
-  if(o_sender)
-    setenv("NULLMAILER_NAME", o_sender, 1);
-  if(o_from)
-    if(!setenvelope(o_from))
-      return -1;
+  const char* extra_args[argc + 5] = {0};
+  int extra_argc = 1;
+
   switch (o_mode) {
   case mode_smtp:
-    return do_exec("nullmailer-smtpd", 0, 0, 0);
+    return do_exec("nullmailer-smtpd", extra_args);
   case mode_mailq:
-    return do_exec("mailq", 0, 0, 0);
+    return do_exec("mailq", extra_args);
   default:
-    return do_exec("nullmailer-inject", use_header ? "-b" : "-e", argc, argv);
+
+    extra_args[extra_argc++] = use_header ? "-b" : "-e";
+
+    if(o_sender)
+      setenv("NULLMAILER_NAME", o_sender, 1);
+    if(o_from) {
+      if(!setenvelope(o_from))
+        return -1;
+
+      // pass along empty sender
+      if(o_from[0] == '\0' || (strcmp(o_from, "<>") == 0)) {
+        extra_args[extra_argc++] = "-f";
+        extra_args[extra_argc++] = o_from;
+      }
+    }
+
+    for(int i = 0; i < argc; i++)
+      extra_args[extra_argc++] = argv[i];
+
+    return do_exec("nullmailer-inject", extra_args);
   }
 }
