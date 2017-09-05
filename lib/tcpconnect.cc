@@ -95,6 +95,7 @@ int tcpconnect(const char* hostname, int port, const char* source)
       return err;
   }
   int s = -1;
+  errno = 0;
   err = ERR_CONN_FAILED;
   struct addrinfo* orig_res = res;
 
