@@ -66,6 +66,7 @@ do
 	echo "Testing protocol failure with $p."
 	error 11 protocol $p -p $port --host=localhost 3<testmail
 	stop server
+	sleep 1
 done
 
 rm -f testmail
