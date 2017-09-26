@@ -42,6 +42,8 @@ int main()
   TEST("\"one two\"", 1, "one two");		     // Double quoted
   TEST(" one \"two\"three four", 3, "one", "twothree", "four"); // Mixed quoted and unquoted
   TEST("\"one\\\" two\"", 1, "one\" two");			// Double quoted with escaped quote
+  TEST("one='two three' four", 2, "one=two three", "four");	// Single quotes within an arg with multiple args
+  TEST("one=\"two three\" four", 2, "one=two three", "four");	// Double quotes within an arg with multiple args
 
   fout << itoa(count) << " tests run, ";
   fout << itoa(failed) << " failed." << endl;
