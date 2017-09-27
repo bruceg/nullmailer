@@ -9,8 +9,8 @@ for input in "$@"; do
 	dir="`basename "$input"`"
 	mkdir "$dir"
 	cd "$dir"
-	ar x ../../"$input"
+	"${AR:-ar}" x ../../"$input"
 	cd ..
 done
-ar rc ../"$archive" */*
-ranlib ../"$archive"
+"${AR:-ar}" rc ../"$archive" */*
+"${RANLIB:-ranlib}" ../"$archive"
