@@ -4,6 +4,8 @@ Changes in version 2.1
 
 - Added support for TLS anonymous authentication.
 
+- Fixed sendmail wrapper handling of empty sender on command line.
+
 - Fixed nullmailer-inject handling of leading "From " lines.
 
 - Some build fixes.
