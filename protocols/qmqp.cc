@@ -33,7 +33,7 @@
 const int default_port = 628;
 const int default_tls_port = -1; // No standard for QMQP over SSL exists
 const char* cli_program = "qmqp";
-const char* cli_help_prefix = "Send an emal message via QMQP\n";
+const char* cli_help_prefix = "Send an email message via QMQP\n";
 
 class qmqp 
 {
