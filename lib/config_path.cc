@@ -37,7 +37,7 @@ static bool initialized = false;
 mystring config_path(const char* dflt, const char* testdir, const char* subdir, const char* filename)
 {
   if (!initialized) {
-    // Check if the program is running setuid, to avoid privilege escallation.
+    // Check if the program is running setuid, to avoid privilege escalation.
     if (getuid() == geteuid())
       test_prefix = getenv("NULLMAILER_TEST_PREFIX");
   }
