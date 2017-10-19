@@ -71,7 +71,7 @@ static const char indentstr[] = "                       ";
 static const char* indent = indentstr + sizeof indentstr - 1;
 #define ENTER(R) do{ fout.write(indent--); fout.write(__FUNCTION__); fout.write(": "); fout.write(ptr); fout.write(": "); fout.writeln(R); }while(0)
 #define FAIL(MSG) do{ fout.write(++indent); fout.write(__FUNCTION__); fout.write(": failed: "); fout.writeln(MSG); return result(); }while(0)
-#define RETURNR(R) do{ fout.write(++indent); fout.write(__FUNCTION__); fout.write(": succeded str="); fout.write(R.str); fout.write(" comment="); fout.writeln(R.comment); return (R); }while(0)
+#define RETURNR(R) do{ fout.write(++indent); fout.write(__FUNCTION__); fout.write(": succeeded str="); fout.write(R.str); fout.write(" comment="); fout.writeln(R.comment); return (R); }while(0)
 #define RETURN(N,S,C,L) do{ result r(N,S,C,L); RETURNR(r); }while(0)
 #endif
 
