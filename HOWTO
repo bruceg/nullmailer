@@ -2,9 +2,9 @@ Configuration of this program in the typical case is quite simple.
 
 1. Compile and install the program.  If you are using the RPM, skip this
 step.  See the INSTALL file for more details.  Note that this package is
-designed to execute as a non-priveleged user named "nullmail".  When you
+designed to execute as a non-privileged user named "nullmail".  When you
 do the final install, add the "nullmail" user (typically with either a
-non-priveleged group or a new "nullmail" group) and run "make
+non-privileged group or a new "nullmail" group) and run "make
 install-root" to set up the files with the proper permissions.
 
 2. Set up your hostname in SYSCONFDIR[1]/nullmailer/me.  Usually this
