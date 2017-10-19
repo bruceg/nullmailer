@@ -249,7 +249,7 @@
 
 	* Released version 0.31
 
-	* Makefile.am (install-root): Neede to make nullmailer-queue
+	* Makefile.am (install-root): Needed to make nullmailer-queue
 	setuid nullmail here.
 
 	* HOWTO: Added a quick guide to getting nullmailer running.
