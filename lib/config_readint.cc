@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include <stdlib.h>
+#include <limits.h>
 #include "defines.h"
 #include "configio.h"
 #include "fdbuf/fdbuf.h"
@@ -31,6 +32,7 @@ bool config_readint(const char* filename, int& result)
   if(!config_read(filename, tmp))
     return false;
   char* endptr;
-  result = strtol(tmp.c_str(), &endptr, 10);
-  return endptr > tmp.c_str();
+  long longresult = strtol(tmp.c_str(), &endptr, 10);
+  result = (int) longresult;
+  return endptr > tmp.c_str() && longresult >= INT_MIN && longresult <= INT_MAX;
 }
