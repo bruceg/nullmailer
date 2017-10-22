@@ -18,7 +18,7 @@ struct cli_option
 {
   char ch;
   const char* name;
-  enum { flag, counter, integer, string, stringlist, uinteger } type;
+  enum { flag, counter, integer, string, stringlist, ulong } type;
   int flag_value;
   void* dataptr;
   const char* helpstr;
