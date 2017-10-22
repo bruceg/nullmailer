@@ -10,7 +10,7 @@ static const char* parse_arg(mystring& arg, const char* start, const char* end)
       arg.append(start, ptr - start);
       for (start = ++ptr; ptr < end && *ptr != '\''; ++ptr) ;
       arg.append(start, ptr - start);
-      start = ++ptr;
+      start = ptr + 1;
       continue;
     case '"':
       arg.append(start, ptr - start);
@@ -23,7 +23,7 @@ static const char* parse_arg(mystring& arg, const char* start, const char* end)
 	}
       }
       arg.append(start, ptr - start);
-      start = ++ptr;
+      start = ptr + 1;
       continue;
     case '\\':
       arg.append(start, ptr - start);
@@ -33,7 +33,8 @@ static const char* parse_arg(mystring& arg, const char* start, const char* end)
       continue;
     }
   }
-  arg.append(start, ptr - start);
+  if ((ptr - start) > 0)
+    arg.append(start, ptr - start);
   return ptr;
 }
 

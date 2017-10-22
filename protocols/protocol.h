@@ -19,13 +19,13 @@ extern int auth_method;
 extern int port;
 extern int use_tls;
 extern int use_starttls;
-extern int tls_insecure;
 
 extern void protocol_prep(fdibuf& in);
 extern void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout);
 extern void protocol_starttls(fdibuf& netin, fdobuf& netout);
 
 extern int tls_insecure;
+extern int tls_anon_auth;
 extern const char* tls_x509certfile;
 extern const char* tls_x509keyfile;
 extern const char* tls_x509cafile;

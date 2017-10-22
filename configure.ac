@@ -1,4 +1,4 @@
-AC_INIT([nullmailer], [2.0])
+AC_INIT([nullmailer], [2.1])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([lib/defines.h])
 AM_INIT_AUTOMAKE
@@ -82,6 +82,8 @@ AM_CONDITIONAL(TLS, $tls)
 if $tls; then
   AC_CHECK_LIB(gnutls, gnutls_certificate_set_verify_function,
    [AC_DEFINE(HAVE_GNUTLS_SET_VERIFY_FUNCTION, 1, [libgnutls has gnutls_certificate_set_verify_function])])
+  AC_CHECK_LIB(gnutls, gnutls_priority_set_direct,
+   [AC_DEFINE(HAVE_GNUTLS_PRIORITY_SET_DIRECT, 1, [libgnutls has gnutls_priority_set_direct])])
 fi
 
 AC_CONFIG_FILES([Makefile doc/Makefile lib/Makefile lib/cli++/Makefile lib/fdbuf/Makefile lib/mystring/Makefile protocols/Makefile src/Makefile test/Makefile])

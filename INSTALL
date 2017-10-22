@@ -1,8 +1,11 @@
 To build and install nullmailer, run:
 
+	sh autogen.sh
 	./configure
 	make
 	sudo make install install-root
+
+(Running autogen.sh is optional for release packages)
 
 To enable SSL/TLS support, add "--enable-tls" to the configure command
 line above.

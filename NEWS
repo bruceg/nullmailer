@@ -1,5 +1,18 @@
 This file lists all the major user-visible changes to nullmailer.
 -------------------------------------------------------------------------------
+Changes in version 2.1
+
+- Added support for TLS anonymous authentication.
+
+- Fixed sendmail wrapper handling of empty sender on command line.
+
+- Fixed nullmailer-inject handling of leading "From " lines.
+
+- Some build fixes.
+
+Development of this version has been sponsored by FutureQuest, Inc.
+ossi@FutureQuest.net  http://www.FutureQuest.net/
+-------------------------------------------------------------------------------
 Changes in version 2.0
 
 - Added support to nullmailer-send to move permanently failing messages
@@ -32,8 +45,6 @@ Changes in version 2.0
   address. Needed for RFC 3798 (Message Disposition Notification).
 
 - Moved spool directory to /var/spool/nullmailer like other MTAs.
-
-- Fixed nullmailer-inject handling of leading "From " lines.
 
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
