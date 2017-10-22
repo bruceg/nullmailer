@@ -184,14 +184,17 @@ int cli_option::set(const char* arg)
     *(int*)dataptr += flag_value;
     return 0;
   case integer:
-    *(int*)dataptr = strtol(arg, &endptr, 10);
-    if(*endptr) {
-      ferr << argv0 << ": invalid integer: " << arg << endl;
-      return -1;
+    {
+      long longresult = strtol(arg, &endptr, 10);
+      if(*endptr || longresult < INT_MIN || longresult > INT_MAX) {
+        ferr << argv0 << ": invalid integer: " << arg << endl;
+        return -1;
+      }
+      *(int*)dataptr = (int) longresult;
+      return 1;
     }
-    return 1;
-  case uinteger:
-    *(unsigned*)dataptr = strtoul(arg, &endptr, 10);
+  case ulong:
+    *(unsigned long*)dataptr = strtoul(arg, &endptr, 10);
     if(*endptr) {
       ferr << argv0 << ": invalid unsigned integer: " << arg << endl;
       return -1;
