@@ -20,6 +20,7 @@ exit_cleanup() {
     # Remove all temporary files on success
     if [ $? -eq 0 ]
     then
+        sleep 1
         rm -rf $tmpdir
     fi
 }
