@@ -10,6 +10,9 @@ Changes in version 2.1
 
 - Some build fixes.
 
+- Fixed bogus temporary gethostbyname error message when the protocol
+  source address was incorrect.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------

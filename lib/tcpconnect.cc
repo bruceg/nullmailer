@@ -98,7 +98,15 @@ int tcpconnect(const char* hostname, int port, const char* source)
   err = ERR_CONN_FAILED;
   struct addrinfo* orig_res = res;
 
-  for (; res; res = res->ai_next ) {
+  if (source_addr)
+    // Check if some address is the same family as the source
+    for (; res != NULL; res = res->ai_next)
+      if (canbind(res->ai_family, source_addr))
+        break;
+  if (res == NULL)
+    return -ERR_BIND_FAILED;
+
+  for (; res != NULL; res = res->ai_next) {
     if (!source_addr || canbind(res->ai_family, source_addr)) {
       s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
       if(s > 0) {
