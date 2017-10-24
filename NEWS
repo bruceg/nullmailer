@@ -3,8 +3,13 @@ This file lists all the major user-visible changes to nullmailer.
 Changes in version 2.1
 
 - Added support for TLS anonymous authentication.
+  Thanks Uffe Jakobsen.
 
 - Fixed sendmail wrapper handling of empty sender on command line.
+  Thanks Sebastian Wiedenroth.
+
+- Fixed handling of quoted strings in the "remotes" file.
+  Thanks Mihai Moldovan.
 
 - Fixed nullmailer-inject handling of leading "From " lines.
 
