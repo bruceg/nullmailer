@@ -16,7 +16,6 @@ EOF
 for p in smtp qmqp
 do
 	start server "tcpserver -1 ::0 0 sh $srcdir/test/accept-$p.sh"
-	sleep 1
 	port=$( head -n 1 $tmpdir/service/server-log )
 
 	echo "Testing protocol success with $p (command-line)"
@@ -61,7 +60,6 @@ do
 	error 1 protocol $p -p foo --host=localhost 3<testmail
 
 	start server tcpserver -1 0 0 date
-	sleep 1
 	port=$( head -n 1 $tmpdir/service/server-log )
 	echo "Testing protocol failure with $p."
 	error 11 protocol $p -p $port --host=localhost 3<testmail

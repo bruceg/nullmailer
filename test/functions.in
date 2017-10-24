@@ -20,6 +20,7 @@ exit_cleanup() {
     # Remove all temporary files on success
     if [ $? -eq 0 ]
     then
+        wait
         rm -rf $tmpdir
     fi
 }
@@ -39,10 +40,12 @@ start() {
     } >$tmpdir/service/$name/run
     chmod +x $tmpdir/service/$name/run
     supervise $tmpdir/service/$name </dev/null >$tmpdir/service/${name}-log 2>&1 &
+    sleep 1
 }
 stop() {
     for name in $*; do
 	svc -dx $tmpdir/service/$name >/dev/null 2>&1
+	wait
     done
 }
 

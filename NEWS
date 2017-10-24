@@ -13,6 +13,9 @@ Changes in version 2.1
 - Fixed bogus temporary gethostbyname error message when the protocol
   source address was incorrect.
 
+- Fixed potential race condition in tests.
+  Thanks Felix Lechner.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
