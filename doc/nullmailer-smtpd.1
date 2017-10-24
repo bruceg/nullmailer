@@ -1,0 +1,26 @@
+.TH nullmailer-smtpd 1
+.SH NAME
+nullmailer-smtpd \- Simple SMTP agent for emulating sendmail -bs mode.
+.SH SYNOPSIS
+.B nullmailer-smtpd
+.SH DESCRIPTION
+This program emulates a simple SMTP interface that queues messages directly to
+.BR nullmailer-queue .
+It is invoked by the
+.BR sendmail
+wrapper when the
+.B \-bs
+option is used.
+.SH OPTIONS
+None.
+.SH RETURN VALUE
+Exits 0 if it was successful, otherwise it prints a diagnostic message
+to standard error and exits 1.
+.SH WARNINGS
+This is not a general purpose SMTP server. In particular, it cannot
+handle authentication, and it only does minimal validation of email
+addresses. Do not use this as a SMTP server on untrusted network
+interfaces.
+.SH SEE ALSO
+sendmail(1),
+nullmailer-queue(8)
