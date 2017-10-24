@@ -16,6 +16,9 @@ Changes in version 2.1
 - Fixed potential race condition in tests.
   Thanks Felix Lechner.
 
+- Fixed handling of time values on 32-bit big-endian systems.
+  Thanks Felix Lechner.
+
 Development of this version has been sponsored by FutureQuest, Inc.
 ossi@FutureQuest.net  http://www.FutureQuest.net/
 -------------------------------------------------------------------------------
