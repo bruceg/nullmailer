@@ -34,7 +34,7 @@ $section = 1;
 sub type2word {
     my($type) = shift;
     return 'INT' if $type eq 'integer';
-    return 'UINT' if $type eq 'uinteger';
+    return 'UINT' if $type eq 'ulong';
     return 'STR' if $type eq 'string' || $type eq 'stringlist';
     return '' if $type eq 'flag' || $type eq 'counter';
     die "Invalid cli option type '$type'";

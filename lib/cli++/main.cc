@@ -17,6 +17,7 @@
 #include <config.h>
 #include "ac/time.h"
 #include "fdbuf/fdbuf.h"
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include "cli++.h"
@@ -89,7 +90,7 @@ static int calc_width(const cli_option* o)
     switch (o->type) {
     case cli_option::string:     width += 6; break;
     case cli_option::integer:    width += 4; break;
-    case cli_option::uinteger:   width += 4; break;
+    case cli_option::ulong:      width += 4; break;
     case cli_option::stringlist: width += 5; break;
     case cli_option::flag:       break;
     case cli_option::counter:    break;
@@ -123,7 +124,7 @@ static void show_option(const cli_option* o, int maxwidth)
     switch(o->type) {
     case cli_option::string:     extra = "=VALUE"; break;
     case cli_option::integer:    extra = "=INT"; break;
-    case cli_option::uinteger:   extra = "=UNS"; break;
+    case cli_option::ulong:      extra = "=UNS"; break;
     case cli_option::stringlist: extra = "=ITEM"; break;
     case cli_option::flag:       break;
     case cli_option::counter:    break;
