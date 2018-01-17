@@ -111,8 +111,9 @@ int do_exec(const char* program, const char* args[])
 
 int cli_main(int argc, char* argv[])
 {
-  const char* extra_args[argc + 5] = {0};
+  const char* extra_args[argc + 5];
   int extra_argc = 1;
+  memset(extra_args, 0, sizeof extra_args);
 
   switch (o_mode) {
   case mode_smtp:

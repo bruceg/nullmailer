@@ -1,4 +1,6 @@
 This file lists all the major user-visible changes to nullmailer.
+
+- Fixed compile error in sendmail on GCC older than 4.9.
 -------------------------------------------------------------------------------
 Changes in version 2.1
 
