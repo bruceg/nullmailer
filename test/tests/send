@@ -105,4 +105,4 @@ grep -qx "^Starting delivery: host: 127.0.0.1 protocol: dummy file: $msgid" $log
 grep -qx 'From: <> to: <me@example.com>' $log
 grep -qx 'Sending failed: Unspecified temporary error' $log
 grep -qx "Message-Id: <$msgid>" $log
-grep -qx "Not generating double bounce for <$msgid>" $log
+grep -qx "Not generating double bounce for $msgid" $log

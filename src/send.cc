@@ -350,11 +350,11 @@ bool bounce_msg(const message& msg, const remote& remote, const mystring& output
   }
   autoclose fd = open(failed.c_str(), O_RDONLY);
   if (fd < 0)
-    fout << "Can't open file '" << failed << "' to create bounce message" << endl;
+    fout << "Can't open file " << failed << " to create bounce message" << endl;
   else if (is_bounce(fd))
-    fout << "Not generating double bounce for <" << msg.filename << ">" << endl;
+    fout << "Not generating double bounce for " << msg.filename << "" << endl;
   else {
-    fout << "Generating bounce for '" << msg.filename << "'" << endl;
+    fout << "Generating bounce for " << msg.filename << endl;
     queue_pipe qp;
     autoclose pfd = qp.start();
     if (pfd > 0) {
