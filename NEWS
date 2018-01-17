@@ -1,5 +1,8 @@
 This file lists all the major user-visible changes to nullmailer.
 
+- nullmailer-send no longer generates bounces for rejected bounces.
+  Thanks Fejes József
+
 - Fixed compile error in sendmail on GCC older than 4.9.
 
 - Fixed treating authentication failure as message rejection.

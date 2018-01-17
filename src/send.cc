@@ -330,6 +330,15 @@ static void parse_output(const mystring& output, const remote& remote, mystring&
     }
 }
 
+static bool is_bounce(int fd)
+{
+  fdibuf in(fd);
+  mystring sender;
+  bool result = in.getline(sender) && sender.length() == 0;
+  lseek(fd, 0, SEEK_SET);
+  return result;
+}
+
 bool bounce_msg(const message& msg, const remote& remote, const mystring& output)
 {
   mystring failed = "../failed/";
@@ -342,6 +351,8 @@ bool bounce_msg(const message& msg, const remote& remote, const mystring& output
   autoclose fd = open(failed.c_str(), O_RDONLY);
   if (fd < 0)
     fout << "Can't open file '" << failed << "' to create bounce message" << endl;
+  else if (is_bounce(fd))
+    fout << "Not generating double bounce for <" << msg.filename << ">" << endl;
   else {
     fout << "Generating bounce for '" << msg.filename << "'" << endl;
     queue_pipe qp;

@@ -17,10 +17,12 @@ echo 127.0.0.1 smtp >$SYSCONFDIR/remotes
 start send $builddir/src/nullmailer-send
 
 make_message() {
+  local sender=$1
+  local recip=$2
   msgid=$(date +%s).$$.me
   cat <<EOF >$QUEUEDIR/tmp/$msgid
-me@example.com
-me@example.net
+$sender
+$recip
 
 Subject: test
 Message-Id: <$msgid>
@@ -31,22 +33,25 @@ EOF
 }
 
 send_message() {
+  local sender=$1
+  local recip=$2
+  shift 2
   echo 127.0.0.1 dummy $@ >$SYSCONFDIR/remotes
-  make_message
+  make_message "$sender" "$recip"
   svc -a $tmpdir/service/send
   sleep 2
   not test -e $QUEUEDIR/queue/$msgid
 }
 
 echo 'Testing sending with a succeeding protocol'
-send_message 0 2.0.0
+send_message me@example.com me@example.net 0 2.0.0
 
 echo 'Testing sending with a failing protocol'
-not send_message 1 5.2.2
+not send_message me@example.com me@example.net 1 5.2.2
 rm -f $QUEUEDIR/queue/$msgid
 
 echo 'Testing handling of a permanent failure'
-send_message 33 5.2.2
+send_message me@example.com me@example.net 33 5.2.2
 
 echo 'Checking failed message was moved out of the queue'
 test -e $QUEUEDIR/failed/$msgid
@@ -74,6 +79,7 @@ sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Status: 5.2.1'
 sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Diagnostic-Code: DUMMY; code=33 (#5.2.1) host=127.0.0.1'
 sed -e '1,3d; 1,/^$/d' $fn | grep -qx 'Subject: test'
 sed -e '1,3d; 1,/^$/d' $fn | not grep -qx 'This is just a test.'
+rm -f $fn
 
 echo 'Checking log outputs'
 log=$tmpdir/service/send-log
@@ -81,3 +87,22 @@ grep -qx "^Starting delivery: host: 127.0.0.1 protocol: dummy file: $msgid" $log
 grep -qx 'From: <me@example.com> to: <me@example.net>' $log
 grep -qx 'Sending failed: Unspecified temporary error' $log
 grep -qx "Message-Id: <$msgid>" $log
+
+echo 'Testing handling of rejected bounces'
+send_message '' me@example.com 33 5.2.2
+
+echo 'Checking failed message was moved out of the queue'
+test -e $QUEUEDIR/failed/$msgid
+rm -f $QUEUEDIR/failed/$msgid
+
+echo 'Checking for no generated bounce message'
+msgid2=$( ls $QUEUEDIR/failed )
+test $( wc -w <<< $msgid2 ) = 0
+
+echo 'Checking log outputs'
+log=$tmpdir/service/send-log
+grep -qx "^Starting delivery: host: 127.0.0.1 protocol: dummy file: $msgid" $log
+grep -qx 'From: <> to: <me@example.com>' $log
+grep -qx 'Sending failed: Unspecified temporary error' $log
+grep -qx "Message-Id: <$msgid>" $log
+grep -qx "Not generating double bounce for <$msgid>" $log
