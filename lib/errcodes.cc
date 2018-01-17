@@ -44,6 +44,7 @@ const char* errorstr(int code)
   case ERR_MSG_REFUSED: return "Server refused the message";
   case ERR_MSG_PERMFAIL: return "Permanent error in sending the message";
   case ERR_BIND_FAILED: return "Failed to bind source address";
+  case ERR_AUTH_FAILED: return "Failed to authenticate to server";
   }
   return (code & ERR_PERMANENT_FLAG)
     ? "Unspecified permanent error"

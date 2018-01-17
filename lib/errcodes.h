@@ -20,6 +20,7 @@
 #define ERR_UNKNOWN 17		// Arbitrary error code
 #define ERR_CONFIG 18		// Error reading a config file
 #define ERR_BIND_FAILED 19      // Failed to bind source address
+#define ERR_AUTH_FAILED 20      // Failed to authenticate to server
 
 // Permanent errors
 #define ERR_GHBN_FATAL 33	// gethostbyname failed with NO_RECOVERY

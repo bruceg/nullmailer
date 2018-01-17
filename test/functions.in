@@ -48,6 +48,10 @@ stop() {
 	wait
     done
 }
+catch-port() {
+    local name=$1
+    port=$( head -n 1 $tmpdir/service/${name}-log )
+}
 
 #not() { if "$@"; then return 1; else return 0; fi }
 not() { ! safe "$@"; }
@@ -126,6 +130,21 @@ splitblank() {
       echo "$line" >> ${fn}.$n
     fi
   done
+}
+
+make-testmail() {
+    testmail=$tmpdir/testmail
+    rm -f $testmail
+    cat >$testmail <<EOF
+bruce@untroubled.org
+bruce@untroubled.org
+
+From: <bruce@untroubled.org>
+To: <bruce@untroubled.org>
+Subject: Nullmailer automated test message
+
+Just testing, please ignore
+EOF
 }
 
 export PATH=/bin:/usr/bin:/usr/local/bin

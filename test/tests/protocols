@@ -1,69 +1,59 @@
 . functions
 export HELOHOST=f.q.d.n
 
-rm -f testmail
-cat >testmail <<EOF
-bruce@untroubled.org
-bruce@untroubled.org
-
-From: <bruce@untroubled.org>
-To: <bruce@untroubled.org>
-Subject: Nullmailer automated test message
-
-Just testing, please ignore
-EOF
+make-testmail
 
 for p in smtp qmqp
 do
 	start server "tcpserver -1 ::0 0 sh $srcdir/test/accept-$p.sh"
-	port=$( head -n 1 $tmpdir/service/server-log )
+	catch-port server
 
 	echo "Testing protocol success with $p (command-line)"
-	protocol $p --host=localhost --port=$port 3<testmail
+	protocol $p --host=localhost --port=$port 3<$testmail
 
 	echo "Testing protocol success with $p (stdin)"
-	protocol $p -- host=localhost port=$port 3<testmail
+	protocol $p -- host=localhost port=$port 3<$testmail
 
 	echo "Testing protocol success with $p (stdin, IPv6)"
-	protocol $p -- host=::1 port=$port 3<testmail
+	protocol $p -- host=::1 port=$port 3<$testmail
 
 	echo "Testing protocol success with $p (source addr)"
-	protocol $p -- host=::1 port=$port source=::1 3<testmail
+	protocol $p -- host=::1 port=$port source=::1 3<$testmail
 
 	echo "Testing protocol failure with $p (bad source addr 1)"
-	error 19 protocol $p -- host=::1 port=$port source=127.0.0.1 3<testmail
+	error 19 protocol $p -- host=::1 port=$port source=127.0.0.1 3<$testmail
 
 	echo "Testing protocol failure with $p (bad source addr 2)"
-	error 19 protocol $p -- host=127.0.0.1 port=$port source=::1 3<testmail
+	error 19 protocol $p -- host=127.0.0.1 port=$port source=::1 3<$testmail
 
 	stop server
 
 	echo "Testing host not found error with $p."
-	error 2 protocol $p --host=this.host.can.not.exist 3<testmail
+	error 2 protocol $p --host=this.host.can.not.exist 3<$testmail
 
 	echo "Testing connection refused error with $p."
-	error 7 protocol $p -p $port --host=localhost 3<testmail
+	error 7 protocol $p -p $port --host=localhost 3<$testmail
 
 	echo "Testing connection refused error with $p (IPv6)."
-	error 7 protocol $p -p $port --host=::1 3<testmail
+	error 7 protocol $p -p $port --host=::1 3<$testmail
 	
 	echo "Testing usage error with $p (zero args)."
-	error 1 protocol $p 3<testmail
+	error 1 protocol $p 3<$testmail
 	
 	echo "Testing usage error with $p (two args)."
-	error 1 protocol $p --host=localhost foobar 3<testmail
+	error 1 protocol $p --host=localhost foobar 3<$testmail
 	
 	echo "Testing usage error with $p (unknown option)."
-	error 1 protocol $p -x --host=localhost 3<testmail
+	error 1 protocol $p -x --host=localhost 3<$testmail
 	
 	echo "Testing usage error with $p (invalid integer)."
-	error 1 protocol $p -p foo --host=localhost 3<testmail
+	error 1 protocol $p -p foo --host=localhost 3<$testmail
 
 	start server tcpserver -1 0 0 date
 	port=$( head -n 1 $tmpdir/service/server-log )
 	echo "Testing protocol failure with $p."
-	error 11 protocol $p -p $port --host=localhost 3<testmail
+	error 11 protocol $p -p $port --host=localhost 3<$testmail
 	stop server
 done
 
-rm -f testmail
+stop server

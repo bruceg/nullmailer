@@ -45,8 +45,8 @@ public:
   ~smtp();
   int get(mystring& str);
   int put(mystring cmd, mystring& result);
-  void docmd(mystring cmd, int range, mystring& result);
-  void docmd(mystring cmd, int range);
+  void docmd(mystring cmd, int range, mystring& result, int permfail=ERR_MSG_PERMFAIL);
+  void docmd(mystring cmd, int range, int permfail=ERR_MSG_PERMFAIL);
   void dohelo(bool ehlo);
   bool hascap(const char* name, const char* word = NULL);
   void auth_login(void);
@@ -91,7 +91,7 @@ int smtp::put(mystring cmd, mystring& result)
   return get(result);
 }
 
-void smtp::docmd(mystring cmd, int range, mystring& result)
+void smtp::docmd(mystring cmd, int range, mystring& result, int permfail)
 {
   int code;
   if(!cmd)
@@ -101,7 +101,7 @@ void smtp::docmd(mystring cmd, int range, mystring& result)
   if(code < range || code >= (range+100)) {
     int e;
     if(code >= 500)
-      e = ERR_MSG_PERMFAIL;
+      e = permfail;
     else if(code >= 400)
       e = ERR_MSG_TEMPFAIL;
     else
@@ -112,10 +112,10 @@ void smtp::docmd(mystring cmd, int range, mystring& result)
   }
 }
 
-void smtp::docmd(mystring cmd, int range)
+void smtp::docmd(mystring cmd, int range, int permfail)
 {
   mystring msg;
-  docmd(cmd, range, msg);
+  docmd(cmd, range, msg, permfail);
 }
 
 void smtp::dohelo(bool ehlo)
@@ -162,7 +162,7 @@ void smtp::auth_login(void)
 {
   mystring encoded;
   base64_encode(user, encoded);
-  docmd("AUTH LOGIN " + encoded, 300);
+  docmd("AUTH LOGIN " + encoded, 300, ERR_AUTH_FAILED);
   encoded = "";
   base64_encode(pass, encoded);
   docmd(encoded, 200);
@@ -177,7 +177,7 @@ void smtp::auth_plain(void)
   plain += pass;
   mystring encoded = "AUTH PLAIN ";
   base64_encode(plain, encoded);
-  docmd(encoded, 200);
+  docmd(encoded, 200, ERR_AUTH_FAILED);
 }
 
 void smtp::send_envelope(fdibuf& msg)
