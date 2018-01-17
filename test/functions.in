@@ -16,9 +16,10 @@ ln -s $builddir/src $tmpdir/bin
 ln -s $builddir/protocols/* $tmpdir/protocols/
 
 exit_cleanup() {
+    local exit=$?
     svc -dx $tmpdir/service/* > /dev/null 2>&1 || :
     # Remove all temporary files on success
-    if [ $? -eq 0 ]
+    if [ $exit -eq 0 ]
     then
         wait
         rm -rf $tmpdir
