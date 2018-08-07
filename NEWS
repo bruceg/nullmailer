@@ -7,6 +7,10 @@ This file lists all the major user-visible changes to nullmailer.
 
 - Fixed treating authentication failure as message rejection.
   Thanks Fejes József
+
+- nullmailer-inject now sets the full name of the sender to the user
+  name as a fallback. This helps distinguish system sent messages when
+  the MTA rewrites the address (as does GMail, for example).
 -------------------------------------------------------------------------------
 Changes in version 2.1
 

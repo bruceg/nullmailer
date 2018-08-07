@@ -274,6 +274,7 @@ void setup_from()
   mystring name = getenv("NULLMAILER_NAME");
   if(!name) name = getenv("MAILNAME");
   if(!name) name = getenv("NAME");
+  if(!name) name = user;
 
   if(use_name_address_style) {
     if(!name) from = "<" + user + "@" + host + ">";
