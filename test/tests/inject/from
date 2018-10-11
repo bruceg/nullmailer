@@ -56,9 +56,6 @@ testvar MAILUSER name3 ' <name3@'
 
 testvar NULLMAILER_USER name4 ' <name4@'
 
-echo "Checking that inject uses a blank name."
-inj | grep -q '^ <'
-
 testvar NAME full1 '^ full1 <'
 
 testvar MAILNAME full2 '^ full2 <'
