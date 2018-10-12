@@ -6,10 +6,6 @@ nullmailer-inject  nullmailer-smtpd
            \            /
             \          /
              \        /
-          nullmailer-inject
-                  |
-                  |
-                  |
           nullmailer-queue
                   |
                   |
