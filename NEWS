@@ -1,4 +1,6 @@
 This file lists all the major user-visible changes to nullmailer.
+-------------------------------------------------------------------------------
+Changes in version 2.2
 
 - nullmailer-send no longer generates bounces for rejected bounces.
   Thanks Fejes József
