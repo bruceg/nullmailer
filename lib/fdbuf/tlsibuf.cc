@@ -27,5 +27,10 @@ tlsibuf::tlsibuf(gnutls_session_t s, unsigned bufsz)
 
 ssize_t tlsibuf::_read(char* buf, ssize_t len)
 {
-  return gnutls_record_recv(session, buf, len);
+  int rc;
+  do
+  {
+    rc = gnutls_record_recv(session, buf, len);
+  } while (rc == GNUTLS_E_AGAIN);
+  return rc;
 }

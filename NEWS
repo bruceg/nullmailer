@@ -11,6 +11,8 @@ This file lists all the major user-visible changes to nullmailer.
 - nullmailer-inject now sets the full name of the sender to the user
   name as a fallback. This helps distinguish system sent messages when
   the MTA rewrites the address (as does GMail, for example).
+
+- Fixed compatibility issue with gnutls 3.6 (and possibly others).
 -------------------------------------------------------------------------------
 Changes in version 2.1
 
