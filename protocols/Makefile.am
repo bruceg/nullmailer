@@ -12,7 +12,7 @@ TLS_LDADD =
 endif
 
 smtp_SOURCES = smtp.cc protocol.cc $(TLS_SOURCES) protocol.h
-smtp_LDADD = ../lib/cli++/libcli++.a ../lib/libnullmailer.a $(TLS_LDADD)
+smtp_LDADD = ../lib/fdbuf/libfdbuf.a ../lib/mystring/libmystring.a ../lib/libmisc.a ../lib/cli++/libcli++.a ../lib/libnullmailer.a $(TLS_LDADD)
 
 qmqp_SOURCES = qmqp.cc protocol.cc $(TLS_SOURCES) protocol.h
-qmqp_LDADD = ../lib/cli++/libcli++.a ../lib/libnullmailer.a $(TLS_LDADD)
+qmqp_LDADD = ../lib/fdbuf/libfdbuf.a ../lib/mystring/libmystring.a ../lib/libmisc.a ../lib/cli++/libcli++.a ../lib/libnullmailer.a $(TLS_LDADD)
