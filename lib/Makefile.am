@@ -29,7 +29,7 @@ libnullmailer_a_SOURCES =
 libnullmailer.a: mergelib.sh libmisc.a fdbuf/libfdbuf.a \
 	mystring/libmystring.a Makefile
 	$(RM) -f libnullmailer.a
-	sh $(srcdir)/mergelib.sh libnullmailer.a \
+	AR=$(AR) RANLIB=$(RANLIB) sh $(srcdir)/mergelib.sh libnullmailer.a \
 		libmisc.a \
 		fdbuf/libfdbuf.a \
 		mystring/libmystring.a
