@@ -150,9 +150,10 @@ static bool header_add_to = false;
 
 struct header_field
 {
+  typedef unsigned length_t;
   // member information
   const char* name;
-  unsigned length;
+  length_t length;
   bool is_address;
   bool is_recipient;
   bool is_sender;
@@ -207,7 +208,7 @@ struct header_field
 #define F false
 #define T true
 #define X(N,IA,IR,IS,IRS,R) { #N ":", \
-  static_cast<decltype(std::declval<header_field>().length)>(strlen(#N ":")), \
+  static_cast<header_field::length_t>(strlen(#N ":")), \
   IA,IR,IS,IRS,R,false, false }
 static header_field header_fields[] = {
   // Sender address fields, in order of priority
