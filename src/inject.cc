@@ -19,6 +19,8 @@
 // available to discuss this package.  To subscribe, send an email to
 // <nullmailer-subscribe@lists.untroubled.org>.
 
+#include <utility>
+
 #include "config.h"
 #include "defines.h"
 #include <ctype.h>
@@ -160,7 +162,7 @@ struct header_field
 
   bool present;
 
-  bool parse(mystring& line, bool& rm) 
+  bool parse(mystring& line, bool& rm)
     {
       if(strncasecmp(line.c_str(), name, length))
 	return false;
@@ -204,7 +206,8 @@ struct header_field
 
 #define F false
 #define T true
-#define X(N,IA,IR,IS,IRS,R) { #N ":",strlen(#N ":"),\
+#define X(N,IA,IR,IS,IRS,R) { #N ":", \
+  static_cast<decltype(std::declval<header_field>().length)>(strlen(#N ":")), \
   IA,IR,IS,IRS,R,false, false }
 static header_field header_fields[] = {
   // Sender address fields, in order of priority
@@ -284,14 +287,14 @@ void setup_from()
     if(!name) from = user + "@" + host;
     else      from = user + "@" + host + " (" + name + ")";
   }
-  
+
   mystring suser = getenv("NULLMAILER_SUSER");
   if(!suser) suser = user;
 
   mystring shost = getenv("NULLMAILER_SHOST");
   if(!shost) shost = host;
   canonicalize(shost);
-  
+
   if(use_header_sender && !sender)
     sender = suser + "@" + shost;
 }
