@@ -51,7 +51,11 @@ stop() {
 }
 catch-port() {
     local name=$1
-    port=$( head -n 1 $tmpdir/service/${name}-log )
+    port=
+    while [ -z "$port" ]
+    do
+        port=$( head -n 1 $tmpdir/service/${name}-log )
+    done
 }
 
 #not() { if "$@"; then return 1; else return 0; fi }
