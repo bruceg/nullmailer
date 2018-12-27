@@ -22,4 +22,6 @@ echo 'Testing auth permanent failure with smtp'
 echo '550 No' > $tmpdir/smtp-result
 error 20 protocol smtp --host=localhost --port $port --user=example --pass=example 3<$testmail
 
+rm -f $tmpdir/smtp-result
+
 stop server
