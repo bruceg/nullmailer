@@ -152,6 +152,6 @@ void mystringrep::detach()
   --references;
   if(!references) {
     trace("deleting this");
-    delete this;
+    delete[] (char*)this;
   }
 }
