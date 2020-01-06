@@ -57,7 +57,7 @@ fdbuf::~fdbuf()
 #ifdef _REENTRANT
   pthread_mutex_destroy(&mutex);
 #endif
-  delete buf;
+  delete[] buf;
 }
 
 bool fdbuf::error() const
