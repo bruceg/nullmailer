@@ -15,7 +15,7 @@ const char *itoa(long v, int digits)
     v /= 10;
     --digits;
   } while(v != 0);
-  while(digits > 0 && ptr > buf-1)
+  while(digits > 0 && ptr >= buf)
     *--ptr = '0', --digits;
   if(neg)
     *--ptr = '-';
