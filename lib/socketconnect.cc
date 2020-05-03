@@ -24,6 +24,7 @@
 #include <netdb.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/un.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -173,3 +174,19 @@ int tcpconnect(const char* hostname, int port, const char* source)
 }
 
 #endif
+
+int unixconnect(const char* unix_socket)
+{
+  struct sockaddr_un sa;
+  memset(&sa, 0, sizeof(sa));
+  sa.sun_family = AF_UNIX;
+  strncpy(sa.sun_path, unix_socket, sizeof(sa.sun_path) - 1);
+  int s = socket(PF_UNIX, SOCK_STREAM, 0);
+  if(s == -1)
+    return -ERR_SOCKET;
+  if(connect(s, (sockaddr*)&sa, sizeof(sa)) != 0) {
+    close(s);
+    return err_return(errno, ERR_CONN_FAILED);
+  }
+  return s;
+}
