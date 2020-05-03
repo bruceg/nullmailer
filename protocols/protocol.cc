@@ -35,6 +35,7 @@ int port = 0;
 int auth_method = AUTH_DETECT;
 int use_tls = 0;
 int use_starttls = 0;
+const char* unix_socket = 0;
 const char* remote = 0;
 const char* source = 0;
 const char* cli_help_suffix = "";
@@ -42,6 +43,8 @@ const char* cli_args_usage = "< options 3< mail-file";
 const int cli_args_min = 0;
 const int cli_args_max = 0;
 cli_option cli_options[] = {
+  { 0, "unix-socket", cli_option::string, 0, &unix_socket,
+    "Set the path to the unix socket for the remote", 0 },
   { 0, "host", cli_option::string, 0, &remote,
     "Set the hostname for the remote", 0 },
   { 'p', "port", cli_option::integer, 0, &port,
@@ -134,17 +137,23 @@ static void parse_options(void)
 int cli_main(int, char*[])
 {
   parse_options();
-  if (remote == 0)
-    protocol_fail(ERR_USAGE, "Remote host not set");
-  if (port == 0)
-    port = use_tls ? default_tls_port : default_port;
-  if (port < 0)
-    protocol_fail(ERR_USAGE, "Invalid value for port");
-  if (use_tls || use_starttls)
-    tls_init(remote);
+  if (unix_socket == 0) {
+    if (remote == 0)
+      protocol_fail(ERR_USAGE, "Remote host not set");
+    if (port == 0)
+      port = use_tls ? default_tls_port : default_port;
+    if (port < 0)
+      protocol_fail(ERR_USAGE, "Invalid value for port");
+    if (use_tls || use_starttls)
+      tls_init(remote);
+  }
+  else if (port != 0 || source != 0)
+    protocol_fail(ERR_USAGE, "Both INET and UNIX socket specified");
   fdibuf in(3, true);
   protocol_prep(in);
-  int fd = tcpconnect(remote, port, source);
+  int fd = unix_socket == 0
+    ? tcpconnect(remote, port, source)
+    : unixconnect(unix_socket);
   if(fd < 0)
     protocol_fail(-fd, "Connect failed");
   if (use_tls)

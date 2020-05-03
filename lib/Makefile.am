@@ -13,7 +13,7 @@ libmisc_a_SOURCES = \
 	canonicalize.h canonicalize.cc \
 	configio.h config_path.cc \
 	config_read.cc config_readlist.cc config_readint.cc config_syserr.cc \
-	connect.h tcpconnect.cc \
+	connect.h socketconnect.cc \
 	defines.h \
 	errcodes.h errcodes.cc \
 	hostname.h hostname.cc \
