@@ -25,7 +25,7 @@ nullmailer_queue_SOURCES = queue.cc
 nullmailer_queue_LDADD = ../lib/libnullmailer.a ../lib/cli++/libcli++.a
 
 nullmailer_send_SOURCES = send.cc
-nullmailer_send_LDADD = ../lib/libnullmailer.a ../lib/cli++/libcli++.a
+nullmailer_send_LDADD = ../lib/libnullmailer.a ../lib/cli++/libcli++.a $(SYSTEMD_LIBS)
 
 nullmailer_smtpd_SOURCES = smtpd.cc
 nullmailer_smtpd_LDADD = ../lib/libnullmailer.a

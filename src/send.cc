@@ -44,6 +44,11 @@
 #include "list.h"
 #include "selfpipe.h"
 #include "setenv.h"
+#ifdef HAVE_SYSTEMD
+#include <systemd/sd-daemon.h>
+#endif
+
+#define MICROSECOND 1000000
 
 const char* cli_program = "nullmailer-send";
 
@@ -70,6 +75,12 @@ typedef list<struct message> msglist;
 
 static mystring trigger_path;
 static mystring msg_dir;
+
+#ifdef HAVE_SYSTEMD
+#define MAXPAUSE_DEFAULT 9*60
+#else
+#define MAXPAUSE_DEFAULT 24*60*60
+#endif
 
 struct remote
 {
@@ -115,8 +126,8 @@ typedef list<remote> rlist;
 static rlist remotes;
 static int minpause = 60;
 static int pausetime = minpause;
-static int maxpause = 24*60*60;
-static int sendtimeout = 60*60;
+static int maxpause = MAXPAUSE_DEFAULT;
+static int sendtimeout = 5*60; // reduced from 60*60
 static int queuelifetime = 7*24*60*60;
 
 bool load_remotes()
@@ -149,7 +160,7 @@ bool load_config()
   if(!config_readint("pausetime", minpause))
     minpause = 60;
   if(!config_readint("maxpause", maxpause))
-    maxpause = 24*60*60;
+    maxpause = MAXPAUSE_DEFAULT;
   if(!config_readint("sendtimeout", sendtimeout))
     sendtimeout = 60*60;
   if(!config_readint("queuelifetime", queuelifetime))
@@ -375,6 +386,18 @@ bool bounce_msg(const message& msg, const remote& remote, const mystring& output
   return true;
 }
 
+#ifdef HAVE_SYSTEMD
+void systemd_notify_ready() 
+{
+  sd_notify(0, "READY=1");
+}
+
+void systemd_notify_heartbeat() 
+{
+  sd_notify(0, "WATCHDOG=1");
+}
+#endif
+
 void send_all()
 {
   if(!load_config()) {
@@ -468,6 +491,10 @@ bool do_select()
   if (pausetime > maxpause)
     pausetime = maxpause;
 
+#ifdef HAVE_SYSTEMD
+  systemd_notify_heartbeat();
+#endif
+
   int s = select(trigger+1, &readfds, 0, 0, &timeout);
   if(s == 1) {
     fout << "Trigger pulled." << endl;
@@ -508,6 +535,9 @@ int main(int, char*[])
   signal(SIGHUP, SIG_IGN);
   load_config();
   load_messages();
+#ifdef HAVE_SYSTEMD
+  systemd_notify_ready();
+#endif
   for(;;) {
     send_all();
     if (minpause == 0) break;
