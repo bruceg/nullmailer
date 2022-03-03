@@ -55,6 +55,8 @@ cli_option cli_options[] = {
   { 0, "source", cli_option::string, 0, &source,
     "Source address for connections", 0 },
 #ifdef HAVE_TLS
+  { 0, "auth-external", cli_option::flag, AUTH_EXTERNAL, &auth_method,
+    "Use AUTH EXTERNAL for certificate based authentication", 0 },
   { 0, "tls", cli_option::flag, 1, &use_tls,
     "Connect using TLS (on an alternate port by default)", 0 },
   { 0, "ssl", cli_option::flag, 1, &use_tls,

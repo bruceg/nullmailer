@@ -13,6 +13,7 @@ extern void protocol_succ(const char* msg);
 #define AUTH_DETECT 0
 #define AUTH_LOGIN 1
 #define AUTH_PLAIN 2
+#define AUTH_EXTERNAL 3
 extern const char* user;
 extern const char* pass;
 extern int auth_method;
