@@ -231,7 +231,14 @@ void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout)
   if (!did_starttls)
     conn.docmd("", 200);
 
-  if (user != 0 && pass != 0) {
+  if (auth_method == AUTH_EXTERNAL) {
+    conn.dohelo(true);
+    if (conn.hascap("AUTH", "EXTERNAL"))
+      conn.docmd("AUTH EXTERNAL =", 200, ERR_AUTH_FAILED);
+    else
+      protocol_fail(ERR_MSG_TEMPFAIL, "Server does not advertise certificate authentication");
+  }
+  else if (user != 0 && pass != 0) {
     conn.dohelo(true);
     if (auth_method == AUTH_LOGIN)
       conn.auth_login();
