@@ -122,11 +122,7 @@ bool copyenv(fdobuf& out)
 
 bool makereceived(fdobuf& out)
 {
-  mystring line("Received: (nullmailer pid ");
-  line += itoa(pid);
-  line += " invoked by uid ";
-  line += itoa(uid);
-  line += ");\n\t";
+  mystring line("Received: with " PACKAGE_STRING ";\n\t");
   char buf[100];
   if(!strftime(buf, 100, "%a, %d %b %Y %H:%M:%S -0000\n", gmtime(&timesecs)))
     fail("Error generating a date string.");
