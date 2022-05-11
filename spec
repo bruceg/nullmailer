@@ -81,6 +81,7 @@ fi
 %doc AUTHORS BUGS ChangeLog COPYING INSTALL NEWS README TODO doc/DIAGRAM
 %dir /etc/nullmailer
 %attr(04711,nullmail,nullmail) /usr/bin/mailq
+/usr/bin/nullmailer-dsn
 /usr/bin/nullmailer-inject
 /usr/bin/nullmailer-smtpd
 /usr/lib/sendmail
