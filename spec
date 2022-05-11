@@ -41,6 +41,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 ln -s ../sbin/sendmail $RPM_BUILD_ROOT/usr/lib/sendmail
 install scripts/nullmailer.run $RPM_BUILD_ROOT/var/service/nullmailer/run
 install scripts/nullmailer-log.run $RPM_BUILD_ROOT/var/service/nullmailer/log/run
+install scripts/nullmailer.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -85,6 +86,7 @@ fi
 /usr/bin/nullmailer-inject
 /usr/bin/nullmailer-smtpd
 /usr/lib/sendmail
+/usr/lib/systemd/system/nullmailer.service
 %dir /usr/libexec/nullmailer
 /usr/libexec/nullmailer/*
 %{_mandir}/*/*
