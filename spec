@@ -11,10 +11,11 @@ Packager: Bruce Guenter <bruce@untroubled.org>
 Provides: smtpdaemon
 Conflicts: sendmail
 Conflicts: qmail
-Requires: supervise-scripts >= 3.2
 Requires: gnutls
 BuildRequires: gnutls-devel
+BuildRequires: systemd-rpm-macros
 Requires(pre,preun): shadow-utils
+Requires(postun,preun): systemd
 
 %description
 Nullmailer is a mail transport agent designed to only relay all its
@@ -34,14 +35,11 @@ make
 rm -fr $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/etc
 mkdir -p $RPM_BUILD_ROOT/usr/lib
-mkdir -p $RPM_BUILD_ROOT/var/service/nullmailer/log
 mkdir -p $RPM_BUILD_ROOT/var/log/nullmailer
 
 make DESTDIR=$RPM_BUILD_ROOT install
 ln -s ../sbin/sendmail $RPM_BUILD_ROOT/usr/lib/sendmail
-install scripts/nullmailer.run $RPM_BUILD_ROOT/var/service/nullmailer/run
-install scripts/nullmailer-log.run $RPM_BUILD_ROOT/var/service/nullmailer/log/run
-install scripts/nullmailer.service $RPM_BUILD_ROOT/usr/lib/systemd/system
+install -D -t $RPM_BUILD_ROOT/usr/lib/systemd/system scripts/nullmailer.service
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -55,9 +53,6 @@ if [ "$1" = 1 ]; then
 fi
 
 %post
-if ! [ -L /service/nullmailer ]; then
-	svc-add /var/service/nullmailer
-fi
 if ! [ -s /etc/nullmailer/me ]; then
 	/bin/hostname --fqdn >/etc/nullmailer/me
 fi
@@ -66,16 +61,10 @@ if ! [ -s /etc/nullmailer/defaultdomain ]; then
 fi
 
 %preun
-if [ "$1" = 0 ]; then
-	svc-remove nullmailer
-fi
+%systemd_preun nullmailer.service
 
 %postun
-if [ "$1" = 0 ]; then
-	# post-erase instructions
-	/usr/sbin/userdel nullmail
-	/usr/sbin/groupdel nullmail
-fi
+%systemd_postun_with_restart nullmailer.service
 
 %files
 %defattr(-,nullmail,nullmail)
@@ -94,5 +83,4 @@ fi
 /usr/sbin/nullmailer-send
 /usr/sbin/sendmail
 %dir /var/log/nullmailer
-/var/service/nullmailer
 /var/spool/nullmailer
