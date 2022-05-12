@@ -49,7 +49,7 @@ PATH="/sbin:/usr/sbin:$PATH" export PATH
 if [ "$1" = 1 ]; then
 	# pre-install instructions
 	grep ^nullmail: /etc/group >/dev/null || groupadd -r nullmail
-	grep ^nullmail: /etc/passwd >/dev/null || useradd -d /var/lock/svc/nullmailer -g nullmail -M -r -s /bin/true nullmail
+	grep ^nullmail: /etc/passwd >/dev/null || useradd -d /var/spool/nullmailer -g nullmail -M -r -s /bin/false nullmail
 fi
 
 %post
