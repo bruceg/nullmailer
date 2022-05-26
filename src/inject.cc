@@ -253,6 +253,39 @@ static header_field& header_field_rpath = header_fields[3];
 static bool use_name_address_style = true;
 static mystring from;
 
+bool allmailfrom=false;
+mystring allmailfrom_user;
+mystring allmailfrom_hostname;
+
+bool
+config_allmailfrom(){
+	char* str = NULL;
+	char* char_pos = NULL;
+	mystring amf_config;
+	if(config_read("allmailfrom", amf_config)){
+		str=(char*)amf_config.c_str();
+		//remove newline character
+		char_pos=strchr(str, '\n');
+		if(char_pos)
+			*char_pos = '\0';
+		char_pos=strchr(str, '@');
+		if(char_pos){
+			*char_pos='\0';
+			allmailfrom_user = mystring( str );
+			allmailfrom_hostname = mystring( char_pos+1 );
+		}else{
+			// address doesn't contain @, probablty malformed
+			return false;
+		}
+		// success, this flag overwrites 'From: ' field
+		// which may already be in the mail header.
+		allmailfrom=true;
+		return true;
+	}
+	return false;
+}
+
+
 void setup_from()
 {
   mystring user = getenv("NULLMAILER_USER");
@@ -275,6 +308,10 @@ void setup_from()
   if(!name) name = getenv("MAILNAME");
   if(!name) name = getenv("NAME");
   if(!name) name = user;
+
+  if(allmailfrom){
+    user = allmailfrom_user;
+    host = allmailfrom_hostname;}
 
   if(use_name_address_style) {
     if(!name) from = "<" + user + "@" + host + ">";
@@ -399,6 +436,8 @@ bool fix_header()
       headers.append("Message-Id: " + make_messageid(idhost));
     if(!header_has_from)
       headers.append("From: " + from);
+    if(header_has_from && allmailfrom)
+      headers.append("From: " + from);
     if(!header_has_to && !header_has_cc && header_add_to &&
        recipients.count() > 0) {
       header_has_to = true;
@@ -509,6 +548,9 @@ bool parse_args(int argc, char* argv[])
 {
   if(!parse_flags())
     return false;
+  config_allmailfrom();
+  if(allmailfrom){
+    header_field_from.ignore=header_field_from.remove=true;}
   if(o_from) {
     mystring list;
     mystring tmp(o_from);
