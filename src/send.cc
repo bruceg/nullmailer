@@ -50,6 +50,12 @@
 
 #define MICROSECOND 1000000
 
+#ifdef HAVE_SYSTEMD
+#define MAXPAUSE_DEFAULT 9*60
+#else
+#define MAXPAUSE_DEFAULT 24*60*60
+#endif
+
 const char* cli_program = "nullmailer-send";
 
 selfpipe selfpipe;
@@ -77,9 +83,8 @@ static mystring trigger_path;
 static mystring msg_dir;
 
 #ifdef HAVE_SYSTEMD
-#define MAXPAUSE_DEFAULT 9*60
-#else
-#define MAXPAUSE_DEFAULT 24*60*60
+static int watchdog_enabled = 0;
+static uint64_t watchdog_timeout = 0;
 #endif
 
 struct remote
@@ -387,16 +392,36 @@ bool bounce_msg(const message& msg, const remote& remote, const mystring& output
 }
 
 #ifdef HAVE_SYSTEMD
+/* update maxpause so select will return before we need to send our next notification
+   maxpause is in seconds, watchdog_timeout is microseconds */
+int get_maxpause()
+{
+  int new_maxpause = (watchdog_timeout/(2*MICROSECOND));
+  if (new_maxpause < 1) {
+    fout << "systemd watchdog timeout is too short, disabling" << endl;
+    watchdog_enabled = false;
+    return maxpause;
+  }
+  return new_maxpause;
+}
+
 void systemd_notify_ready() 
 {
-  sd_notify(0, "READY=1");
+  watchdog_enabled = sd_watchdog_enabled(0, &watchdog_timeout);
+  if (watchdog_enabled) {
+    fout << "systemd watchdog enabled every " << (int)(watchdog_timeout/MICROSECOND) << " seconds" << endl;
+    sd_notify(0, "READY=1");
+    maxpause = get_maxpause();
+  }
 }
 
 void systemd_notify_heartbeat() 
 {
-  sd_notify(0, "WATCHDOG=1");
+  if (watchdog_enabled) {
+    sd_notify(0, "WATCHDOG=1");
+  }
 }
-#endif
+#endif // HAVE_SYSTEMD
 
 void send_all()
 {
@@ -418,6 +443,7 @@ void send_all()
     while(msg) {
       switch (send_one((*msg).filename, *remote, output)) {
       case tempfail:
+  systemd_notify_heartbeat();
 	if (time(0) - (*msg).timestamp > queuelifetime) {
 	  if (bounce_msg(*msg, *remote, output)) {
 	    messages.remove(msg);
