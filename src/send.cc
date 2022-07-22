@@ -44,17 +44,16 @@
 #include "list.h"
 #include "selfpipe.h"
 #include "setenv.h"
+
 #ifdef HAVE_SYSTEMD
 #include <systemd/sd-daemon.h>
-#endif
 
-#define MICROSECOND 1000000
-
-#ifdef HAVE_SYSTEMD
 #define MAXPAUSE_DEFAULT 9*60
 #else
 #define MAXPAUSE_DEFAULT 24*60*60
 #endif
+
+#define MICROSECOND 1000000
 
 const char* cli_program = "nullmailer-send";
 
