@@ -1,3 +1,9 @@
+echo 250-domain.com
+echo 250-8BITMIME
+echo 250-ENHANCEDSTATUSCODES
+echo 250-SIZE 36700160
+echo 250-DSN
+echo 250-AUTH PLAIN LOGIN
 echo 250 OK
 echo 250 OK
 echo 250 OK
