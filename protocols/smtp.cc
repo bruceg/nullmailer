@@ -194,6 +194,7 @@ void smtp::send_data(fdibuf& msg)
   docmd("DATA", 300);
   mystring tmp;
   while(msg.getline(tmp)) {
+    if(tmp[tmp.length()-1] == '\r')  tmp = tmp.left(tmp.length()-1);  
     if((tmp[0] == '.' && !(out << ".")) ||
        !(out << tmp << "\r\n"))
       protocol_fail(ERR_MSG_WRITE, "Error sending message to remote");
