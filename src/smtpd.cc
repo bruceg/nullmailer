@@ -52,7 +52,7 @@ static mystring line;
 static mystring sender;
 static mystring recipients;
 
-extern const char cli_program[] = "nullmailer-smtpd";
+extern const char* cli_program = "nullmailer-smtpd";
 
 static int readline()
 {
