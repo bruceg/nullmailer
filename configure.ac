@@ -86,5 +86,32 @@ if $tls; then
    [AC_DEFINE(HAVE_GNUTLS_PRIORITY_SET_DIRECT, 1, [libgnutls has gnutls_priority_set_direct])])
 fi
 
+AC_ARG_ENABLE(systemd,
+ AS_HELP_STRING(
+   [--enable-systemd],
+   [build with systemd watchdog support]),
+  enable_systemd=$enableval,enable_systemd=auto)
+
+dnl systemd detection
+if test x$enable_systemd = xno ; then
+    have_systemd=no;
+else
+    PKG_CHECK_MODULES([SYSTEMD],
+        [libsystemd >= 209],
+        [have_systemd=yes],
+        [PKG_CHECK_MODULES([SYSTEMD],
+            [libsystemd-daemon >= 32],
+            [have_systemd=yes],
+            [have_systemd=no])])
+fi
+
+if test x$have_systemd = xyes; then
+    AC_DEFINE(HAVE_SYSTEMD,1,[Have systemd])
+fi
+
+if test x$enable_systemd = xyes -a x$have_systemd != xyes ; then
+    AC_MSG_ERROR([Explicitly requested systemd support, but systemd not found])
+fi
+
 AC_CONFIG_FILES([Makefile doc/Makefile lib/Makefile lib/cli++/Makefile lib/fdbuf/Makefile lib/mystring/Makefile protocols/Makefile src/Makefile test/Makefile])
 AC_OUTPUT
