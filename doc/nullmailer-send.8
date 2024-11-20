@@ -134,6 +134,15 @@ Set the SMTP authentication password.
 .BI source= HOSTNAME
 Set the source address for connections to the remote host.
 .TP
+.BI unix-socket=\fISOCKETNAME
+Set the unix socket to connect to. When this option is set, neither
+.B port
+nor
+.B source
+can be used, and
+.B hostname
+is ignored.
+.TP
 .B auth-login
 Force SMTP "AUTH LOGIN" mode instead of auto-detecting.
 .TP
