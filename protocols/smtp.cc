@@ -22,6 +22,11 @@
 #include "config.h"
 #include <stdlib.h>
 #include <unistd.h>
+
+#ifdef HAVE_SASL
+#include <sasl/sasl.h>
+#endif
+
 #include "base64.h"
 #include "connect.h"
 #include "errcodes.h"
@@ -51,6 +56,10 @@ public:
   bool hascap(const char* name, const char* word = NULL);
   void auth_login(void);
   void auth_plain(void);
+#ifdef HAVE_SASL
+  void auth_gssapi(void);
+  void auth_abort(bool cancel, const mystring& msg);
+#endif
   void send_data(fdibuf& msg);
   void send_envelope(fdibuf& msg);
   void send(fdibuf& msg);
@@ -180,6 +189,150 @@ void smtp::auth_plain(void)
   docmd(encoded, 200, ERR_AUTH_FAILED);
 }
 
+#ifdef HAVE_SASL
+static bool sasl_interact(sasl_interact_t *client_interact)
+{
+  for (sasl_interact_t *ci = client_interact; ci && ci->id != SASL_CB_LIST_END; ci++) {
+    const char *r;
+
+    switch (ci->id) {
+    case SASL_CB_USER:
+      /* fallthrough */
+    case SASL_CB_AUTHNAME:
+      r = user ? user : "";
+      break;
+    case SASL_CB_PASS:
+      r = pass ? pass : "";
+      break;
+    default:
+      return false;
+    }
+
+    ci->result = r;
+    ci->len = strlen(r);
+  }
+
+  return true;
+}
+
+// Abort the authentication: if the server is waiting for a client
+// response, cancel the exchange (RFC 4954), then QUIT and fail.
+void smtp::auth_abort(bool cancel, const mystring& msg)
+{
+  if (cancel) {
+    mystring ignored;
+    put("*", ignored);
+  }
+  out << "QUIT\r\n";
+  out.flush();
+  protocol_fail(ERR_AUTH_FAILED, msg.c_str());
+}
+
+void smtp::auth_gssapi(void)
+{
+  int r;
+  static sasl_callback_t callbacks[] = {
+    { SASL_CB_USER, NULL, NULL },
+    { SASL_CB_AUTHNAME, NULL, NULL },
+    { SASL_CB_PASS, NULL, NULL },
+    { SASL_CB_LIST_END, NULL, NULL },
+  };
+  sasl_conn_t *conn;
+  sasl_interact_t *client_interact = NULL;
+  const char *mech_in_use;
+  const char *client_out;
+  unsigned client_out_len;
+  mystring client_msg = "AUTH GSSAPI ";
+
+  if (keytab != 0) {
+    // Acquire credentials from the keytab into a private in-memory
+    // credential cache, unless the caller explicitly chose a cache.
+    if (!getenv("KRB5CCNAME") && setenv("KRB5CCNAME", "MEMORY:", 1) != 0)
+      protocol_fail(ERR_UNKNOWN, "Failed to set KRB5CCNAME env variable");
+    if (setenv("KRB5_CLIENT_KTNAME", keytab, 1) != 0)
+      protocol_fail(ERR_UNKNOWN, "Failed to set KRB5_CLIENT_KTNAME env variable");
+  }
+
+  r = sasl_client_init(callbacks);
+  if (r != SASL_OK)
+    auth_abort(false, mystring("sasl_client_init failed: ") + sasl_errstring(r, NULL, NULL));
+
+  r = sasl_client_new("smtp",
+		      remote, /* remote FQDN */
+		      NULL,   /* local IP;port */
+		      NULL,   /* remote IP;port */
+		      NULL,   /* connection callbacks */
+		      0,      /* sec flags */
+		      &conn);
+  if (r != SASL_OK)
+    auth_abort(false, mystring("sasl_client_new failed: ") + sasl_errstring(r, NULL, NULL));
+
+  // No security layer is negotiated (max_ssf = 0), since all further
+  // traffic is sent unwrapped.
+  sasl_security_properties_t secprops = {
+    0,		/* min_ssf */
+    0,		/* max_ssf */
+    0,		/* maxbufsize */
+    0,		/* security_flags */
+    NULL,	/* property_names */
+    NULL,	/* property_values */
+  };
+  r = sasl_setprop(conn, SASL_SEC_PROPS, &secprops);
+  if (r != SASL_OK)
+    auth_abort(false, mystring("sasl_setprop failed: ") + sasl_errdetail(conn));
+
+  do {
+    r = sasl_client_start(conn,
+			  "GSSAPI",
+			  &client_interact,
+			  &client_out,
+			  &client_out_len,
+			  &mech_in_use);
+    if (r == SASL_INTERACT && !sasl_interact(client_interact))
+      auth_abort(false, "Unexpected SASL interaction");
+  } while (r == SASL_INTERACT);
+
+  if (r != SASL_OK && r != SASL_CONTINUE)
+    auth_abort(false, mystring("SASL failed: ") + sasl_errdetail(conn));
+
+  while (true) {
+    int code;
+    mystring server_msg;
+    mystring server_in;
+
+    base64_encode(mystring(client_out, client_out_len), client_msg);
+    code = put(client_msg, server_msg);
+    client_msg = "";
+
+    if (code == 235 && r == SASL_OK)
+      break;
+
+    if (code != 334)
+      auth_abort(false, "Unexpected server reply: " + server_msg);
+
+    if (!base64_decode(server_msg.right(4), server_in))
+      auth_abort(true, "Failed to base64 decode server message");
+
+    do {
+      client_interact = NULL;
+      r = sasl_client_step(conn,
+			   server_in.c_str(),
+			   server_in.length(),
+			   &client_interact,
+			   &client_out,
+			   &client_out_len);
+      if (r == SASL_INTERACT && !sasl_interact(client_interact))
+	auth_abort(true, "Unexpected SASL interaction");
+    } while (r == SASL_INTERACT);
+
+    if (r != SASL_OK && r != SASL_CONTINUE)
+      auth_abort(true, mystring("SASL failed: ") + sasl_errdetail(conn));
+  }
+
+  sasl_dispose(&conn);
+}
+#endif /* HAVE_SASL */
+
 void smtp::send_envelope(fdibuf& msg)
 {
   mystring tmp;
@@ -238,6 +391,15 @@ void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout)
     else
       protocol_fail(ERR_MSG_TEMPFAIL, "Server does not advertise certificate authentication");
   }
+#ifdef HAVE_SASL
+  else if (auth_method == AUTH_GSSAPI) {
+    conn.dohelo(true);
+    if (conn.hascap("AUTH", "GSSAPI"))
+      conn.auth_gssapi();
+    else
+      protocol_fail(ERR_MSG_TEMPFAIL, "Server does not advertise GSSAPI authentication");
+  }
+#endif
   else if (user != 0 && pass != 0) {
     conn.dohelo(true);
     if (auth_method == AUTH_LOGIN)

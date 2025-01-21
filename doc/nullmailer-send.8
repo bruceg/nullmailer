@@ -137,6 +137,24 @@ Set the source address for connections to the remote host.
 .B auth-login
 Force SMTP "AUTH LOGIN" mode instead of auto-detecting.
 .TP
+.B auth-gssapi
+Use SMTP "AUTH GSSAPI" (Kerberos) for client authentication.
+The service principal is derived from the configured host name
+(\fBsmtp/\fIhost\fR), so the remote host should be specified by the
+name used in the server's keytab.
+If \fBuser\fR is also set, it is sent as the authorization identity.
+Only available if nullmailer was built with SASL support, and requires
+the Cyrus SASL GSSAPI plugin to be installed.
+.TP
+.B keytab=\fIFILENAME
+Acquire Kerberos credentials for GSSAPI authentication from the given
+client keytab (using the MIT Kerberos \fBKRB5_CLIENT_KTNAME\fR
+mechanism).
+Unless \fBKRB5CCNAME\fR is set, the credentials are kept in a private
+in-memory cache.
+Without this option, the default Kerberos credential cache (e.g. as
+maintained by \fBk5start\fR(1)) or default client keytab is used.
+.TP
 .B auth-external
 Use SMTP "AUTH EXTERNAL" for TLS client certificate authentication.
 .TP

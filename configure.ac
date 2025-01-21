@@ -86,5 +86,21 @@ if $tls; then
    [AC_DEFINE(HAVE_GNUTLS_PRIORITY_SET_DIRECT, 1, [libgnutls has gnutls_priority_set_direct])])
 fi
 
+AC_ARG_ENABLE(sasl,
+ [  --enable-sasl     Enable SASL support],
+ [case "${enableval}" in
+   yes) sasl=true; AC_DEFINE(HAVE_SASL, 1, [Build in support for SASL]) ;;
+   no)  sasl=false ;;
+   *) AC_MSG_ERROR(bad value ${enableval} for --enable-sasl) ;;
+ esac],[sasl=false])
+AM_CONDITIONAL(SASL, $sasl)
+
+if $sasl; then
+  AC_CHECK_HEADER(sasl/sasl.h, [],
+   [AC_MSG_ERROR([sasl/sasl.h not found, required by --enable-sasl])])
+  AC_CHECK_LIB(sasl2, sasl_client_init, [:],
+   [AC_MSG_ERROR([libsasl2 not found, required by --enable-sasl])])
+fi
+
 AC_CONFIG_FILES([Makefile doc/Makefile lib/Makefile lib/cli++/Makefile lib/fdbuf/Makefile lib/mystring/Makefile protocols/Makefile src/Makefile test/Makefile])
 AC_OUTPUT
