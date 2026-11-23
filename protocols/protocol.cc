@@ -37,6 +37,7 @@ int use_tls = 0;
 int use_starttls = 0;
 const char* remote = 0;
 const char* source = 0;
+const char* keytab = 0;
 const char* cli_help_suffix = "";
 const char* cli_args_usage = "< options 3< mail-file";
 const int cli_args_min = 0;
@@ -54,6 +55,12 @@ cli_option cli_options[] = {
     "Use AUTH LOGIN instead of auto-detecting in SMTP", 0 },
   { 0, "source", cli_option::string, 0, &source,
     "Source address for connections", 0 },
+#ifdef HAVE_SASL
+  { 0, "auth-gssapi", cli_option::flag, AUTH_GSSAPI, &auth_method,
+    "Use AUTH GSSAPI for authentication", 0 },
+  { 0, "keytab", cli_option::string, 0, &keytab,
+    "Keytab to use for GSSAPI (Kerberos) authentication", 0 },
+#endif
 #ifdef HAVE_TLS
   { 0, "auth-external", cli_option::flag, AUTH_EXTERNAL, &auth_method,
     "Use AUTH EXTERNAL for certificate based authentication", 0 },

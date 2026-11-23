@@ -3,6 +3,7 @@
 
 #include "mystring/mystring.h"
 
+extern bool base64_decode(const mystring& in, mystring& out);
 extern void base64_encode(const mystring& in, mystring& out);
 extern void base64_encode_chunk(const unsigned char bin[3], unsigned len,
 				char encoded[4]);

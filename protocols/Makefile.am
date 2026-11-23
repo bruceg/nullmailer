@@ -11,8 +11,14 @@ TLS_SOURCES = tls_none.cc
 TLS_LDADD =
 endif
 
+if SASL
+SASL_LDADD = -lsasl2
+else
+SASL_LDADD =
+endif
+
 smtp_SOURCES = smtp.cc protocol.cc $(TLS_SOURCES) protocol.h
-smtp_LDADD = ../lib/cli++/libcli++.a ../lib/libnullmailer.a $(TLS_LDADD)
+smtp_LDADD = ../lib/cli++/libcli++.a ../lib/libnullmailer.a $(TLS_LDADD) $(SASL_LDADD)
 
 qmqp_SOURCES = qmqp.cc protocol.cc $(TLS_SOURCES) protocol.h
 qmqp_LDADD = ../lib/cli++/libcli++.a ../lib/libnullmailer.a $(TLS_LDADD)

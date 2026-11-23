@@ -10,6 +10,11 @@ To build and install nullmailer, run:
 To enable SSL/TLS support, add "--enable-tls" to the configure command
 line above.
 
+To enable SASL support (currently used for GSSAPI/Kerberos
+authentication), add "--enable-sasl" to the configure command line
+above.  This requires the Cyrus SASL library (libsasl2) and, at
+runtime, its GSSAPI plugin.
+
 The default installation expects that a user and group "nullmail" have
 already been set up.  The install steps will create all appropriate
 configuration and queue directories, and change their ownership as needed.

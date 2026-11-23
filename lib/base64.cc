@@ -24,6 +24,61 @@
 static char basis[] =
    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+static int base64_value(char c)
+{
+  if (c >= 'A' && c <= 'Z')
+    return c - 'A';
+  if (c >= 'a' && c <= 'z')
+    return c - 'a' + 26;
+  if (c >= '0' && c <= '9')
+    return c - '0' + 52;
+  if (c == '+')
+    return 62;
+  if (c == '/')
+    return 63;
+  return -1;
+}
+
+bool base64_decode(const mystring& min, mystring& out)
+{
+  const char* in = min.c_str();
+  size_t len = min.length();
+
+  if (len % 4)
+    return false;
+
+  for (size_t i = 0; i < len; i += 4) {
+    bool last = (i + 4 == len);
+    int pad = 0;
+    int c[4];
+
+    // Padding is only allowed at the end of the final quantum
+    // ("xx==" or "xxx=")
+    if (last && in[i + 3] == '=') {
+      pad = 1;
+      if (in[i + 2] == '=')
+	pad = 2;
+    }
+
+    for (int k = 0; k < 4 - pad; k++)
+      if ((c[k] = base64_value(in[i + k])) < 0)
+	return false;
+    for (int k = 4 - pad; k < 4; k++)
+      c[k] = 0;
+
+    unsigned long v = ((unsigned long)c[0] << 18) | ((unsigned long)c[1] << 12)
+      | ((unsigned long)c[2] << 6) | (unsigned long)c[3];
+    char buf[3] = {
+      (char)((v >> 16) & 0xFF),
+      (char)((v >> 8) & 0xFF),
+      (char)(v & 0xFF),
+    };
+    out.append(buf, 3 - pad);
+  }
+
+  return true;
+}
+
 void base64_encode(const mystring& in, mystring& out)
 {
   size_t length;

@@ -14,12 +14,16 @@ extern void protocol_succ(const char* msg);
 #define AUTH_LOGIN 1
 #define AUTH_PLAIN 2
 #define AUTH_EXTERNAL 3
+#define AUTH_GSSAPI 4
+
 extern const char* user;
 extern const char* pass;
 extern int auth_method;
 extern int port;
 extern int use_tls;
 extern int use_starttls;
+extern const char* remote;
+extern const char* keytab;
 
 extern void protocol_prep(fdibuf& in);
 extern void protocol_send(fdibuf& in, fdibuf& netin, fdobuf& netout);
