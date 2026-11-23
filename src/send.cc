@@ -319,7 +319,7 @@ static void parse_output(const mystring& output, const remote& remote, mystring&
   diag += output.strip();
   diag.subst('\n', '/');
   status = "5.0.0";
-  for (unsigned i = 0; i < output.length()-5; i++)
+  for (unsigned i = 0; i+5 < output.length(); i++)
     if (isdigit(output[i])
         && output[i+1] == '.'
         && isdigit(output[i+2])
